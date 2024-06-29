@@ -119,6 +119,7 @@ export default class Client implements Requester {
    * @returns The response from the endpoint.
    */
   public do = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
+    url = `${Client.baseUrl}${url}`;
     this.logger.debug(`Sending request: ${options?.method || 'GET'} ${url}`);
 
     // Adds the bearer token to the headers, and ensures the json headers are

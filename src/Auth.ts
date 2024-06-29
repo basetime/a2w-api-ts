@@ -86,20 +86,22 @@ export default class Auth {
           return resp.json();
         }
 
-        throw new Error(`Failed to authenticate: ${resp.statusText}`);
+        throw new Error(
+          `Authentication returned non-ok response: ${resp.status} ${resp.statusText}`,
+        );
       })
       .then((json: Authed) => {
         if (typeof json !== 'object') {
-          throw new Error('Invalid response from /auth/apiGrant endpoint.');
+          throw new Error('Invalid object from /auth/apiGrant endpoint.');
         }
         if (typeof json.idToken !== 'string') {
-          throw new Error('Invalid response from /auth/apiGrant endpoint.');
+          throw new Error('Invalid idToken from /auth/apiGrant endpoint.');
         }
         if (typeof json.refreshToken !== 'string') {
-          throw new Error('Invalid response from /auth/apiGrant endpoint.');
+          throw new Error('Invalid refreshToken from /auth/apiGrant endpoint.');
         }
         if (typeof json.expiresAt !== 'number') {
-          throw new Error('Invalid response from /auth/apiGrant endpoint.');
+          throw new Error('Invalid expiresAt from /auth/apiGrant endpoint.');
         }
 
         return json;

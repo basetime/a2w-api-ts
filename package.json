@@ -5,8 +5,8 @@
   "type": "module",
   "main": "build/index.js",
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
+    "build": "pnpm esbuild --bundle --platform=node --target=node14 --outdir=dist --sourcemap=external --format=esm src/index.ts && tsc",
+    "watch": "nodemon --exec 'pnpm run build' --watch src --ext ts",
     "test": "mocha"
   },
   "keywords": [],
@@ -19,12 +19,14 @@
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
     "chai": "^5.1.1",
+    "esbuild": "^0.21.5",
     "eslint": "^9.6.0",
     "eslint-config-google": "^0.14.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
     "fetch-mock": "^10.0.7",
     "mocha": "^10.5.2",
+    "nodemon": "^3.1.4",
     "prettier": "^3.3.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.2"
