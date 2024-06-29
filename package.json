@@ -1,6 +1,7 @@
 {
   "name": "@basetime/aw2-api-ts",
   "version": "0.0.1",
+  "private": false,
   "description": "Client library that communicates with the addtowallet API.",
   "type": "module",
   "main": "build/index.js",
