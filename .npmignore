@@ -3,3 +3,8 @@ node_modules
 example.mjs
 src
 tests
+.nvmrc
+.mocharc.js
+.editorconfig
+.prettierrc
+.eslintrc.js
