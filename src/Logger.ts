@@ -1,7 +1,7 @@
 /**
  * Represents a type that logs messages.
  */
-export interface ILogger {
+export interface Logger {
   /**
    * Log a message.
    *

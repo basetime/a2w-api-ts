@@ -32,9 +32,9 @@ describe('Client', () => {
   /**
    *
    */
-  it('makeRequest should succeed', async () => {
+  it('makeRequest() should succeed', async () => {
     fetchMock.get('/campaigns', { campaigns: [] });
-    await client.makeRequest('/campaigns', {});
+    await client.do('/campaigns', {});
 
     const lastCalled = fetchMock.lastCall();
     expect(lastCalled).to.not.be.undefined;

@@ -1,9 +1,9 @@
-import { ILogger } from './ILogger';
+import { Logger } from './Logger';
 
 /**
  * A logger that does nothing.
  */
-export default class NoopLogger implements ILogger {
+export default class NoopLogger implements Logger {
   /**
    * @inheritDoc
    */

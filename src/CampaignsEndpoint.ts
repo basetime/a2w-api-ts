@@ -6,12 +6,20 @@ import { Pass } from './Pass';
  */
 export default class CampaignsEndpoint extends Endpoint {
   /**
+   * The endpoint.
+   */
+  public static readonly endpoint = '/campaigns';
+
+  /**
+   * Returns the passes for a campaign.
    *
    * @param campaignId The ID of the campaign.
    */
-  public getPasses = async (campaignId: string): Promise<Pass> => {
-    console.log(campaignId);
+  public getPasses = async (campaignId: string): Promise<Pass[]> => {
+    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes`;
 
-    return Promise.resolve({} as Pass);
+    return await this.req.do<Pass[]>(url, {
+      method: 'GET',
+    });
   };
 }

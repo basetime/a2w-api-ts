@@ -2,14 +2,14 @@ import Auth from './Auth';
 import CampaignsEndpoint from './CampaignsEndpoint';
 import ClaimsEndpoint from './ClaimsEndpoint';
 import { Fetcher } from './Fetcher';
-import { ILogger } from './ILogger';
-import { IRequester } from './IRequester';
+import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
+import { Requester } from './Requester';
 
 /**
  * Client class that communicates with the the addtowallet API.
  */
-export default class Client implements IRequester {
+export default class Client implements Requester {
   /**
    * Base URL for the production environment.
    */
@@ -39,7 +39,7 @@ export default class Client implements IRequester {
   /**
    * The logger.
    */
-  protected logger: ILogger;
+  protected logger: Logger;
 
   /**
    * The campaigns endpoint.
@@ -58,7 +58,7 @@ export default class Client implements IRequester {
    * @param secret The API secret.
    * @param logger The logger to use.
    */
-  constructor(key: string, secret: string, logger?: ILogger) {
+  constructor(key: string, secret: string, logger?: Logger) {
     this.logger = logger || new NoopLogger();
     this.setAuth(new Auth(key, secret, Client.baseUrl));
   }
@@ -118,10 +118,12 @@ export default class Client implements IRequester {
    * @param options The fetch options.
    * @returns The response from the endpoint.
    */
-  public makeRequest = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
+  public do = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
     this.logger.debug(`Sending request: ${options?.method || 'GET'} ${url}`);
 
-    // Adds the bearer token to the headers, and ensures the json headers are set.
+    // Adds the bearer token to the headers, and ensures the json headers are
+    // set. The caller *might* want to override the json headers (like when
+    // uploading a multipart file), so we don't overwrite them if they are set.
     const bearerToken = await this.auth.getBearerToken();
     const headers = options.headers ? new Headers(options.headers) : new Headers();
     headers.set('Authorization', `Bearer ${bearerToken}`);

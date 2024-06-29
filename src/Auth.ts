@@ -1,6 +1,6 @@
 import { Authed } from './Authed';
 import { Fetcher } from './Fetcher';
-import { ILogger } from './ILogger';
+import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
 
 /**
@@ -20,7 +20,7 @@ export default class Auth {
   /**
    * The logger.
    */
-  private logger: ILogger;
+  private logger: Logger;
 
   /**
    * Constructor.
@@ -34,7 +34,7 @@ export default class Auth {
     private readonly key: string,
     private readonly secret: string,
     private readonly baseUrl: string,
-    logger?: ILogger,
+    logger?: Logger,
   ) {
     this.logger = logger || new NoopLogger();
   }
@@ -44,7 +44,7 @@ export default class Auth {
    *
    * @param logger The logger to use.
    */
-  public setLogger = (logger: ILogger) => {
+  public setLogger = (logger: Logger) => {
     this.logger = logger;
   };
 

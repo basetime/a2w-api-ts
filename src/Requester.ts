@@ -1,7 +1,7 @@
 /**
  * Represents a class that can make HTTP requests to the a2w API.
  */
-export interface IRequester {
+export interface Requester {
   /**
    * Sends a request using the fetcher and returns the response.
    *
@@ -11,5 +11,5 @@ export interface IRequester {
    * @param options The fetch options.
    * @returns {T} The response from the endpoint.
    */
-  makeRequest: <T>(url: string, options: RequestInit) => Promise<T>;
+  do: <T>(url: string, options: RequestInit) => Promise<T>;
 }

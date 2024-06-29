@@ -6,7 +6,7 @@ describe('Auth', () => {
   /**
    *
    */
-  it('getBearerToken should return an idToken', async () => {
+  it('getBearerToken() should return an idToken', async () => {
     const idToken = 'xxxxxxxx';
     const refreshToken = 'yyyyyyyy';
     fetchMock.post(`${Client.baseDev}/auth/apiGrant`, {
