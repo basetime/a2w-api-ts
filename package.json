@@ -8,7 +8,9 @@
   "scripts": {
     "build": "pnpm esbuild --bundle --platform=node --target=node14 --outdir=dist --sourcemap=external --format=esm src/index.ts && tsc",
     "watch": "nodemon --exec 'pnpm run build' --watch src --ext ts",
-    "test": "mocha"
+    "test": "mocha",
+    "clean": "rm -rf dist",
+    "prepare": "pnpm clean && pnpm build"
   },
   "keywords": [],
   "author": "",
