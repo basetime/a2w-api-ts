@@ -1,13 +1,26 @@
+import { Authed } from './Authed';
+import { Fetcher } from './Fetcher';
 import { ILogger } from './ILogger';
+import NoopLogger from './NoopLogger';
 
 /**
  * Authenticates the with the a2w API.
  */
 export default class Auth {
   /**
-   * The last id token.
+   * The fetcher function used to make requests.
    */
-  private idToken?: string;
+  private fetcher: Fetcher = fetch;
+
+  /**
+   * The last authentication.
+   */
+  private authed?: Authed;
+
+  /**
+   * The logger.
+   */
+  private logger: ILogger;
 
   /**
    * Constructor.
@@ -21,8 +34,28 @@ export default class Auth {
     private readonly key: string,
     private readonly secret: string,
     private readonly baseUrl: string,
-    private readonly logger: ILogger,
-  ) {}
+    logger?: ILogger,
+  ) {
+    this.logger = logger || new NoopLogger();
+  }
+
+  /**
+   * Sets the logger to use.
+   *
+   * @param logger The logger to use.
+   */
+  public setLogger = (logger: ILogger) => {
+    this.logger = logger;
+  };
+
+  /**
+   * Sets the instance of fetch() to use when making requests.
+   *
+   * @param fetcher The fetch instance.
+   */
+  public setFetcher = (fetcher: Fetcher) => {
+    this.fetcher = fetcher;
+  };
 
   /**
    * Retreives an id token from the a2w API.
@@ -30,8 +63,8 @@ export default class Auth {
    * @returns The id token.
    */
   public getBearerToken = async (): Promise<string> => {
-    if (this.idToken) {
-      return this.idToken;
+    if (this.authed && this.authed.expiresAt > Date.now()) {
+      return this.authed.idToken;
     }
 
     const opts: RequestInit = {
@@ -47,9 +80,34 @@ export default class Auth {
     };
 
     this.logger.debug(`Sending request to ${this.baseUrl}/auth/apiGrant`);
-    const resp = await fetch(`${this.baseUrl}/auth/apiGrant`, opts).then((r) => r.json());
-    this.idToken = resp.idToken;
+    this.authed = await this.fetcher(`${this.baseUrl}/auth/apiGrant`, opts)
+      .then((resp) => {
+        if (resp.ok) {
+          return resp.json();
+        }
 
-    return resp.idToken;
+        throw new Error(`Failed to authenticate: ${resp.statusText}`);
+      })
+      .then((json: Authed) => {
+        if (typeof json !== 'object') {
+          throw new Error('Invalid response from /auth/apiGrant endpoint.');
+        }
+        if (typeof json.idToken !== 'string') {
+          throw new Error('Invalid response from /auth/apiGrant endpoint.');
+        }
+        if (typeof json.refreshToken !== 'string') {
+          throw new Error('Invalid response from /auth/apiGrant endpoint.');
+        }
+        if (typeof json.expiresAt !== 'number') {
+          throw new Error('Invalid response from /auth/apiGrant endpoint.');
+        }
+
+        return json;
+      })
+      .catch((err: any) => {
+        throw new Error(`Failed to authenticate: ${err.toString()}`);
+      });
+
+    return this.authed.idToken;
   };
 }

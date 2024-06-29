@@ -1,32 +1,40 @@
 import Auth from './Auth';
 import CampaignsEndpoint from './CampaignsEndpoint';
-import ClaimsEndpoint from './CampaignsEndpoint';
+import ClaimsEndpoint from './ClaimsEndpoint';
+import { Fetcher } from './Fetcher';
 import { ILogger } from './ILogger';
+import { IRequester } from './IRequester';
 import NoopLogger from './NoopLogger';
 
 /**
  * Client class that communicates with the the addtowallet API.
  */
-export default class Client {
+export default class Client implements IRequester {
   /**
    * Base URL for the production environment.
    */
-  protected readonly baseProd = 'https://app.addtowallet.io/api/v1';
+  public static readonly baseProd = 'https://app.addtowallet.io/api/v1';
 
   /**
    * Base URL for the dev environment.
    */
-  protected readonly baseDev = 'https://local.addtowallet.io:5009/api/v1';
+  public static readonly baseDev = 'https://local.addtowallet.io:5009/api/v1';
 
   /**
    * The base URL.
    */
-  protected baseUrl = process.env.NODE_ENV === 'production' ? this.baseProd : this.baseDev;
+  public static readonly baseUrl =
+    process.env.NODE_ENV === 'production' ? this.baseProd : this.baseDev;
+
+  /**
+   * The fetcher function used to make requests.
+   */
+  private fetcher: Fetcher = fetch;
 
   /**
    * The authentication object.
    */
-  protected auth: Auth;
+  protected auth!: Auth;
 
   /**
    * The logger.
@@ -52,8 +60,28 @@ export default class Client {
    */
   constructor(key: string, secret: string, logger?: ILogger) {
     this.logger = logger || new NoopLogger();
-    this.auth = new Auth(key, secret, this.baseUrl, this.logger);
+    this.setAuth(new Auth(key, secret, Client.baseUrl));
   }
+
+  /**
+   * Sets the auth instance to use.
+   *
+   * @param auth The auth instance to use.
+   */
+  public setAuth = (auth: Auth) => {
+    this.auth = auth;
+    this.auth.setLogger(this.logger);
+    this.auth.setFetcher(this.fetcher);
+  };
+
+  /**
+   * Sets the instance of fetch() to use when making requests.
+   *
+   * @param fetcher The fetch instance.
+   */
+  public setFetcher = (fetcher: Fetcher) => {
+    this.fetcher = fetcher;
+  };
 
   /**
    * Returns the campaigns endpoint.
@@ -62,7 +90,7 @@ export default class Client {
    */
   public get campaigns(): CampaignsEndpoint {
     if (!this._campaigns) {
-      this._campaigns = new CampaignsEndpoint(this.auth);
+      this._campaigns = new CampaignsEndpoint(this);
     }
 
     return this._campaigns;
@@ -75,9 +103,50 @@ export default class Client {
    */
   public get claims(): ClaimsEndpoint {
     if (!this._claims) {
-      this._claims = new ClaimsEndpoint(this.auth);
+      this._claims = new ClaimsEndpoint(this);
     }
 
     return this._claims;
   }
+
+  /**
+   * Sends a request using the fetcher and returns the response.
+   *
+   * Adds the bearer token to the headers and catches errors.
+   *
+   * @param url The url to send the request to.
+   * @param options The fetch options.
+   * @returns The response from the endpoint.
+   */
+  public makeRequest = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
+    this.logger.debug(`Sending request: ${options?.method || 'GET'} ${url}`);
+
+    // Adds the bearer token to the headers, and ensures the json headers are set.
+    const bearerToken = await this.auth.getBearerToken();
+    const headers = options.headers ? new Headers(options.headers) : new Headers();
+    headers.set('Authorization', `Bearer ${bearerToken}`);
+    if (!headers.has('Accept')) {
+      headers.set('Accept', 'application/json');
+    }
+    if (!headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
+
+    const opts: RequestInit = {
+      ...options,
+      headers,
+    };
+
+    return await this.fetcher(url, opts)
+      .then((resp) => {
+        if (resp.ok) {
+          return resp.json() as T;
+        }
+
+        throw new Error(`Failed to authenticate: ${resp.statusText}`);
+      })
+      .catch((err: any) => {
+        throw new Error(`Failed to authenticate: ${err.toString()}`);
+      });
+  };
 }

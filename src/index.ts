@@ -12,3 +12,5 @@ export type { CampaignStats, DetailedStats, DailyStats } from './CampaignStats';
 export type { Template } from './Template';
 export type { User } from './User';
 export type { Domain } from './Domain';
+export type { Fetcher } from './Fetcher';
+export type { IRequester } from './IRequester';

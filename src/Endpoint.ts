@@ -1,4 +1,4 @@
-import Auth from './Auth';
+import { IRequester } from './IRequester';
 
 /**
  * Parent class for other endpoints.
@@ -7,16 +7,7 @@ export default abstract class Endpoint {
   /**
    * Constructor.
    *
-   * @param auth The authentication object.
+   * @param requester The object to use to make requests.
    */
-  constructor(private auth: Auth) {}
-
-  /**
-   * Retreives a bearer token from the a2w API.
-   *
-   * @returns {Promise<string>} The bearer token.
-   */
-  public getBearerToken = async (): Promise<string> => {
-    return this.auth.getBearerToken();
-  };
+  constructor(protected requester: IRequester) {}
 }
