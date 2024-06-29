@@ -3,18 +3,32 @@
   "version": "0.0.2",
   "private": false,
   "description": "Client library that communicates with the addtowallet API.",
+  "keywords": [
+    "addtowallet",
+    "passkit",
+    "api",
+    "client",
+    "typescript",
+    "nodejs"
+  ],
+  "homepage": "https://github.com/basetime/aw2-api-ts",
+  "bugs": {
+    "url": "https://github.com/basetime/aw2-api-ts/issues"
+  },
+  "license": "MIT",
+  "author": "Avagate",
   "type": "module",
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "pnpm esbuild --bundle --platform=node --target=node14 --outdir=dist --sourcemap=external --format=esm src/index.ts && tsc",
-    "watch": "nodemon --exec 'pnpm run build' --watch src --ext ts",
-    "test": "mocha",
     "clean": "rm -rf dist",
-    "prepare": "pnpm clean && pnpm build"
+    "prepare": "pnpm clean && pnpm build",
+    "test": "mocha",
+    "watch": "nodemon --exec 'pnpm run build' --watch src --ext ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "dependencies": {
+    "passkit-generator": "^3.1.11"
+  },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/chai": "^4.3.16",
@@ -33,8 +47,5 @@
     "prettier": "^3.3.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.5.2"
-  },
-  "dependencies": {
-    "passkit-generator": "^3.1.11"
   }
 }
