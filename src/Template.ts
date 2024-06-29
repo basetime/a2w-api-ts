@@ -1,7 +1,7 @@
 import { PassProps } from 'passkit-generator';
-import { GoogleTemplate } from '@/GoogleTemplate';
-import { Organization } from '@/Organization';
-import { User } from '@/User';
+import { GoogleTemplate } from './GoogleTemplate';
+import { Organization } from './Organization';
+import { User } from './User';
 
 /**
  * Represents a template from which passes can be created.

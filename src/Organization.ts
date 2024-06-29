@@ -1,5 +1,5 @@
-import { Domain } from '@/Domain';
-import { User } from '@/User';
+import { Domain } from './Domain';
+import { User } from './User';
 
 /**
  * Represents an organization.

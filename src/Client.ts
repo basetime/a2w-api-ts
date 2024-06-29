@@ -1,8 +1,8 @@
-import Auth from '@/Auth';
-import CampaignsEndpoint from '@/CampaignsEndpoint';
-import ClaimsEndpoint from '@/CampaignsEndpoint';
-import { ILogger } from '@/ILogger';
-import NoopLogger from '@/NoopLogger';
+import Auth from './Auth';
+import CampaignsEndpoint from './CampaignsEndpoint';
+import ClaimsEndpoint from './CampaignsEndpoint';
+import { ILogger } from './ILogger';
+import NoopLogger from './NoopLogger';
 
 /**
  * Client class that communicates with the the addtowallet API.

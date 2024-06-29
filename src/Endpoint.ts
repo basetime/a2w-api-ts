@@ -1,4 +1,4 @@
-import Auth from '@/Auth';
+import Auth from './Auth';
 
 /**
  * Parent class for other endpoints.

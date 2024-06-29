@@ -2,24 +2,30 @@
   "name": "@basetime/aw2-api-ts",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "build/index.js",
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.7",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
+    "chai": "^5.1.1",
     "eslint": "^9.6.0",
     "eslint-config-google": "^0.14.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
+    "mocha": "^10.5.2",
     "prettier": "^3.3.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.2"
   },
   "dependencies": {

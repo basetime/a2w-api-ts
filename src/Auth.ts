@@ -1,4 +1,4 @@
-import { ILogger } from '@/ILogger';
+import { ILogger } from './ILogger';
 
 /**
  * Authenticates the with the a2w API.
@@ -27,7 +27,7 @@ export default class Auth {
   /**
    * Retreives an id token from the a2w API.
    *
-   * @returns {Promise<string>} The id token.
+   * @returns The id token.
    */
   public getBearerToken = async (): Promise<string> => {
     if (this.idToken) {

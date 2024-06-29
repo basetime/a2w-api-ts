@@ -1,4 +1,4 @@
-import Endpoint from '@/Endpoint';
+import Endpoint from './Endpoint';
 
 /**
  * Communicate with the claims endpoints.

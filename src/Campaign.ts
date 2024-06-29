@@ -1,7 +1,7 @@
-import { CampaignStats } from '@/CampaignStats';
-import { Organization } from '@/Organization';
-import { Schedule } from '@/Schedule';
-import { Template } from '@/Template';
+import { CampaignStats } from './CampaignStats';
+import { Organization } from './Organization';
+import { Schedule } from './Schedule';
+import { Template } from './Template';
 
 /**
  * The details of a campaign.

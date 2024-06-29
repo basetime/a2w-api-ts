@@ -1,5 +1,5 @@
-import Endpoint from '@/Endpoint';
-import { Pass } from '@/Pass';
+import Endpoint from './Endpoint';
+import { Pass } from './Pass';
 
 /**
  * Communicate with the campaigns endpoints.

@@ -1,4 +1,4 @@
-import { ILogger } from '@/ILogger';
+import { ILogger } from './ILogger';
 
 /**
  * A logger that does nothing.
