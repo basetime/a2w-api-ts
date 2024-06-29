@@ -142,7 +142,10 @@ export default class Client implements Requester {
     return await this.fetcher(url, opts)
       .then((resp) => {
         if (resp.ok) {
-          return resp.json() as T;
+          if (headers.get('Accept') === 'application/json') {
+            return resp.json() as T;
+          }
+          return resp.text() as unknown as T;
         }
 
         throw new Error(`Failed to authenticate: ${resp.statusText}`);
