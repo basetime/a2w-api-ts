@@ -4,10 +4,13 @@ import NoopLogger from './NoopLogger';
 
 /**
  * Authenticates the with the a2w API.
+ *
+ * Used to make authentication requests to a2w in order to obtain tokens. The
+ * tokens will be used for future requests to the API.
  */
 export default class Auth {
   /**
-   * The last authentication.
+   * The successful last authentication.
    */
   private authed?: Authed;
 
@@ -43,7 +46,10 @@ export default class Auth {
   };
 
   /**
-   * Retreives the last authentication.
+   * Returns the last authentication.
+   *
+   * This method is used to retrieve the last successful authentication. In
+   * includes the id token, refresh token, and the expiration time.
    *
    * @returns The last authentication.
    */
@@ -54,10 +60,14 @@ export default class Auth {
   /**
    * Retreives an id token from the a2w API.
    *
+   * This method will authenticate with the a2w API and return the id token. It
+   * stores the response in the `authed` property. Use the getAuthed method to
+   * retrieve the last successful authentication.
+   *
    * @returns The id token.
    */
-  public getBearerToken = async (): Promise<string> => {
-    if (this.authed && this.authed.expiresAt > Date.now()) {
+  public authenticate = async (): Promise<string> => {
+    if (this.authed && this.authed.expiresAt > Date.now() / 1000) {
       return this.authed.idToken;
     }
 

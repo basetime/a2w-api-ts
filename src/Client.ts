@@ -10,19 +10,9 @@ import { Requester } from './Requester';
  */
 export default class Client implements Requester {
   /**
-   * Base URL for the production environment.
-   */
-  public static readonly baseProd = 'https://app.addtowallet.io/api/v1';
-
-  /**
-   * Base URL for the dev environment.
-   */
-  public static readonly baseDev = 'https://local.addtowallet.io:5009/api/v1';
-
-  /**
    * The base URL.
    */
-  public static readonly baseUrl = Client.baseProd;
+  public static readonly baseUrl = 'https://app.addtowallet.io/api/v1';
 
   /**
    * The authentication object.
@@ -108,7 +98,7 @@ export default class Client implements Requester {
     // Adds the bearer token to the headers, and ensures the json headers are
     // set. The caller *might* want to override the json headers (like when
     // uploading a multipart file), so we don't overwrite them if they are set.
-    const bearerToken = await this.auth.getBearerToken();
+    const bearerToken = await this.auth.authenticate();
     const headers = options.headers ? new Headers(options.headers) : new Headers();
     headers.set('Authorization', `Bearer ${bearerToken}`);
     if (!headers.has('Accept')) {
