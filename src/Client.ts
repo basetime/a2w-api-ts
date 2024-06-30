@@ -23,8 +23,7 @@ export default class Client implements Requester {
   /**
    * The base URL.
    */
-  public static readonly baseUrl =
-    process.env.NODE_ENV === 'production' ? this.baseProd : this.baseDev;
+  public static readonly baseUrl = this.baseProd;
 
   /**
    * The fetcher function used to make requests.

@@ -1,5 +1,5 @@
 {
-  "name": "@basetime/aw2-api-ts",
+  "name": "@basetime/a2w-api-ts",
   "version": "0.0.4",
   "private": false,
   "description": "Client library that communicates with the addtowallet API.",
@@ -20,7 +20,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "pnpm esbuild --bundle --minify --platform=node --target=node14 --outdir=dist --sourcemap=external --format=esm src/index.ts && tsc",
+    "build": "pnpm esbuild --bundle --platform=node --target=node14 --outdir=dist --sourcemap=external --format=esm src/index.ts && tsc",
     "clean": "rm -rf dist",
     "prepare": "pnpm clean && pnpm build",
     "test": "mocha",
