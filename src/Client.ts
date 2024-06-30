@@ -1,7 +1,6 @@
 import Auth from './Auth';
 import CampaignsEndpoint from './CampaignsEndpoint';
 import ClaimsEndpoint from './ClaimsEndpoint';
-import { Fetcher } from './Fetcher';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
 import { Requester } from './Requester';
@@ -23,12 +22,7 @@ export default class Client implements Requester {
   /**
    * The base URL.
    */
-  public static readonly baseUrl = this.baseProd;
-
-  /**
-   * The fetcher function used to make requests.
-   */
-  private fetcher: Fetcher = fetch;
+  public static readonly baseUrl = Client.baseProd;
 
   /**
    * The authentication object.
@@ -70,16 +64,6 @@ export default class Client implements Requester {
   public setAuth = (auth: Auth) => {
     this.auth = auth;
     this.auth.setLogger(this.logger);
-    this.auth.setFetcher(this.fetcher);
-  };
-
-  /**
-   * Sets the instance of fetch() to use when making requests.
-   *
-   * @param fetcher The fetch instance.
-   */
-  public setFetcher = (fetcher: Fetcher) => {
-    this.fetcher = fetcher;
   };
 
   /**
@@ -139,7 +123,7 @@ export default class Client implements Requester {
       headers,
     };
 
-    return await this.fetcher(url, opts)
+    return await fetch(url, opts)
       .then((resp) => {
         if (resp.ok) {
           if (headers.get('Accept') === 'application/json') {

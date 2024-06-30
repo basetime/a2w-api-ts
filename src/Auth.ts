@@ -1,5 +1,4 @@
 import { Authed } from './Authed';
-import { Fetcher } from './Fetcher';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
 
@@ -7,11 +6,6 @@ import NoopLogger from './NoopLogger';
  * Authenticates the with the a2w API.
  */
 export default class Auth {
-  /**
-   * The fetcher function used to make requests.
-   */
-  private fetcher: Fetcher = fetch;
-
   /**
    * The last authentication.
    */
@@ -49,12 +43,12 @@ export default class Auth {
   };
 
   /**
-   * Sets the instance of fetch() to use when making requests.
+   * Retreives the last authentication.
    *
-   * @param fetcher The fetch instance.
+   * @returns The last authentication.
    */
-  public setFetcher = (fetcher: Fetcher) => {
-    this.fetcher = fetcher;
+  public getAuthed = (): Authed | undefined => {
+    return this.authed;
   };
 
   /**
@@ -80,7 +74,7 @@ export default class Auth {
     };
 
     this.logger.debug(`Sending request to ${this.baseUrl}/auth/apiGrant`);
-    this.authed = await this.fetcher(`${this.baseUrl}/auth/apiGrant`, opts)
+    this.authed = await fetch(`${this.baseUrl}/auth/apiGrant`, opts)
       .then((resp) => {
         if (resp.ok) {
           return resp.json();

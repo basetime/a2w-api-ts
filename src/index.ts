@@ -13,7 +13,6 @@ export type { Job, JobStatus, JobMode, Task } from './Job';
 export type { Template } from './Template';
 export type { User } from './User';
 export type { Domain } from './Domain';
-export type { Fetcher } from './Fetcher';
 export type { Requester } from './Requester';
 export type { Claim } from './Claim';
 export type { Enrollment } from './Enrollment';
