@@ -19,7 +19,7 @@ export default class ClaimsEndpoint extends Endpoint {
   public getPkpass = async (campaignId: string, passId: string): Promise<string> => {
     const url = `${ClaimsEndpoint.endpoint}/${campaignId}/${passId}.pkpass`;
 
-    return await this.req.do<string>(url, {
+    return await this.req.fetch<string>(url, {
       method: 'GET',
       headers: {
         Accept: 'application/vnd.apple.pkpass',
@@ -37,7 +37,7 @@ export default class ClaimsEndpoint extends Endpoint {
   public debugJson = async (campaignId: string, passId: string): Promise<object> => {
     const url = `${ClaimsEndpoint.endpoint}/${campaignId}/${passId}/debugDownloadJson`;
 
-    return await this.req.do<object>(url, {
+    return await this.req.fetch<object>(url, {
       method: 'GET',
     });
   };

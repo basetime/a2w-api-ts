@@ -11,5 +11,5 @@ export interface Requester {
    * @param options The fetch options.
    * @returns {T} The response from the endpoint.
    */
-  do: <T>(url: string, options: RequestInit) => Promise<T>;
+  fetch: <T>(url: string, options: RequestInit) => Promise<T>;
 }

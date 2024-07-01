@@ -23,7 +23,7 @@ export default class CampaignsEndpoint extends Endpoint {
   public getPasses = async (campaignId: string): Promise<Pass[]> => {
     const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes`;
 
-    return await this.req.do<Pass[]>(url, {
+    return await this.req.fetch<Pass[]>(url, {
       method: 'GET',
     });
   };
@@ -38,7 +38,7 @@ export default class CampaignsEndpoint extends Endpoint {
   public getPassesByJob = async (campaignId: string, jobId: string): Promise<Pass[]> => {
     const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/${jobId}`;
 
-    return await this.req.do<Pass[]>(url, {
+    return await this.req.fetch<Pass[]>(url, {
       method: 'GET',
     });
   };
@@ -52,7 +52,7 @@ export default class CampaignsEndpoint extends Endpoint {
   public getClaims = async (campaignId: string): Promise<Claim[]> => {
     const url = `${CampaignsEndpoint.endpoint}/${campaignId}/claims`;
 
-    return await this.req.do<Claim[]>(url, {
+    return await this.req.fetch<Claim[]>(url, {
       method: 'GET',
     });
   };
@@ -66,7 +66,7 @@ export default class CampaignsEndpoint extends Endpoint {
   public getJobs = async (campaignId: string): Promise<Job[]> => {
     const url = `${CampaignsEndpoint.endpoint}/${campaignId}/jobs`;
 
-    return await this.req.do<Job[]>(url, {
+    return await this.req.fetch<Job[]>(url, {
       method: 'GET',
     });
   };
@@ -80,7 +80,7 @@ export default class CampaignsEndpoint extends Endpoint {
   public getStats = async (campaignId: string): Promise<CampaignStats> => {
     const url = `${CampaignsEndpoint.endpoint}/${campaignId}/stats`;
 
-    return await this.req.do<CampaignStats>(url, {
+    return await this.req.fetch<CampaignStats>(url, {
       method: 'GET',
     });
   };
@@ -94,7 +94,7 @@ export default class CampaignsEndpoint extends Endpoint {
   public getEnrollments = async (campaignId: string): Promise<Enrollment[]> => {
     const url = `${CampaignsEndpoint.endpoint}/${campaignId}/enrollments`;
 
-    return await this.req.do<Enrollment[]>(url, {
+    return await this.req.fetch<Enrollment[]>(url, {
       method: 'GET',
     });
   };

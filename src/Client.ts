@@ -91,9 +91,9 @@ export default class Client implements Requester {
    * @param options The fetch options.
    * @returns The response from the endpoint.
    */
-  public do = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
+  public fetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
     url = `${Client.baseUrl}${url}`;
-    this.logger.debug(`Sending request: ${options?.method || 'GET'} ${url}`);
+    this.logger.debug(`${options?.method || 'GET'} ${url}`);
 
     // Adds the bearer token to the headers, and ensures the json headers are
     // set. The caller *might* want to override the json headers (like when
