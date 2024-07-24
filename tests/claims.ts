@@ -1,9 +1,10 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { ClaimsEndpoint, Client } from '../src/index';
+import { baseUrl } from '../src/constants';
+import { ClaimsEndpoint, Client, KeysProvider } from '../src/index';
 
 describe('ClaimsEndpoint', () => {
-  const authUrl = `${Client.baseDev}/auth/apiGrant`;
+  const authUrl = `${baseUrl}/auth/apiGrant`;
   const key = 'api_key';
   const secret = 'api_secret';
   let client: Client;
@@ -20,7 +21,8 @@ describe('ClaimsEndpoint', () => {
       expiresAt: Date.now() + 1000,
     });
 
-    client = new Client(key, secret);
+    const auth = new KeysProvider(key, secret, console);
+    client = new Client(auth);
   });
 
   /**
@@ -49,7 +51,7 @@ describe('ClaimsEndpoint', () => {
   it('getPkpass() should succeed', async () => {
     const campaignId = 'UUUUUU';
     const passId = 'PPPPPP';
-    const url = `${ClaimsEndpoint.endpoint}/${campaignId}/${passId}.pkpass`;
+    const url = `${baseUrl}${ClaimsEndpoint.endpoint}/${campaignId}/${passId}.pkpass`;
     fetchMock.get(url, 'PKPASS');
 
     const passes = await client.claims.getPkpass(campaignId, passId);
@@ -62,7 +64,7 @@ describe('ClaimsEndpoint', () => {
   it('debugJson() should succeed', async () => {
     const campaignId = 'UUUUUU';
     const passId = 'PPPPPP';
-    const url = `${ClaimsEndpoint.endpoint}/${campaignId}/${passId}/debugDownloadJson`;
+    const url = `${baseUrl}${ClaimsEndpoint.endpoint}/${campaignId}/${passId}/debugDownloadJson`;
     fetchMock.get(url, { id: 'PPPPPP' });
 
     const passes = await client.claims.debugJson(campaignId, passId);

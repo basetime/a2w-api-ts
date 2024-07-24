@@ -1,23 +1,19 @@
-import Auth from './Auth';
+import { AuthProvider } from './AuthProvider';
 import CampaignsEndpoint from './CampaignsEndpoint';
 import ClaimsEndpoint from './ClaimsEndpoint';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
 import { Requester } from './Requester';
+import { baseUrl } from './constants';
 
 /**
  * Client class that communicates with the the addtowallet API.
  */
 export default class Client implements Requester {
   /**
-   * The base URL.
-   */
-  public static readonly baseUrl = 'https://app.addtowallet.io/api/v1';
-
-  /**
    * The authentication object.
    */
-  protected auth!: Auth;
+  protected auth!: AuthProvider;
 
   /**
    * The logger.
@@ -37,21 +33,20 @@ export default class Client implements Requester {
   /**
    * Constructor.
    *
-   * @param key The API key.
-   * @param secret The API secret.
+   * @param auth The authentication provider.
    * @param logger The logger to use.
    */
-  constructor(key: string, secret: string, logger?: Logger) {
+  constructor(auth: AuthProvider, logger?: Logger) {
     this.logger = logger || new NoopLogger();
-    this.setAuth(new Auth(key, secret, Client.baseUrl));
+    this.setAuth(auth);
   }
 
   /**
-   * Sets the auth instance to use.
+   * Sets the auth provider to use.
    *
-   * @param auth The auth instance to use.
+   * @param auth The auth provider to use.
    */
-  public setAuth = (auth: Auth) => {
+  public setAuth = (auth: AuthProvider) => {
     this.auth = auth;
     this.auth.setLogger(this.logger);
   };
@@ -92,7 +87,7 @@ export default class Client implements Requester {
    * @returns The response from the endpoint.
    */
   public fetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
-    url = `${Client.baseUrl}${url}`;
+    url = `${baseUrl}${url}`;
     this.logger.debug(`${options?.method || 'GET'} ${url}`);
 
     // Adds the bearer token to the headers, and ensures the json headers are

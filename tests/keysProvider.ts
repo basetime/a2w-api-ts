@@ -1,15 +1,16 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { Auth, Client } from '../src/index';
+import { baseUrl } from '../src/constants';
+import { KeysProvider } from '../src/index';
 
-describe('Auth', () => {
+describe('KeysProvider', () => {
   /**
    *
    */
-  it('getBearerToken() should return an idToken', async () => {
+  it('authenticate() should return an idToken', async () => {
     const idToken = 'xxxxxxxx';
     const refreshToken = 'yyyyyyyy';
-    fetchMock.post(`${Client.baseDev}/auth/apiGrant`, {
+    fetchMock.post(`${baseUrl}/auth/apiGrant`, {
       idToken,
       refreshToken,
       expiresAt: Date.now() + 1000,
@@ -17,8 +18,8 @@ describe('Auth', () => {
 
     const key = 'api_key';
     const secret = 'api_secret';
-    const auth = new Auth(key, secret, Client.baseDev, console);
-    const token = await auth.getBearerToken();
+    const auth = new KeysProvider(key, secret, console);
+    const token = await auth.authenticate();
 
     expect(fetchMock.called()).to.be.true;
     expect(token).to.be.equal(idToken);

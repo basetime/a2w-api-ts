@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { CampaignsEndpoint, ClaimsEndpoint, Client } from '../src/index';
+import { baseUrl } from '../src/constants';
+import { CampaignsEndpoint, ClaimsEndpoint, Client, KeysProvider } from '../src/index';
 
 describe('Client', () => {
   const key = 'api_key';
@@ -13,13 +14,14 @@ describe('Client', () => {
   beforeEach(() => {
     const idToken = 'xxxxxxxx';
     const refreshToken = 'yyyyyyyy';
-    fetchMock.post(`${Client.baseDev}/auth/apiGrant`, {
+    fetchMock.post(`${baseUrl}/auth/apiGrant`, {
       idToken,
       refreshToken,
       expiresAt: Date.now() + 1000,
     });
 
-    client = new Client(key, secret);
+    const auth = new KeysProvider(key, secret, console);
+    client = new Client(auth);
   });
 
   /**
@@ -32,13 +34,13 @@ describe('Client', () => {
   /**
    *
    */
-  it('makeRequest() should succeed', async () => {
-    fetchMock.get('/campaigns', { campaigns: [] });
-    await client.do('/campaigns', {});
+  it('fetch() should succeed', async () => {
+    fetchMock.get(`${baseUrl}/campaigns`, { campaigns: [] });
+    await client.fetch('/campaigns', {});
 
     const lastCalled = fetchMock.lastCall();
     expect(lastCalled).to.not.be.undefined;
-    expect(lastCalled?.[0]).to.be.equal('/campaigns');
+    expect(lastCalled?.[0]).to.be.equal(`${baseUrl}/campaigns`);
   });
 
   /**

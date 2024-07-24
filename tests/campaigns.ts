@@ -1,9 +1,10 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { CampaignsEndpoint, Client } from '../src/index';
+import { baseUrl } from '../src/constants';
+import { CampaignsEndpoint, Client, KeysProvider } from '../src/index';
 
 describe('CampaignsEndpoint', () => {
-  const authUrl = `${Client.baseDev}/auth/apiGrant`;
+  const authUrl = `${baseUrl}/auth/apiGrant`;
   const key = 'api_key';
   const secret = 'api_secret';
   let client: Client;
@@ -20,7 +21,8 @@ describe('CampaignsEndpoint', () => {
       expiresAt: Date.now() + 1000,
     });
 
-    client = new Client(key, secret);
+    const auth = new KeysProvider(key, secret, console);
+    client = new Client(auth);
   });
 
   /**
@@ -48,7 +50,8 @@ describe('CampaignsEndpoint', () => {
    */
   it('getPasses() should succeed', async () => {
     const campaignId = 'UUUUUU';
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes`;
+    const url = `${baseUrl}${CampaignsEndpoint.endpoint}/${campaignId}/passes`;
+    console.log(url);
     fetchMock.get(url, [{ id: 'PPPPPP' }]);
 
     const passes = await client.campaigns.getPasses(campaignId);
@@ -61,7 +64,7 @@ describe('CampaignsEndpoint', () => {
   it('getPassesByJob() should succeed', async () => {
     const campaignId = 'UUUUUU';
     const jobId = 'JJJJJJ';
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/${jobId}`;
+    const url = `${baseUrl}${CampaignsEndpoint.endpoint}/${campaignId}/passes/${jobId}`;
     fetchMock.get(url, [{ id: 'PPPPPP' }]);
 
     const passes = await client.campaigns.getPassesByJob(campaignId, jobId);
@@ -73,7 +76,7 @@ describe('CampaignsEndpoint', () => {
    */
   it('getClaims() should succeed', async () => {
     const campaignId = 'UUUUUU';
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/claims`;
+    const url = `${baseUrl}${CampaignsEndpoint.endpoint}/${campaignId}/claims`;
     fetchMock.get(url, [{ id: 'PPPPPP' }]);
 
     const claims = await client.campaigns.getClaims(campaignId);
@@ -85,7 +88,7 @@ describe('CampaignsEndpoint', () => {
    */
   it('getJobs() should succeed', async () => {
     const campaignId = 'UUUUUU';
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/jobs`;
+    const url = `${baseUrl}${CampaignsEndpoint.endpoint}/${campaignId}/jobs`;
     fetchMock.get(url, [{ id: 'PPPPPP' }]);
 
     const jobs = await client.campaigns.getJobs(campaignId);
@@ -97,7 +100,7 @@ describe('CampaignsEndpoint', () => {
    */
   it('getStats() should succeed', async () => {
     const campaignId = 'UUUUUU';
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/stats`;
+    const url = `${baseUrl}${CampaignsEndpoint.endpoint}/${campaignId}/stats`;
     fetchMock.get(url, { countMacType: 1 });
 
     const stats = await client.campaigns.getStats(campaignId);
@@ -109,7 +112,7 @@ describe('CampaignsEndpoint', () => {
    */
   it('getEnrollments() should succeed', async () => {
     const campaignId = 'UUUUUU';
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/enrollments`;
+    const url = `${baseUrl}${CampaignsEndpoint.endpoint}/${campaignId}/enrollments`;
     fetchMock.get(url, [{ id: 'PPPPPP' }]);
 
     const enrollments = await client.campaigns.getEnrollments(campaignId);

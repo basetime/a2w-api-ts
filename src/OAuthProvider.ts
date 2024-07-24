@@ -1,14 +1,15 @@
+import { AuthProvider } from './AuthProvider';
 import { Authed } from './Authed';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
+import { baseUrl } from './constants';
+
+const e = encodeURIComponent;
 
 /**
- * Authenticates the with the a2w API.
- *
- * Used to make authentication requests to a2w in order to obtain tokens. The
- * tokens will be used for future requests to the API.
+ * Authenticates with the a2w API using an oauth code.
  */
-export default class Auth {
+export default class OAuthProvider implements AuthProvider {
   /**
    * The successful last authentication.
    */
@@ -22,15 +23,13 @@ export default class Auth {
   /**
    * Constructor.
    *
-   * @param key The API key.
-   * @param secret The API secret.
-   * @param baseUrl The base URL.
+   * @param app The ID of the app requesting authentication.
+   * @param code The code that was received from the oauth.
    * @param logger The logger to use.
    */
   constructor(
-    private readonly key: string,
-    private readonly secret: string,
-    private readonly baseUrl: string,
+    private app: string,
+    private code = '',
     logger?: Logger,
   ) {
     this.logger = logger || new NoopLogger();
@@ -58,13 +57,19 @@ export default class Auth {
   };
 
   /**
-   * Retreives an id token from the a2w API.
+   * Returns a URL to get an oauth code.
    *
-   * This method will authenticate with the a2w API and return the id token. It
-   * stores the response in the `authed` property. Use the getAuthed method to
-   * retrieve the last successful authentication.
-   *
-   * @returns The id token.
+   * @param redirectUrl The URL to redirect to after the oauth code is received.
+   * @param scopes The requested scopes.
+   * @param state Any value, it will be returned in the redirect.
+   */
+  public getCodeUrl = (redirectUrl: string, scopes: string[], state: string): string => {
+    this.logger.debug('OAuth.getCodeUrl', { redirectUrl, scopes, state });
+    return `${baseUrl}/auth/oauth/code?app=${e(this.app)}&redirectUrl=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
+  };
+
+  /**
+   * Exchanges an oauth code for an id token.
    */
   public authenticate = async (): Promise<string> => {
     if (this.authed && this.authed.expiresAt > Date.now() / 1000) {
@@ -78,13 +83,13 @@ export default class Auth {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        key: this.key,
-        secret: this.secret,
+        app: this.app,
+        code: this.code,
       }),
     };
 
-    this.logger.debug(`Sending request to ${this.baseUrl}/auth/apiGrant`);
-    this.authed = await fetch(`${this.baseUrl}/auth/apiGrant`, opts)
+    this.logger.debug(`Sending request to ${baseUrl}/auth/oauth/token`);
+    this.authed = await fetch(`${baseUrl}/auth/oauth/token`, opts)
       .then((resp) => {
         if (resp.ok) {
           return resp.json();
@@ -96,16 +101,16 @@ export default class Auth {
       })
       .then((json: Authed) => {
         if (typeof json !== 'object') {
-          throw new Error('Invalid object from /auth/apiGrant endpoint.');
+          throw new Error('Invalid object from /oauth/token endpoint.');
         }
         if (typeof json.idToken !== 'string') {
-          throw new Error('Invalid idToken from /auth/apiGrant endpoint.');
+          throw new Error('Invalid idToken from /oauth/token endpoint.');
         }
         if (typeof json.refreshToken !== 'string') {
-          throw new Error('Invalid refreshToken from /auth/apiGrant endpoint.');
+          throw new Error('Invalid refreshToken from /oauth/token endpoint.');
         }
         if (typeof json.expiresAt !== 'number') {
-          throw new Error('Invalid expiresAt from /auth/apiGrant endpoint.');
+          throw new Error('Invalid expiresAt from /oauth/token endpoint.');
         }
 
         return json;
