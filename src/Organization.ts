@@ -104,9 +104,4 @@ export interface Organization {
    * The join code for the organization.
    */
   joinCode: string;
-
-  /**
-   * Is generative AI enabled for the organization.
-   */
-  isAiEnabled: boolean;
 }

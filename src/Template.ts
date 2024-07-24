@@ -38,11 +38,6 @@ export interface Template {
   templateUrls: Record<string, string>;
 
   /**
-   * @deprecated
-   */
-  pass?: PassProps;
-
-  /**
    * Values related to the Apple version of the template.
    */
   apple: PassProps;
