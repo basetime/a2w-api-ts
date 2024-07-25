@@ -3,6 +3,7 @@ export { default as ClaimsEndpoint } from './ClaimsEndpoint';
 export { default as CampaignsEndpoint } from './CampaignsEndpoint';
 export { default as KeysProvider } from './KeysProvider';
 export { default as OAuthProvider } from './OAuthProvider';
+export { default as StoredProvider } from './StoredProvider';
 export { default as Endpoint } from './Endpoint';
 export type { Logger } from './Logger';
 export type { Pass } from './Pass';

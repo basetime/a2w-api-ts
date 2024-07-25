@@ -37,34 +37,21 @@ export default class KeysProvider implements AuthProvider {
   }
 
   /**
-   * Sets the logger to use.
-   *
-   * @param logger The logger to use.
+   * @inheritdoc
    */
   public setLogger = (logger: Logger) => {
     this.logger = logger;
   };
 
   /**
-   * Returns the last authentication.
-   *
-   * This method is used to retrieve the last successful authentication. In
-   * includes the id token, refresh token, and the expiration time.
-   *
-   * @returns The last authentication.
+   * @inheritdoc
    */
   public getAuthed = (): Authed | undefined => {
     return this.authed;
   };
 
   /**
-   * Retreives an id token from the a2w API.
-   *
-   * This method will authenticate with the a2w API and return the id token. It
-   * stores the response in the `authed` property. Use the getAuthed method to
-   * retrieve the last successful authentication.
-   *
-   * @returns The id token.
+   * @inheritdoc
    */
   public authenticate = async (): Promise<string> => {
     if (this.authed && this.authed.expiresAt > Date.now() / 1000) {

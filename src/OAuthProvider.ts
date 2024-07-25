@@ -36,21 +36,14 @@ export default class OAuthProvider implements AuthProvider {
   }
 
   /**
-   * Sets the logger to use.
-   *
-   * @param logger The logger to use.
+   * @inheritdoc
    */
   public setLogger = (logger: Logger) => {
     this.logger = logger;
   };
 
   /**
-   * Returns the last authentication.
-   *
-   * This method is used to retrieve the last successful authentication. In
-   * includes the id token, refresh token, and the expiration time.
-   *
-   * @returns The last authentication.
+   * @inheritdoc
    */
   public getAuthed = (): Authed | undefined => {
     return this.authed;
@@ -69,7 +62,7 @@ export default class OAuthProvider implements AuthProvider {
   };
 
   /**
-   * Exchanges an oauth code for an id token.
+   * @inheritdoc
    */
   public authenticate = async (): Promise<string> => {
     if (this.authed && this.authed.expiresAt > Date.now() / 1000) {

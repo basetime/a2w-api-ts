@@ -27,7 +27,7 @@
   "scripts": {
     "build": "pnpm build:es && pnpm build:cjs",
     "build:es": "pnpm esbuild --bundle --platform=node --target=node14 --outdir=dist --sourcemap=external --format=esm src/index.ts && tsc",
-    "build:cjs": "pnpm esbuild --bundle --platform=node --target=node14 --outfile=dist/index.cjs.js --format=cjs dist/index.js",
+    "build:cjs": "pnpm esbuild --bundle --platform=node --target=node14 --outfile=dist/index.cjs.js --format=cjs src/index.ts",
     "clean": "rm -rf dist",
     "prepare": "pnpm clean && pnpm build",
     "test": "mocha",
