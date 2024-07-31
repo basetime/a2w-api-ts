@@ -26,19 +26,4 @@ export default class ClaimsEndpoint extends Endpoint {
       },
     });
   };
-
-  /**
-   * Returns debugging information for a campaign and pass.
-   *
-   * @param campaignId The ID of the campaign.
-   * @param passId The ID of the pass.
-   * @returns Debugging information.
-   */
-  public debugJson = async (campaignId: string, passId: string): Promise<object> => {
-    const url = `${ClaimsEndpoint.endpoint}/${campaignId}/${passId}/debugDownloadJson`;
-
-    return await this.req.fetch<object>(url, {
-      method: 'GET',
-    });
-  };
 }

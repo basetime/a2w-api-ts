@@ -7,8 +7,8 @@ import { Client, KeysProvider } from '@basetime/a2w-api-ts';
 
 const auth = new KeysProvider('api_key', 'api_secret');
 const client = new Client(auth);
-const passes = await client.campaigns.getPasses('123');
-console.log(passes);
+const templates = await client.templates.getAll();
+console.log(templates);
 ```
 
 ## Installing

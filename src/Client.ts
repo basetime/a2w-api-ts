@@ -4,6 +4,7 @@ import ClaimsEndpoint from './ClaimsEndpoint';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
 import { Requester } from './Requester';
+import TemplatesEndpoint from './TemplatesEndpoint';
 import { baseUrl } from './constants';
 
 /**
@@ -29,6 +30,11 @@ export default class Client implements Requester {
    * The claims endpoint.
    */
   protected _claims?: ClaimsEndpoint;
+
+  /**
+   * The templates endpoint.
+   */
+  protected _templates?: TemplatesEndpoint;
 
   /**
    * Constructor.
@@ -75,6 +81,17 @@ export default class Client implements Requester {
     }
 
     return this._claims;
+  }
+
+  /**
+   * Returns the templates endpoint.
+   */
+  public get templates(): TemplatesEndpoint {
+    if (!this._templates) {
+      this._templates = new TemplatesEndpoint(this);
+    }
+
+    return this._templates;
   }
 
   /**
