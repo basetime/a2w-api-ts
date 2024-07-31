@@ -14,6 +14,7 @@ export type { Schedule, ScheduleWhen } from './Schedule';
 export type { CampaignStats, DetailedStats, DailyStats } from './CampaignStats';
 export type { Job, JobStatus, JobMode, Task } from './Job';
 export type { Template } from './Template';
+export type { TemplateThumbnail } from './TemplateThumbnail';
 export type { User } from './User';
 export type { Domain } from './Domain';
 export type { Requester } from './Requester';

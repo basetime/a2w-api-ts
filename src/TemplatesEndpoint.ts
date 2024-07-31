@@ -1,5 +1,6 @@
 import { Template } from 'passkit-generator/lib/schemas';
 import Endpoint from './Endpoint';
+import { TemplateThumbnail } from './TemplateThumbnail';
 
 /**
  * Communicate with the templates endpoints.
@@ -19,6 +20,20 @@ export default class TemplatesEndpoint extends Endpoint {
     const url = `${TemplatesEndpoint.endpoint}/organization`;
 
     return await this.req.fetch<Template[]>(url, {
+      method: 'GET',
+    });
+  };
+
+  /**
+   * Returns all of the templates for a specific tag.
+   *
+   * @param tag The tag.
+   * @returns The templates.
+   */
+  public getByTag = async (tag: string): Promise<TemplateThumbnail[]> => {
+    const url = `${TemplatesEndpoint.endpoint}/tagged/${tag}`;
+
+    return await this.req.fetch<TemplateThumbnail[]>(url, {
       method: 'GET',
     });
   };

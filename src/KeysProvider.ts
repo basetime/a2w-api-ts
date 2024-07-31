@@ -72,7 +72,7 @@ export default class KeysProvider implements AuthProvider {
 
     this.logger.debug(`Sending request to ${baseUrl}/auth/apiGrant`);
     this.authed = await fetch(`${baseUrl}/auth/apiGrant`, opts)
-      .then((resp) => {
+      .then(async (resp) => {
         if (resp.ok) {
           return resp.json();
         }

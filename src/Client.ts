@@ -124,7 +124,7 @@ export default class Client implements Requester {
       ...options,
       headers,
     };
-
+    console.log(url);
     return await fetch(url, opts)
       .then((resp) => {
         if (resp.ok) {
@@ -134,10 +134,10 @@ export default class Client implements Requester {
           return resp.text() as unknown as T;
         }
 
-        throw new Error(`Failed to authenticate: ${resp.statusText}`);
+        throw new Error(`Response failed: ${resp.statusText}`);
       })
       .catch((err: any) => {
-        throw new Error(`Failed to authenticate: ${err.toString()}`);
+        throw new Error(`Response failed: ${err.toString()}`);
       });
   };
 }
