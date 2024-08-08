@@ -2,7 +2,7 @@ import { AuthProvider } from './AuthProvider';
 import { Authed } from './Authed';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
-import { baseUrl } from './constants';
+import { getBaseUrl } from './constants';
 
 const e = encodeURIComponent;
 
@@ -58,7 +58,7 @@ export default class OAuthProvider implements AuthProvider {
    */
   public getCodeUrl = (redirectUrl: string, scopes: string[], state: string): string => {
     this.logger.debug('OAuth.getCodeUrl', { redirectUrl, scopes, state });
-    return `${baseUrl}/auth/oauth/code?app=${e(this.app)}&redirectUrl=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
+    return `${getBaseUrl()}/auth/oauth/code?app=${e(this.app)}&redirectUrl=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
   };
 
   /**
@@ -81,6 +81,7 @@ export default class OAuthProvider implements AuthProvider {
       }),
     };
 
+    const baseUrl = getBaseUrl();
     this.logger.debug(`Sending request to ${baseUrl}/auth/oauth/token`);
     this.authed = await fetch(`${baseUrl}/auth/oauth/token`, opts)
       .then((resp) => {

@@ -18,6 +18,11 @@ export interface TemplateThumbnail {
   version: number;
 
   /**
+   * URL of the png thumbnail for the template.
+   */
+  thumbnail: string;
+
+  /**
    * The logo URL for the template.
    */
   logo: string;

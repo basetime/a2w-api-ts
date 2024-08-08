@@ -5,7 +5,7 @@ import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
 import { Requester } from './Requester';
 import TemplatesEndpoint from './TemplatesEndpoint';
-import { baseUrl } from './constants';
+import { getBaseUrl, setBaseUrl } from './constants';
 
 /**
  * Client class that communicates with the the addtowallet API.
@@ -46,6 +46,15 @@ export default class Client implements Requester {
     this.logger = logger || new NoopLogger();
     this.setAuth(auth);
   }
+
+  /**
+   * Sets the base URL for all requests to the API.
+   *
+   * @param url The base URL for all requests to the API.
+   */
+  public setBaseUrl = (url: string) => {
+    setBaseUrl(url);
+  };
 
   /**
    * Sets the auth provider to use.
@@ -104,7 +113,7 @@ export default class Client implements Requester {
    * @returns The response from the endpoint.
    */
   public fetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
-    url = `${baseUrl}${url}`;
+    url = `${getBaseUrl()}${url}`;
     this.logger.debug(`${options?.method || 'GET'} ${url}`);
 
     // Adds the bearer token to the headers, and ensures the json headers are

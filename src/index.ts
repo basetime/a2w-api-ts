@@ -21,3 +21,4 @@ export type { Requester } from './Requester';
 export type { Claim } from './Claim';
 export type { Enrollment } from './Enrollment';
 export type { AuthProvider } from './AuthProvider';
+export type { MetaValues, MetaValue } from './MetaValues';

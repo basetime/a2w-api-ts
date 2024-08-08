@@ -2,7 +2,7 @@ import { AuthProvider } from './AuthProvider';
 import { Authed } from './Authed';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
-import { baseUrl } from './constants';
+import { getBaseUrl } from './constants';
 
 /**
  * Authenticates the with the a2w API using an API key and secret.
@@ -70,6 +70,7 @@ export default class KeysProvider implements AuthProvider {
       }),
     };
 
+    const baseUrl = getBaseUrl();
     this.logger.debug(`Sending request to ${baseUrl}/auth/apiGrant`);
     this.authed = await fetch(`${baseUrl}/auth/apiGrant`, opts)
       .then(async (resp) => {

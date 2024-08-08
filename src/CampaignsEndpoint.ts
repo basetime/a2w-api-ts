@@ -3,6 +3,7 @@ import { Claim } from './Claim';
 import Endpoint from './Endpoint';
 import { Enrollment } from './Enrollment';
 import { Job } from './Job';
+import { MetaValues } from './MetaValues';
 import { Pass } from './Pass';
 
 /**
@@ -26,6 +27,44 @@ export default class CampaignsEndpoint extends Endpoint {
     return await this.req.fetch<Pass[]>(url, {
       method: 'GET',
     });
+  };
+
+  /**
+   * Creates a pass bundle and returns the URL to the claims page.
+   *
+   * Example:
+   * ```ts
+   * const client = new Client(auth, console);
+   * const link = await client.campaigns.createBundle('123');
+   * console.log(link);
+   * ```
+   *
+   * @param campaignId The campaign the pass belongs to.
+   * @param metaValues The meta values to set.
+   * @param formValues The form values to set.
+   * @param utm The UTM values to pass along to the api.
+   */
+  public createBundle = async (
+    campaignId: string,
+    metaValues: MetaValues = {},
+    formValues: Record<string, any> = {},
+    utm: Record<string, string> = {},
+  ): Promise<string> => {
+    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/bundle`;
+    const opts: RequestInit = {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        metaValues,
+        formValues,
+        utm,
+      }),
+    };
+
+    return await this.req.fetch<string>(url, opts);
   };
 
   /**
