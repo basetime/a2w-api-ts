@@ -46,9 +46,6 @@ import { Client, KeysProvider } from '@basetime/a2w-api-ts';
 
 const auth = new KeysProvider('api_key', 'api_secret');
 const client = new Client(auth);
-
-// When testing, the base URL can be overridden.
-client.setBaseUrl('https://dev-app.addtowallet.io/api/v1');
 ```
 
 ### Creating a new client with oauth
@@ -77,6 +74,8 @@ const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
 // @see https://avagate.atlassian.net/wiki/spaces/Addto/pages/102891521/Campaigns#Meta-values
 const meta = {
   bundle: '9YpI7B8G0dnvRBC1R1a2,9YpI7B8G0dnvRBC1R1a2',
+  banner: 'https://example.com/banner.png',
+  backgroundColor: '#ae00ff',
 };
 
 // Form values to assign to the pass bundle. Typically, a primary key is set.
