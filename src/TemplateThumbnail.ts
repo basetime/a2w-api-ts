@@ -23,6 +23,31 @@ export interface TemplateThumbnail {
   thumbnail: string;
 
   /**
+   * The description of the template.
+   */
+  description: string;
+
+  /**
+   * The logo text for the template.
+   */
+  logoText: string;
+
+  /**
+   * Primary text for the template.
+   */
+  primaryText: string;
+
+  /**
+   * Header text for the template.
+   */
+  headerText: string;
+
+  /**
+   * Secondary text for the template.
+   */
+  secondaryText: string;
+
+  /**
    * The logo URL for the template.
    */
   logo: string;
