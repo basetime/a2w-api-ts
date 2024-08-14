@@ -13,10 +13,6 @@ export const getBaseUrl = () => {
     return baseUrl;
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    return 'https://local.addtowallet.io:5009/api/v1';
-  }
-
   return 'https://app.addtowallet.io/api/v1';
 };
 
