@@ -14,7 +14,7 @@ export default class Client implements Requester {
   /**
    * The authentication object.
    */
-  protected auth!: AuthProvider;
+  public auth!: AuthProvider;
 
   /**
    * The logger.
