@@ -145,7 +145,7 @@ export default class Client implements Requester {
       headers.set('Content-Type', 'application/json');
     }
 
-    this.logger.debug(`${options?.method || 'GET'} ${url}, Bearer ${bearerToken}`);
+    this.logger.debug(`${options?.method || 'GET'} ${url}`);
 
     const opts: RequestInit = {
       ...options,

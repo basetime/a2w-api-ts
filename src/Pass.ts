@@ -10,6 +10,11 @@ export interface Pass {
   id: string;
 
   /**
+   * The ID of the bundle the pass belongs to.
+   */
+  bundle: string;
+
+  /**
    * The ID of the job that created the pass.
    */
   jobId: string;
