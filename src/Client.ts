@@ -3,6 +3,7 @@ import CampaignsEndpoint from './CampaignsEndpoint';
 import ClaimsEndpoint from './ClaimsEndpoint';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
+import OrganizationsEndpoint from './OrganizationsEndpoint';
 import { Requester } from './Requester';
 import TemplatesEndpoint from './TemplatesEndpoint';
 import { getBaseUrl, setBaseUrl } from './constants';
@@ -35,6 +36,11 @@ export default class Client implements Requester {
    * The templates endpoint.
    */
   protected _templates?: TemplatesEndpoint;
+
+  /**
+   * The organizations endpoint.
+   */
+  protected _organizations?: OrganizationsEndpoint;
 
   /**
    * Constructor.
@@ -101,6 +107,17 @@ export default class Client implements Requester {
     }
 
     return this._templates;
+  }
+
+  /**
+   * Returns the organizations endpoint.
+   */
+  public get organizations(): OrganizationsEndpoint {
+    if (!this._organizations) {
+      this._organizations = new OrganizationsEndpoint(this);
+    }
+
+    return this._organizations;
   }
 
   /**

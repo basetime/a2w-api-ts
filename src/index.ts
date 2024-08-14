@@ -2,6 +2,7 @@ export { default as Client } from './Client';
 export { default as ClaimsEndpoint } from './ClaimsEndpoint';
 export { default as CampaignsEndpoint } from './CampaignsEndpoint';
 export { default as TemplatesEndpoint } from './TemplatesEndpoint';
+export { default as OrganizationsEndpoint } from './OrganizationsEndpoint';
 export { default as KeysProvider } from './KeysProvider';
 export { default as OAuthProvider } from './OAuthProvider';
 export { default as StoredProvider } from './StoredProvider';

@@ -9,7 +9,9 @@ Client library that communicates with the addtowallet API.
   - [Creating a new client with keys](#creating-a-new-client-with-keys)
   - [Creating a new client with oauth](#creating-a-new-client-with-oauth)
   - [Fetching templates by tag](#fetching-templates-by-tag)
+  - [Fetching a pass](#fetching-a-pass)
   - [Creating a pass bundle](#creating-a-pass-bundle)
+  - [Fetching the authenticated organization](#fetching-the-authenticated-organization)
 
 ## Installing
 
@@ -94,4 +96,11 @@ const form = {
 
 const url = await client.campaigns.createBundle(campaignId, meta, form);
 console.log(url);
+```
+
+### Fetching the authenticated organization
+
+```ts
+const organization = await client.organizations.getMine();
+console.log(organization);
 ```
