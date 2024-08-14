@@ -12,6 +12,19 @@ export default class TemplatesEndpoint extends Endpoint {
   public static readonly endpoint = '/templates';
 
   /**
+   * Returns a template by ID.
+   *
+   * @param id The ID of the template.
+   */
+  public getById = async (id: string): Promise<TemplateThumbnail> => {
+    const url = `${TemplatesEndpoint.endpoint}/simple/${id}`;
+
+    return await this.req.fetch<TemplateThumbnail>(url, {
+      method: 'GET',
+    });
+  };
+
+  /**
    * Returns all of the templates for authenticated organization.
    *
    * @returns The templates.
