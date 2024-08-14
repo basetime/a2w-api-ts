@@ -114,7 +114,6 @@ export default class Client implements Requester {
    */
   public fetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
     url = `${getBaseUrl()}${url}`;
-    this.logger.debug(`${options?.method || 'GET'} ${url}`);
 
     // Adds the bearer token to the headers, and ensures the json headers are
     // set. The caller *might* want to override the json headers (like when
@@ -129,11 +128,13 @@ export default class Client implements Requester {
       headers.set('Content-Type', 'application/json');
     }
 
+    this.logger.debug(`${options?.method || 'GET'} ${url}, Bearer ${bearerToken}`);
+
     const opts: RequestInit = {
       ...options,
       headers,
     };
-    console.log(url);
+
     return await fetch(url, opts)
       .then(async (resp) => {
         if (resp.ok) {
