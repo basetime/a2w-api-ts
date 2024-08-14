@@ -65,6 +65,15 @@ const templates = await client.templates.getByTag('tag');
 console.log(templates);
 ```
 
+### Fetching a pass
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+const pass = await client.campaigns.getPass(campaignId, passId);
+console.log(pass);
+```
+
 ### Creating a pass bundle
 
 ```ts

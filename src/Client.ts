@@ -135,7 +135,7 @@ export default class Client implements Requester {
     };
     console.log(url);
     return await fetch(url, opts)
-      .then((resp) => {
+      .then(async (resp) => {
         if (resp.ok) {
           if (headers.get('Accept') === 'application/json') {
             return resp.json() as T;
@@ -143,7 +143,11 @@ export default class Client implements Requester {
           return resp.text() as unknown as T;
         }
 
-        throw new Error(`Response failed: ${resp.statusText}`);
+        const body = await resp.json();
+        if (body && body.error) {
+          throw new Error(`${resp.status} ${body.error}`);
+        }
+        throw new Error(`Response failed: ${resp.status} ${resp.statusText}`);
       })
       .catch((err: any) => {
         throw new Error(`Response failed: ${err.toString()}`);

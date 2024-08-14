@@ -30,6 +30,20 @@ export default class CampaignsEndpoint extends Endpoint {
   };
 
   /**
+   * Returns the details for a pass.
+   *
+   * @param campaignId The campaign the pass belongs to.
+   * @param passId The ID of the pass.
+   */
+  public getPass = async (campaignId: string, passId: string): Promise<Pass> => {
+    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/details/${passId}`;
+
+    return await this.req.fetch<Pass>(url, {
+      method: 'GET',
+    });
+  };
+
+  /**
    * Creates a pass bundle and returns the URL to the claims page.
    *
    * Example:
