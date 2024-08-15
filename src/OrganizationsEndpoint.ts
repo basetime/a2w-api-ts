@@ -42,11 +42,28 @@ export default class OrganizationsEndpoint extends Endpoint {
   };
 
   /**
+   * Begins the scanner exchange.
+   *
+   * @param code The invite code.
+   */
+  public startScannerExchange = async (code: string): Promise<ScannerInvite | null> => {
+    const url = `${OrganizationsEndpoint.endpoint}/scanners/invites/${code}/start`;
+
+    return await this.req.fetch<ScannerInvite>(
+      url,
+      {
+        method: 'GET',
+      },
+      false,
+    );
+  };
+
+  /**
    * Accepts an scanner app invite code and returns api keys.
    *
    * @param code The invite code.
    */
-  public exchangeScannerInvite = async (code: string): Promise<{ key: string; secret: string }> => {
+  public finishScannerExchange = async (code: string): Promise<{ key: string; secret: string }> => {
     const url = `${OrganizationsEndpoint.endpoint}/scanners/invites`;
 
     return await this.req.fetch<{ key: string; secret: string }>(
