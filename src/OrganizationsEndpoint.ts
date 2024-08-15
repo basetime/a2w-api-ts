@@ -32,9 +32,13 @@ export default class OrganizationsEndpoint extends Endpoint {
   public getScannerInvite = async (code: string): Promise<ScannerInvite | null> => {
     const url = `${OrganizationsEndpoint.endpoint}/scanners/invites/${code}`;
 
-    return await this.req.fetch<ScannerInvite>(url, {
-      method: 'GET',
-    });
+    return await this.req.fetch<ScannerInvite>(
+      url,
+      {
+        method: 'GET',
+      },
+      false,
+    );
   };
 
   /**
