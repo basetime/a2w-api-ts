@@ -9,7 +9,8 @@ export interface Requester {
    *
    * @param url The url to send the request to.
    * @param options The fetch options.
+   * @param authenticate Whether to authenticate the request.
    * @returns {T} The response from the endpoint.
    */
-  fetch: <T>(url: string, options: RequestInit) => Promise<T>;
+  fetch: <T>(url: string, options: RequestInit, authenticate?: boolean) => Promise<T>;
 }

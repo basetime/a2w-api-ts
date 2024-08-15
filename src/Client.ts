@@ -15,7 +15,7 @@ export default class Client implements Requester {
   /**
    * The authentication object.
    */
-  public auth!: AuthProvider;
+  public auth?: AuthProvider;
 
   /**
    * The logger.
@@ -48,9 +48,11 @@ export default class Client implements Requester {
    * @param auth The authentication provider.
    * @param logger The logger to use.
    */
-  constructor(auth: AuthProvider, logger?: Logger) {
+  constructor(auth?: AuthProvider, logger?: Logger) {
     this.logger = logger || new NoopLogger();
-    this.setAuth(auth);
+    if (auth) {
+      this.setAuth(auth);
+    }
   }
 
   /**
@@ -127,17 +129,17 @@ export default class Client implements Requester {
    *
    * @param url The url to send the request to.
    * @param options The fetch options.
+   * @param authenticate Whether to authenticate the request.
    * @returns The response from the endpoint.
    */
-  public fetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
+  public fetch = async <T>(
+    url: string,
+    options: RequestInit = {},
+    authenticate = true,
+  ): Promise<T> => {
     url = `${getBaseUrl()}${url}`;
 
-    // Adds the bearer token to the headers, and ensures the json headers are
-    // set. The caller *might* want to override the json headers (like when
-    // uploading a multipart file), so we don't overwrite them if they are set.
-    const bearerToken = await this.auth.authenticate();
     const headers = options.headers ? new Headers(options.headers) : new Headers();
-    headers.set('Authorization', `Bearer ${bearerToken}`);
     if (!headers.has('Accept')) {
       headers.set('Accept', 'application/json');
     }
@@ -145,7 +147,17 @@ export default class Client implements Requester {
       headers.set('Content-Type', 'application/json');
     }
 
-    this.logger.debug(`${options?.method || 'GET'} ${url}`);
+    // Adds the bearer token to the headers, and ensures the json headers are
+    // set. The caller *might* want to override the json headers (like when
+    // uploading a multipart file), so we don't overwrite them if they are set.
+    if (authenticate && this.auth) {
+      const bearerToken = await this.auth.authenticate();
+      headers.set('Authorization', `Bearer ${bearerToken}`);
+    }
+
+    this.logger.debug(
+      `${options?.method || 'GET'} ${url}, ${authenticate ? 'authenticate' : 'no authenticate'}`,
+    );
 
     const opts: RequestInit = {
       ...options,
