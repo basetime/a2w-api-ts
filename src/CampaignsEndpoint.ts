@@ -34,9 +34,10 @@ export default class CampaignsEndpoint extends Endpoint {
    *
    * @param campaignId The campaign the pass belongs to.
    * @param passId The ID of the pass.
+   * @param scanner The scanner to use.
    */
-  public getPass = async (campaignId: string, passId: string): Promise<Pass> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/details/${passId}`;
+  public getPass = async (campaignId: string, passId: string, scanner = ''): Promise<Pass> => {
+    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/details/${passId}?scanner=${scanner}`;
 
     return await this.req.fetch<Pass>(url, {
       method: 'GET',
