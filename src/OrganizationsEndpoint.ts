@@ -22,4 +22,24 @@ export default class OrganizationsEndpoint extends Endpoint {
       method: 'GET',
     });
   };
+
+  /**
+   * Accepts an scanner app invite code and returns api keys.
+   *
+   * @param code The invite code.
+   */
+  public exchangeScannerInvite = async (code: string): Promise<{ key: string; secret: string }> => {
+    const url = `${OrganizationsEndpoint.endpoint}/scanners/invites`;
+
+    return await this.req.fetch<{ key: string; secret: string }>(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        code,
+      }),
+    });
+  };
 }
