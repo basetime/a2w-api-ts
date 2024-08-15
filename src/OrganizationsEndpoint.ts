@@ -1,5 +1,6 @@
 import Endpoint from './Endpoint';
 import { Organization } from './Organization';
+import { ScannerInvite } from './ScannerInvite';
 
 /**
  * Communicate with the organizations endpoints.
@@ -19,6 +20,19 @@ export default class OrganizationsEndpoint extends Endpoint {
     const url = OrganizationsEndpoint.endpoint;
 
     return await this.req.fetch<Organization>(url, {
+      method: 'GET',
+    });
+  };
+
+  /**
+   * Returns a scanner invite by code.
+   *
+   * @param code The invite code.
+   */
+  public getScannerInvite = async (code: string): Promise<ScannerInvite | null> => {
+    const url = `${OrganizationsEndpoint.endpoint}/scanners/invites/${code}`;
+
+    return await this.req.fetch<ScannerInvite>(url, {
       method: 'GET',
     });
   };
