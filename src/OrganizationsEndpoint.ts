@@ -64,10 +64,10 @@ export default class OrganizationsEndpoint extends Endpoint {
    *
    * @param code The invite code.
    */
-  public finishScannerExchange = async (code: string): Promise<{ key: string; secret: string }> => {
+  public finishScannerExchange = async (code: string): Promise<ApiKey> => {
     const url = `${OrganizationsEndpoint.endpoint}/scanners/invites`;
 
-    return await this.req.fetch<{ key: string; secret: string }>(
+    return await this.req.fetch<ApiKey>(
       url,
       {
         method: 'POST',
