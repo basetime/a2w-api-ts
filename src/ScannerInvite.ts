@@ -18,9 +18,9 @@ export interface ScannerInvite {
   code: string;
 
   /**
-   * The pin number used to verify the scanner.
+   * The security code used to verify the scanner.
    */
-  pin: string;
+  securityCode: string;
 
   /**
    * Has the invite been claimed?
