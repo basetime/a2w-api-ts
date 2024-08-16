@@ -15,12 +15,12 @@ export interface ScannerInvite {
   /**
    * The invite code.
    */
-  code: string;
+  secret: string;
 
   /**
    * The security code used to verify the scanner.
    */
-  securityCode: string;
+  verificationCode: string;
 
   /**
    * Has the invite been claimed?
