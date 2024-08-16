@@ -85,13 +85,9 @@ export default class OrganizationsEndpoint extends Endpoint {
   public getApiKeys = async (): Promise<ApiKey[]> => {
     const url = `${OrganizationsEndpoint.endpoint}/apiKeys`;
 
-    return await this.req.fetch<ApiKey[]>(
-      url,
-      {
-        method: 'GET',
-      },
-      false,
-    );
+    return await this.req.fetch<ApiKey[]>(url, {
+      method: 'GET',
+    });
   };
 
   /**
@@ -102,12 +98,8 @@ export default class OrganizationsEndpoint extends Endpoint {
   public getApiKey = async (id: string): Promise<ApiKey | null> => {
     const url = `${OrganizationsEndpoint.endpoint}/apiKeys/${id}`;
 
-    return await this.req.fetch<ApiKey | null>(
-      url,
-      {
-        method: 'GET',
-      },
-      false,
-    );
+    return await this.req.fetch<ApiKey | null>(url, {
+      method: 'GET',
+    });
   };
 }
