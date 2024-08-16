@@ -1,3 +1,4 @@
+import { ApiKey } from './ApiKey';
 import Endpoint from './Endpoint';
 import { Organization } from './Organization';
 import { ScannerInvite } from './ScannerInvite';
@@ -73,6 +74,38 @@ export default class OrganizationsEndpoint extends Endpoint {
         body: JSON.stringify({
           code,
         }),
+      },
+      false,
+    );
+  };
+
+  /**
+   * Returns the API keys for the authenticated organization.
+   */
+  public getApiKeys = async (): Promise<ApiKey[]> => {
+    const url = `${OrganizationsEndpoint.endpoint}/apiKeys`;
+
+    return await this.req.fetch<ApiKey[]>(
+      url,
+      {
+        method: 'GET',
+      },
+      false,
+    );
+  };
+
+  /**
+   * Returns an API key by ID.
+   *
+   * @param id The ID of the API key.
+   */
+  public getApiKey = async (id: string): Promise<ApiKey | null> => {
+    const url = `${OrganizationsEndpoint.endpoint}/apiKeys/${id}`;
+
+    return await this.req.fetch<ApiKey | null>(
+      url,
+      {
+        method: 'GET',
       },
       false,
     );

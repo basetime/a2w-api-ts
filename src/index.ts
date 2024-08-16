@@ -24,3 +24,4 @@ export type { Enrollment } from './Enrollment';
 export type { AuthProvider } from './AuthProvider';
 export type { MetaValues, MetaValue } from './MetaValues';
 export type { ScannerInvite } from './ScannerInvite';
+export type { ApiKey } from './ApiKey';
