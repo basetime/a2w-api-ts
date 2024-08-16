@@ -34,10 +34,11 @@ export default class CampaignsEndpoint extends Endpoint {
    *
    * @param campaignId The campaign the pass belongs to.
    * @param passId The ID of the pass.
-   * @param scanner The scanner to use.
+   * @param scanner The scanner that's being used to request the pass.
    */
-  public getPass = async (campaignId: string, passId: string, scanner = ''): Promise<Pass> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/details/${passId}?scanner=${scanner}`;
+  public getPass = async (campaignId: string, passId: string, scanner: any = ''): Promise<Pass> => {
+    const scannerStr = encodeURIComponent(JSON.stringify(scanner));
+    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/details/${passId}?scanner=${scannerStr}`;
 
     return await this.req.fetch<Pass>(url, {
       method: 'GET',
