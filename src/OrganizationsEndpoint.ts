@@ -64,8 +64,13 @@ export default class OrganizationsEndpoint extends Endpoint {
    *
    * @param code The invite code.
    * @param pushToken The push token.
+   * @param scannerDeviceInfo The scanner device info.
    */
-  public finishScannerExchange = async (code: string, pushToken: string): Promise<ApiKey> => {
+  public finishScannerExchange = async (
+    code: string,
+    pushToken: string,
+    scannerDeviceInfo: any,
+  ): Promise<ApiKey> => {
     const url = `${OrganizationsEndpoint.endpoint}/scanners/invites`;
 
     return await this.req.fetch<ApiKey>(
@@ -75,6 +80,7 @@ export default class OrganizationsEndpoint extends Endpoint {
         body: JSON.stringify({
           code,
           pushToken,
+          scannerDeviceInfo,
         }),
       },
       false,
