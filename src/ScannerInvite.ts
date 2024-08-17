@@ -28,6 +28,21 @@ export interface ScannerInvite {
   isClaimed: boolean;
 
   /**
+   * The pin number used to verify the scanner.
+   */
+  pin: string;
+
+  /**
+   * The brand color.
+   */
+  brandColor: string;
+
+  /**
+   * The brand logo url.
+   */
+  brandLogoUrl: string;
+
+  /**
    * The date the invite was created.
    */
   createdDate: Date;
