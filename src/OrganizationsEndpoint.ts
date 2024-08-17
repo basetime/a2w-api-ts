@@ -63,8 +63,9 @@ export default class OrganizationsEndpoint extends Endpoint {
    * Accepts an scanner app invite code and returns api keys.
    *
    * @param code The invite code.
+   * @param pushToken The push token.
    */
-  public finishScannerExchange = async (code: string): Promise<ApiKey> => {
+  public finishScannerExchange = async (code: string, pushToken: string): Promise<ApiKey> => {
     const url = `${OrganizationsEndpoint.endpoint}/scanners/invites`;
 
     return await this.req.fetch<ApiKey>(
@@ -73,6 +74,7 @@ export default class OrganizationsEndpoint extends Endpoint {
         method: 'POST',
         body: JSON.stringify({
           code,
+          pushToken,
         }),
       },
       false,
