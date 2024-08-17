@@ -105,4 +105,17 @@ export default class OrganizationsEndpoint extends Endpoint {
       method: 'GET',
     });
   };
+
+  /**
+   * Deletes an API key.
+   *
+   * @param id The ID of the API key.
+   */
+  public deleteApiKey = async (id: string): Promise<void> => {
+    const url = `${OrganizationsEndpoint.endpoint}/apiKeys/${id}`;
+
+    return await this.req.fetch<void>(url, {
+      method: 'DELETE',
+    });
+  };
 }
