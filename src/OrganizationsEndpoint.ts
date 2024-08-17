@@ -95,8 +95,9 @@ export default class OrganizationsEndpoint extends Endpoint {
    *
    * @param id The ID of the API key.
    */
-  public getApiKey = async (id: string): Promise<ApiKey | null> => {
-    const url = `${OrganizationsEndpoint.endpoint}/apiKeys/${id}`;
+  public getApiKey = async (id: string, scanner: any = ''): Promise<ApiKey | null> => {
+    const scannerStr = encodeURIComponent(JSON.stringify(scanner));
+    const url = `${OrganizationsEndpoint.endpoint}/apiKeys/${id}?scanner=${scannerStr}`;
 
     return await this.req.fetch<ApiKey | null>(url, {
       method: 'GET',
