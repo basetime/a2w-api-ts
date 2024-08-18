@@ -43,6 +43,16 @@ export interface ScannerInvite {
   brandLogoUrl: string;
 
   /**
+   * The webview url.
+   */
+  webviewUrl: string;
+
+  /**
+   * The webview jwt.
+   */
+  webviewJwt: string;
+
+  /**
    * The date the invite was created.
    */
   createdDate: Date;
