@@ -79,6 +79,11 @@ export interface Pass {
   isClaimed: boolean;
 
   /**
+   * Whether the pass has been scanned.
+   */
+  isScanned: boolean;
+
+  /**
    * The date the pass was created
    */
   createdMillis?: number;
