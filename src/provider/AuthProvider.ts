@@ -1,5 +1,5 @@
-import { Authed } from './Authed';
-import { Logger } from './Logger';
+import { Logger } from '../Logger';
+import { Authed } from '../types/Authed';
 
 /**
  * Authenticates with the a2w API.

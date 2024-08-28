@@ -1,6 +1,6 @@
 import type { PassProps } from 'passkit-generator';
-import { GoogleTemplate } from './GoogleTemplate';
-import { Organization } from './Organization';
+import { GoogleTemplate } from '../types/GoogleTemplate';
+import { Organization } from '../types/Organization';
 import { User } from './User';
 
 /**

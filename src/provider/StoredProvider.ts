@@ -1,7 +1,7 @@
+import { Logger } from '../Logger';
+import NoopLogger from '../NoopLogger';
+import { Authed } from '../types/Authed';
 import { AuthProvider } from './AuthProvider';
-import { Authed } from './Authed';
-import { Logger } from './Logger';
-import NoopLogger from './NoopLogger';
 
 /**
  * Authenticates the with the a2w API using stored id and refresh tokens.

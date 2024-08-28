@@ -1,28 +1,24 @@
-import { ApiKey } from './ApiKey';
+import { ApiKey } from '../types/ApiKey';
+import { Organization } from '../types/Organization';
+import { ScannerInvite } from '../types/ScannerInvite';
 import Endpoint from './Endpoint';
-import { Organization } from './Organization';
-import { ScannerInvite } from './ScannerInvite';
+
+/**
+ * The organizations endpoint.
+ */
+const endpoint = '/organization';
 
 /**
  * Communicate with the organizations endpoints.
  */
 export default class OrganizationsEndpoint extends Endpoint {
   /**
-   * The endpoint.
-   */
-  public static readonly endpoint = '/organization';
-
-  /**
    * Returns the authenticated organization.
    *
    * @returns The organization.
    */
   public getMine = async (): Promise<Organization> => {
-    const url = OrganizationsEndpoint.endpoint;
-
-    return await this.req.fetch<Organization>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<Organization>(endpoint);
   };
 
   /**
@@ -31,15 +27,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param code The invite code.
    */
   public getScannerInvite = async (code: string): Promise<ScannerInvite | null> => {
-    const url = `${OrganizationsEndpoint.endpoint}/scanners/invites/${code}`;
-
-    return await this.req.fetch<ScannerInvite>(
-      url,
-      {
-        method: 'GET',
-      },
-      false,
-    );
+    return await this.doGet<ScannerInvite>(`${endpoint}/scanners/invites/${code}`, false);
   };
 
   /**
@@ -48,15 +36,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param code The invite code.
    */
   public startScannerExchange = async (code: string): Promise<ScannerInvite | null> => {
-    const url = `${OrganizationsEndpoint.endpoint}/scanners/invites/${code}/start`;
-
-    return await this.req.fetch<ScannerInvite>(
-      url,
-      {
-        method: 'GET',
-      },
-      false,
-    );
+    return await this.doGet<ScannerInvite>(`${endpoint}/scanners/invites/${code}/start`, false);
   };
 
   /**
@@ -71,17 +51,12 @@ export default class OrganizationsEndpoint extends Endpoint {
     pushToken: string,
     scannerDeviceInfo: any,
   ): Promise<ApiKey> => {
-    const url = `${OrganizationsEndpoint.endpoint}/scanners/invites`;
-
-    return await this.req.fetch<ApiKey>(
-      url,
+    return await this.doPost<ApiKey>(
+      `${endpoint}/scanners/invites`,
       {
-        method: 'POST',
-        body: JSON.stringify({
-          code,
-          pushToken,
-          scannerDeviceInfo,
-        }),
+        code,
+        pushToken,
+        scannerDeviceInfo,
       },
       false,
     );
@@ -91,11 +66,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    * Returns the API keys for the authenticated organization.
    */
   public getApiKeys = async (): Promise<ApiKey[]> => {
-    const url = `${OrganizationsEndpoint.endpoint}/apiKeys`;
-
-    return await this.req.fetch<ApiKey[]>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<ApiKey[]>(`${endpoint}/apiKeys`);
   };
 
   /**
@@ -105,11 +76,9 @@ export default class OrganizationsEndpoint extends Endpoint {
    */
   public getApiKey = async (id: string, scanner: any = ''): Promise<ApiKey | null> => {
     const scannerStr = encodeURIComponent(JSON.stringify(scanner));
-    const url = `${OrganizationsEndpoint.endpoint}/apiKeys/${id}?scanner=${scannerStr}`;
+    const url = `${endpoint}/apiKeys/${id}?scanner=${scannerStr}`;
 
-    return await this.req.fetch<ApiKey | null>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<ApiKey | null>(url);
   };
 
   /**
@@ -118,10 +87,6 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param id The ID of the API key.
    */
   public deleteApiKey = async (id: string): Promise<void> => {
-    const url = `${OrganizationsEndpoint.endpoint}/apiKeys/${id}`;
-
-    return await this.req.fetch<void>(url, {
-      method: 'DELETE',
-    });
+    return await this.doDelete<void>(`${endpoint}/apiKeys/${id}`);
   };
 }

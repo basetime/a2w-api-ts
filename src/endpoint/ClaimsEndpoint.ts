@@ -1,14 +1,14 @@
 import Endpoint from './Endpoint';
 
 /**
+ * The claims endpoint.
+ */
+const endpoint = '/claim';
+
+/**
  * Communicate with the claims endpoints.
  */
 export default class ClaimsEndpoint extends Endpoint {
-  /**
-   * The endpoint.
-   */
-  public static readonly endpoint = '/claim';
-
   /**
    * Returns the pkpass file for a campaign and pass.
    *
@@ -17,7 +17,7 @@ export default class ClaimsEndpoint extends Endpoint {
    * @returns The pkpass file.
    */
   public getPkpass = async (campaignId: string, passId: string): Promise<string> => {
-    const url = `${ClaimsEndpoint.endpoint}/${campaignId}/${passId}.pkpass`;
+    const url = `${endpoint}/${campaignId}/${passId}.pkpass`;
 
     return await this.req.fetch<string>(url, {
       method: 'GET',

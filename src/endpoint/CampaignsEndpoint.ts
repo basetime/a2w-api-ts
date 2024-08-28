@@ -1,20 +1,20 @@
-import { CampaignStats } from './CampaignStats';
-import { Claim } from './Claim';
+import { CampaignStats } from '../types/CampaignStats';
+import { Claim } from '../types/Claim';
+import { Enrollment } from '../types/Enrollment';
+import { Job } from '../types/Job';
+import { MetaValues } from '../types/MetaValues';
+import { Pass } from '../types/Pass';
 import Endpoint from './Endpoint';
-import { Enrollment } from './Enrollment';
-import { Job } from './Job';
-import { MetaValues } from './MetaValues';
-import { Pass } from './Pass';
+
+/**
+ * The campaigns endpoint.
+ */
+const endpoint = '/campaigns';
 
 /**
  * Communicate with the campaigns endpoints.
  */
 export default class CampaignsEndpoint extends Endpoint {
-  /**
-   * The endpoint.
-   */
-  public static readonly endpoint = '/campaigns';
-
   /**
    * Returns the passes for a campaign.
    *
@@ -22,11 +22,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The passes.
    */
   public getPasses = async (campaignId: string): Promise<Pass[]> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes`;
-
-    return await this.req.fetch<Pass[]>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<Pass[]>(`${endpoint}/${campaignId}/passes`);
   };
 
   /**
@@ -38,11 +34,9 @@ export default class CampaignsEndpoint extends Endpoint {
    */
   public getPass = async (campaignId: string, passId: string, scanner: any = ''): Promise<Pass> => {
     const scannerStr = encodeURIComponent(JSON.stringify(scanner));
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/details/${passId}?scanner=${scannerStr}`;
+    const url = `${endpoint}/${campaignId}/passes/details/${passId}?scanner=${scannerStr}`;
 
-    return await this.req.fetch<Pass>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<Pass>(url);
   };
 
   /**
@@ -66,21 +60,13 @@ export default class CampaignsEndpoint extends Endpoint {
     formValues: Record<string, any> = {},
     utm: Record<string, string> = {},
   ): Promise<string> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/bundle`;
-    const opts: RequestInit = {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        metaValues,
-        formValues,
-        utm,
-      }),
-    };
+    const url = `${endpoint}/${campaignId}/passes/bundle`;
 
-    return await this.req.fetch<string>(url, opts);
+    return await this.doPost<string>(url, {
+      metaValues,
+      formValues,
+      utm,
+    });
   };
 
   /**
@@ -91,11 +77,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The passes.
    */
   public getPassesByJob = async (campaignId: string, jobId: string): Promise<Pass[]> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/passes/${jobId}`;
-
-    return await this.req.fetch<Pass[]>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<Pass[]>(`${endpoint}/${campaignId}/passes/${jobId}`);
   };
 
   /**
@@ -105,11 +87,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The claims.
    */
   public getClaims = async (campaignId: string): Promise<Claim[]> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/claims`;
-
-    return await this.req.fetch<Claim[]>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<Claim[]>(`${endpoint}/${campaignId}/claims`);
   };
 
   /**
@@ -119,11 +97,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The jobs.
    */
   public getJobs = async (campaignId: string): Promise<Job[]> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/jobs`;
-
-    return await this.req.fetch<Job[]>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<Job[]>(`${endpoint}/${campaignId}/jobs`);
   };
 
   /**
@@ -133,11 +107,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The statistics.
    */
   public getStats = async (campaignId: string): Promise<CampaignStats> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/stats`;
-
-    return await this.req.fetch<CampaignStats>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<CampaignStats>(`${endpoint}/${campaignId}/stats`);
   };
 
   /**
@@ -147,10 +117,6 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The enrollments.
    */
   public getEnrollments = async (campaignId: string): Promise<Enrollment[]> => {
-    const url = `${CampaignsEndpoint.endpoint}/${campaignId}/enrollments`;
-
-    return await this.req.fetch<Enrollment[]>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<Enrollment[]>(`${endpoint}/${campaignId}/enrollments`);
   };
 }

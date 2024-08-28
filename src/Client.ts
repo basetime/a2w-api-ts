@@ -1,12 +1,12 @@
-import { AuthProvider } from './AuthProvider';
-import CampaignsEndpoint from './CampaignsEndpoint';
-import ClaimsEndpoint from './ClaimsEndpoint';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
-import OrganizationsEndpoint from './OrganizationsEndpoint';
-import { Requester } from './Requester';
-import TemplatesEndpoint from './TemplatesEndpoint';
 import { getBaseUrl, setBaseUrl } from './constants';
+import CampaignsEndpoint from './endpoint/CampaignsEndpoint';
+import ClaimsEndpoint from './endpoint/ClaimsEndpoint';
+import OrganizationsEndpoint from './endpoint/OrganizationsEndpoint';
+import TemplatesEndpoint from './endpoint/TemplatesEndpoint';
+import { AuthProvider } from './provider/AuthProvider';
+import { Requester } from './types/Requester';
 
 /**
  * Client class that communicates with the the addtowallet API.

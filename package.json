@@ -32,7 +32,8 @@
     "prepare": "pnpm clean && pnpm build",
     "test": "mocha",
     "test:watch": "mocha --watch",
-    "watch": "nodemon --exec 'pnpm run build' --watch src --ext ts"
+    "watch": "nodemon --exec 'pnpm run build' --watch src --ext ts",
+    "example": "NODE_ENV=development NODE_TLS_REJECT_UNAUTHORIZED=0 node example.mjs"
   },
   "dependencies": {
     "passkit-generator": "^3.1.11"

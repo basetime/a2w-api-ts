@@ -1,27 +1,24 @@
 import { Template } from 'passkit-generator/lib/schemas';
+import { TemplateThumbnail } from '../types/TemplateThumbnail';
 import Endpoint from './Endpoint';
-import { TemplateThumbnail } from './TemplateThumbnail';
+
+/**
+ * The templates endpoint.
+ */
+const endpoint = '/templates';
 
 /**
  * Communicate with the templates endpoints.
  */
 export default class TemplatesEndpoint extends Endpoint {
   /**
-   * The endpoint.
-   */
-  public static readonly endpoint = '/templates';
-
-  /**
    * Returns a template by ID.
    *
    * @param id The ID of the template.
    */
   public getById = async (id: string): Promise<TemplateThumbnail> => {
-    const url = `${TemplatesEndpoint.endpoint}/simple/${id}`;
-
-    return await this.req.fetch<TemplateThumbnail>(url, {
-      method: 'GET',
-    });
+    const url = `${endpoint}/simple/${id}`;
+    return await this.doGet<TemplateThumbnail>(url);
   };
 
   /**
@@ -30,11 +27,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @returns The templates.
    */
   public getAll = async (): Promise<Template[]> => {
-    const url = `${TemplatesEndpoint.endpoint}/organization`;
-
-    return await this.req.fetch<Template[]>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<Template[]>(`${endpoint}/organization`);
   };
 
   /**
@@ -44,10 +37,6 @@ export default class TemplatesEndpoint extends Endpoint {
    * @returns The templates.
    */
   public getByTag = async (tag: string): Promise<TemplateThumbnail[]> => {
-    const url = `${TemplatesEndpoint.endpoint}/tagged/${tag}`;
-
-    return await this.req.fetch<TemplateThumbnail[]>(url, {
-      method: 'GET',
-    });
+    return await this.doGet<TemplateThumbnail[]>(`${endpoint}/tagged/${tag}`);
   };
 }
