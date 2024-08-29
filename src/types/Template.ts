@@ -38,6 +38,11 @@ export interface Template {
   templateUrls: Record<string, string>;
 
   /**
+   * The attributes of the template.
+   */
+  attributes: TemplateAttributes;
+
+  /**
    * Values related to the Apple version of the template.
    */
   apple: PassProps;
@@ -148,3 +153,28 @@ export interface Template {
    */
   labels?: string[] | null;
 }
+
+/**
+ * A single attribute of a template.
+ */
+export interface TemplateAttribute {
+  /**
+   * A unique key for the attribute.
+   */
+  key: string;
+
+  /**
+   * The value of the attribute.
+   */
+  value: string;
+
+  /**
+   * The type of the value.
+   */
+  type: string;
+}
+
+/**
+ * A list of attributes of a template.
+ */
+export type TemplateAttributes = TemplateAttribute[];

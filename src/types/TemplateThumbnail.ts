@@ -1,3 +1,5 @@
+import { TemplateAttributes } from './Template';
+
 /**
  * The details needed to render a template thumbnail.
  */
@@ -26,6 +28,11 @@ export interface TemplateThumbnail {
    * The description of the template.
    */
   description: string;
+
+  /**
+   * The attributes of the template.
+   */
+  attributes: TemplateAttributes;
 
   /**
    * The logo text for the template.
