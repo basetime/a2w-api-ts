@@ -157,7 +157,7 @@ export interface Template {
 /**
  * The possible types of attributes.
  */
-export type TemplateAttributeType = 'color' | 'image' | 'text';
+export type TemplateAttributeType = 'color' | 'image' | 'text' | 'boolean';
 
 /**
  * A single attribute of a template.
