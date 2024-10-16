@@ -173,9 +173,19 @@ export default class Client implements Requester {
           return resp.text() as unknown as T;
         }
 
-        const body = await resp.json();
-        if (body && body.error) {
-          throw new Error(`${resp.status} ${body.error}`);
+        const body = await resp.text();
+        let json: any = body;
+        try {
+          json = JSON.parse(body);
+        } catch (err) {
+          // Do nothing
+        }
+
+        if (typeof json === 'string') {
+          throw new Error(`Response failed: ${resp.status} ${body}`);
+        }
+        if (json.error) {
+          throw new Error(`${resp.status} ${json.error}`);
         }
         throw new Error(`Response failed: ${resp.status} ${resp.statusText}`);
       })

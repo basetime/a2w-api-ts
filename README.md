@@ -15,6 +15,7 @@ Client library that communicates with the addtowallet API.
   - [Fetching the authenticated organization](#fetching-the-authenticated-organization)
   - [Fetching all campaigns](#fetching-all-campaigns)
   - [Fetching all templates](#fetching-all-templates)
+  - [Updating a pass](#updating-a-pass)
 
 ## Installing
 
@@ -131,4 +132,29 @@ Fetches the templates for the authenticated organization.
 ```ts
 const templates = await client.templates.getAll();
 console.log(templates);
+```
+
+### Updating a pass
+
+Updates the data inside of a pass. This will also have a2w send the updated pass
+to the wallets that contain it. Only the following values can be updated:
+
+- `templateId`
+- `templateVersion`
+- `data`
+- `passTypeIdentifier`
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+
+// Each value is optional.
+const updatedPass = await client.campaigns.updatePass(campaignId, passId, {
+  templateId: '123123123',
+  templateVersion: 2,
+  data: {
+    points: '42',
+  },
+});
+console.log(updatedPass);
 ```

@@ -59,6 +59,25 @@ export default class CampaignsEndpoint extends Endpoint {
   };
 
   /**
+   * Updates the details of a pass.
+   *
+   * This method also updates the wallets that contain the pass.
+   *
+   * @param campaignId The ID of the campaign the pass belongs to.
+   * @param passId The ID of the pass.
+   * @param body The new pass values.
+   */
+  public updatePass = async (
+    campaignId: string,
+    passId: string,
+    body: Partial<Pick<Pass, 'data' | 'templateId' | 'templateVersion' | 'passTypeIdentifier'>>,
+  ): Promise<Pass> => {
+    const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
+
+    return await this.doPost<Pass>(url, body);
+  };
+
+  /**
    * Creates a pass bundle and returns the URL to the claims page.
    *
    * Example:

@@ -44,6 +44,11 @@ export interface Pass {
   primaryKey: string;
 
   /**
+   * The pass type identifier.
+   */
+  passTypeIdentifier: string;
+
+  /**
    * The campaign the pass belongs to.
    */
   campaign: Campaign;
