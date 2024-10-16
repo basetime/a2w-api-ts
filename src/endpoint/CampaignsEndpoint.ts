@@ -1,3 +1,4 @@
+import { Campaign } from '../types/Campaign';
 import { CampaignStats } from '../types/CampaignStats';
 import { Claim } from '../types/Claim';
 import { Enrollment } from '../types/Enrollment';
@@ -15,6 +16,24 @@ const endpoint = '/campaigns';
  * Communicate with the campaigns endpoints.
  */
 export default class CampaignsEndpoint extends Endpoint {
+  /**
+   * Returns all of the campaigns for authenticated organization.
+   *
+   * @returns The campaigns.
+   */
+  public getAll = async (): Promise<Campaign[]> => {
+    return await this.doGet<Campaign[]>(endpoint);
+  };
+
+  /**
+   * Returns the details of a campaign.
+   *
+   * @param id The ID of the campaign.
+   */
+  public getById = async (id: string): Promise<Campaign> => {
+    return await this.doGet<Campaign>(`${endpoint}/${id}`);
+  };
+
   /**
    * Returns the passes for a campaign.
    *

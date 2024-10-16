@@ -13,6 +13,8 @@ Client library that communicates with the addtowallet API.
   - [Fetching a pass](#fetching-a-pass)
   - [Creating a pass bundle](#creating-a-pass-bundle)
   - [Fetching the authenticated organization](#fetching-the-authenticated-organization)
+  - [Fetching all campaigns](#fetching-all-campaigns)
+  - [Fetching all templates](#fetching-all-templates)
 
 ## Installing
 
@@ -111,4 +113,22 @@ console.log(url);
 ```ts
 const organization = await client.organizations.getMine();
 console.log(organization);
+```
+
+### Fetching all campaigns
+
+Fetches the campaigns for the authenticated organization.
+
+```ts
+const campaigns = await client.campaigns.getAll();
+console.log(campaigns);
+```
+
+### Fetching all templates
+
+Fetches the templates for the authenticated organization.
+
+```ts
+const templates = await client.templates.getAll();
+console.log(templates);
 ```
