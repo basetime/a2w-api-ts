@@ -45,7 +45,7 @@ export interface ScannerInvite {
   /**
    * Whether or not to show the scanner button.
    */
-  hideScannerButton: boolean;
+  hideScanButton: boolean;
 
   /**
    * The webview url.
