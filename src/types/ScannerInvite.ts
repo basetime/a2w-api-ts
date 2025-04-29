@@ -43,6 +43,11 @@ export interface ScannerInvite {
   brandLogoUrl: string;
 
   /**
+   * Whether or not to show the scanner button.
+   */
+  hideScannerButton: boolean;
+
+  /**
    * The webview url.
    */
   webviewUrl: string;
