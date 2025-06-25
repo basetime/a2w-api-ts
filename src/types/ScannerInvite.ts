@@ -48,14 +48,19 @@ export interface ScannerInvite {
   hideScanButton: boolean;
 
   /**
-   * The webview url.
+   * The webview jwt.
+   */
+  webviewJwt: string;
+
+  /**
+   * The scan webview url.
    */
   webviewUrl: string;
 
   /**
-   * The webview jwt.
+   * The standby webview url.
    */
-  webviewJwt: string;
+  standbyUrl: string;
 
   /**
    * The date the invite was created.
