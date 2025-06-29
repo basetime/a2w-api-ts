@@ -32,3 +32,18 @@ export interface Enrollment {
    */
   submitted: Record<string, string>;
 }
+
+/**
+ * Response when creating an enrollment.
+ */
+export interface EnrollmentResponse {
+  /**
+   * The ID of the bundle that was created.
+   */
+  pass: string;
+
+  /**
+   * Any errors that occurred.
+   */
+  errors: string[];
+}

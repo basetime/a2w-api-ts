@@ -1,7 +1,7 @@
 import { Campaign } from '../types/Campaign';
 import { CampaignStats } from '../types/CampaignStats';
 import { Claim } from '../types/Claim';
-import { Enrollment } from '../types/Enrollment';
+import { Enrollment, EnrollmentResponse } from '../types/Enrollment';
 import { Job } from '../types/Job';
 import { MetaValues } from '../types/MetaValues';
 import { Pass } from '../types/Pass';
@@ -11,6 +11,11 @@ import Endpoint from './Endpoint';
  * The campaigns endpoint.
  */
 const endpoint = '/campaigns';
+
+/**
+ * The enrollment endpoint.
+ */
+const enrollmentEndpoint = '/e';
 
 /**
  * Communicate with the campaigns endpoints.
@@ -104,6 +109,26 @@ export default class CampaignsEndpoint extends Endpoint {
       metaValues,
       formValues,
       utm,
+    });
+  };
+
+  /**
+   * Creates an enrollment for a campaign, and returns the bundle ID and any errors.
+   *
+   * @param campaignId The ID of the campaign.
+   * @param metaValues The meta values to set.
+   * @param formValues The form values to set.
+   */
+  public createEnrollment = async (
+    campaignId: string,
+    metaValues: MetaValues = {},
+    formValues: Record<string, any> = {},
+  ): Promise<EnrollmentResponse> => {
+    const url = `${enrollmentEndpoint}/campaign/${campaignId}`;
+
+    return await this.doPost<EnrollmentResponse>(url, {
+      metaValues,
+      formValues,
     });
   };
 

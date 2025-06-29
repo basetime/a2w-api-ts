@@ -137,7 +137,8 @@ export default class Client implements Requester {
     options: RequestInit = {},
     authenticate = true,
   ): Promise<T> => {
-    url = `${getBaseUrl()}${url}`;
+    const sep = url.includes('?') ? '&' : '?';
+    url = `${getBaseUrl()}${url}${sep}api=true`;
 
     const headers = options.headers ? new Headers(options.headers) : new Headers();
     if (!headers.has('Accept')) {
