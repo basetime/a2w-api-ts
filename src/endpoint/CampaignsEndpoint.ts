@@ -199,4 +199,30 @@ export default class CampaignsEndpoint extends Endpoint {
   public getEnrollments = async (campaignId: string): Promise<Enrollment[]> => {
     return await this.doGet<Enrollment[]>(`${endpoint}/${campaignId}/enrollments`);
   };
+
+  /**
+   * Sets the redeemed status of a pass to true.
+   *
+   * @param campaignId The ID of the campaign.
+   * @param passId The ID of the pass.
+   * @returns The string 'ok' if the pass was redeemed.
+   */
+  public redeemPass = async (campaignId: string, passId: string): Promise<string> => {
+    const url = `${endpoint}/${campaignId}/passes/${passId}/redeem`;
+
+    return await this.doPost<string>(url, {});
+  };
+
+  /**
+   * Returns the redeemed status of a pass.
+   *
+   * @param campaignId The ID of the campaign.
+   * @param passId The ID of the pass.
+   * @returns The redeemed status.
+   */
+  public getRedeemedStatus = async (campaignId: string, passId: string): Promise<boolean> => {
+    const url = `${endpoint}/${campaignId}/passes/${passId}/redeemed`;
+
+    return await this.doGet<boolean>(url);
+  };
 }
