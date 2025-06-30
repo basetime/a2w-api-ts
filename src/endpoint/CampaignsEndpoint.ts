@@ -208,7 +208,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The string 'ok' if the pass was redeemed.
    */
   public redeemPass = async (campaignId: string, passId: string): Promise<string> => {
-    const url = `${endpoint}/${campaignId}/passes/${passId}/redeem`;
+    const url = `${endpoint}/${campaignId}/passes/${passId}/redeemed`;
 
     return await this.doPost<string>(url, {});
   };
