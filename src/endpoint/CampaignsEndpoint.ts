@@ -205,12 +205,12 @@ export default class CampaignsEndpoint extends Endpoint {
    *
    * @param campaignId The ID of the campaign.
    * @param passId The ID of the pass.
-   * @returns The string 'ok' if the pass was redeemed.
+   * @returns True if the pass was redeemed, false if it was already redeemed.
    */
-  public redeemPass = async (campaignId: string, passId: string): Promise<string> => {
+  public redeemPass = async (campaignId: string, passId: string): Promise<boolean> => {
     const url = `${endpoint}/${campaignId}/passes/${passId}/redeemed`;
 
-    return await this.doPost<string>(url, {});
+    return await this.doPost<boolean>(url, {});
   };
 
   /**

@@ -187,7 +187,8 @@ console.log(updatedPass);
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
 const passId = '7gXYr76u3Maaf9ugAdWk';
-await client.campaigns.redeemPass(campaignId, passId);
+const redeemed = await client.campaigns.redeemPass(campaignId, passId);
+console.log(redeemed);
 ```
 
 ### Get the redeemed status of a pass
