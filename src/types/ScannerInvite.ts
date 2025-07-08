@@ -28,6 +28,11 @@ export interface ScannerInvite {
   isClaimed: boolean;
 
   /**
+   * The base url for the api.
+   */
+  baseUrl: string;
+
+  /**
    * The pin number used to verify the scanner.
    */
   pin: string;
