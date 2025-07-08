@@ -22,7 +22,7 @@ const enrollmentEndpoint = '/e';
  */
 export default class CampaignsEndpoint extends Endpoint {
   /**
-   * A function to encode the data into a jwt. Used by the enroolment endpoint.
+   * A function to encode the data into a jwt. Used by the enrollment endpoint.
    */
   public jwtEncode?: (data: Record<string, any>) => Promise<string>;
 
@@ -59,7 +59,7 @@ export default class CampaignsEndpoint extends Endpoint {
    *
    * @param campaignId The campaign the pass belongs to.
    * @param passId The ID of the pass.
-   * @param scanner The scanner that's being used to request the pass.
+   * @param scanner Only used by scanners. The scanner that's being used to request the pass.
    */
   public getPass = async (campaignId: string, passId: string, scanner: any = ''): Promise<Pass> => {
     const scannerStr = encodeURIComponent(JSON.stringify(scanner));
