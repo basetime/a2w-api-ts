@@ -17,6 +17,8 @@ Client library that communicates with the addtowallet API.
   - [Fetching all templates](#fetching-all-templates)
   - [Updating a pass](#updating-a-pass)
   - [Updating pass logs](#updating-pass-logs)
+  - [Redeem a pass](#redeem-a-pass)
+  - [Get the redeemed status of a pass](#get-the-redeemed-status-of-a-pass)
 
 ## Installing
 
