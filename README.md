@@ -16,6 +16,7 @@ Client library that communicates with the addtowallet API.
   - [Fetching all campaigns](#fetching-all-campaigns)
   - [Fetching all templates](#fetching-all-templates)
   - [Updating a pass](#updating-a-pass)
+  - [Updating pass logs](#updating-pass-logs)
 
 ## Installing
 
