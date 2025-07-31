@@ -88,6 +88,19 @@ export default class CampaignsEndpoint extends Endpoint {
   };
 
   /**
+   * Appends a log to a pass.
+   *
+   * @param campaignId The ID of the campaign the pass belongs to.
+   * @param passId The ID of the pass.
+   * @param log The message to append to the log.
+   */
+  public appendLog = async (campaignId: string, passId: string, log: string): Promise<Pass> => {
+    const url = `${endpoint}/${campaignId}/passes/${passId}/logs`;
+
+    return await this.doPost<Pass>(url, { log });
+  };
+
+  /**
    * Creates a pass bundle and returns the URL to the claims page.
    *
    * Example:

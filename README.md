@@ -182,6 +182,18 @@ const updatedPass = await client.campaigns.updatePass(campaignId, passId, {
 console.log(updatedPass);
 ```
 
+### Updating pass logs
+
+Appends a new log to a pass.
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+
+const ok = await client.campaigns.appendLog(campaignId, passId, 'This is a log message');
+console.log(ok);
+```
+
 ### Redeem a pass
 
 ```ts
