@@ -4,6 +4,7 @@ import { getBaseUrl, setBaseUrl } from './constants';
 import CampaignsEndpoint from './endpoint/CampaignsEndpoint';
 import ClaimsEndpoint from './endpoint/ClaimsEndpoint';
 import OrganizationsEndpoint from './endpoint/OrganizationsEndpoint';
+import ScannersEndpoint from './endpoint/Scanners';
 import TemplatesEndpoint from './endpoint/TemplatesEndpoint';
 import { AuthProvider } from './provider/AuthProvider';
 import { Requester } from './types/Requester';
@@ -41,6 +42,11 @@ export default class Client implements Requester {
    * The organizations endpoint.
    */
   protected _organizations?: OrganizationsEndpoint;
+
+  /**
+   * The scanners endpoint.
+   */
+  protected _scanners?: ScannersEndpoint;
 
   /**
    * Constructor.
@@ -120,6 +126,17 @@ export default class Client implements Requester {
     }
 
     return this._organizations;
+  }
+
+  /**
+   * Returns the scanners endpoint.
+   */
+  public get scanners(): ScannersEndpoint {
+    if (!this._scanners) {
+      this._scanners = new ScannersEndpoint(this);
+    }
+
+    return this._scanners;
   }
 
   /**

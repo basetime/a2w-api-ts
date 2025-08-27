@@ -24,3 +24,5 @@ export type { AuthProvider } from './provider/AuthProvider';
 export type { MetaValues, MetaValue } from './types/MetaValues';
 export type { ScannerInvite } from './types/ScannerInvite';
 export type { ApiKey } from './types/ApiKey';
+export type { ScannerApp } from './types/ScannerApp';
+export type { Attributes, AttributeItem, AttributeType } from './types/Attributes';
