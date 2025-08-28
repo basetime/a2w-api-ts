@@ -1,10 +1,14 @@
-import { ApiKey } from './ApiKey';
 import { Attributes } from './Attributes';
 
 /**
  * Represents a scanner app.
  */
 export interface ScannerApp {
+  /**
+   * The ID of the scanner app.
+   */
+  id: string;
+
   /**
    * The name of the scanner app.
    */
@@ -49,11 +53,6 @@ export interface ScannerApp {
    * The JWT for the webview.
    */
   webviewJwt: string;
-
-  /**
-   * The API key associated with the scanner.
-   */
-  apiKey?: ApiKey;
 
   /**
    * The passcode to enter the scanner settings screen.

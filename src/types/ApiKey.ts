@@ -28,6 +28,11 @@ export interface ApiKey {
   organizationId: string;
 
   /**
+   * The ID of the scanner app the API key belongs to.
+   */
+  scannerApp?: string;
+
+  /**
    * Whether this API key belongs to a scanner.
    */
   isScanner?: boolean;

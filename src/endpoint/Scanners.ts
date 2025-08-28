@@ -1,3 +1,4 @@
+import { ApiKey } from '../types/ApiKey';
 import { ScannerApp } from '../types/ScannerApp';
 import Endpoint from './Endpoint';
 
@@ -18,5 +19,14 @@ export default class ScannersEndpoint extends Endpoint {
    */
   public getByRegistrationCode = async (registrationCode: string): Promise<ScannerApp | null> => {
     return await this.doGet<ScannerApp | null>(`${endpoint}/registrationCode/${registrationCode}`);
+  };
+
+  /**
+   * Exchanges a scanner app for an API key.
+   *
+   * @param scannerApp The scanner app to register.
+   */
+  public registerScanner = async (scannerApp: ScannerApp): Promise<ApiKey | null> => {
+    return await this.doPost<ApiKey | null>(`${endpoint}/register/${scannerApp.id}`, {});
   };
 }
