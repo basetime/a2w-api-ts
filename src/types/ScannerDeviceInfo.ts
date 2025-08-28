@@ -21,7 +21,7 @@ export interface ScannerDeviceInfo {
    * The human-readable OS version string. Note that the version
    * string may not always contain three numbers separated by dots.
    */
-  osVersion: string;
+  osVersion: string | null;
 
   /**
    * The human-readable name of the device, which may be set

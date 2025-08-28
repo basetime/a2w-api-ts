@@ -174,7 +174,7 @@ export default class Client implements Requester {
     }
 
     this.logger.debug(
-      `${options?.method || 'GET'} ${url}, ${authenticate ? 'authenticate' : 'no authenticate'}`,
+      `${options?.method || 'GET'} ${url}, ${authenticate ? 'authenticate' : 'no authenticate'}, body: ${options.body ? JSON.stringify(options.body) : 'none'}`,
     );
 
     const opts: RequestInit = {
