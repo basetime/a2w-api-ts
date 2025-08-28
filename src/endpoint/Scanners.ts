@@ -19,7 +19,10 @@ export default class ScannersEndpoint extends Endpoint {
    * @returns The scanner app.
    */
   public getByRegistrationCode = async (registrationCode: string): Promise<ScannerApp | null> => {
-    return await this.doGet<ScannerApp | null>(`${endpoint}/registrationCode/${registrationCode}`);
+    return await this.doGet<ScannerApp | null>(
+      `${endpoint}/registrationCode/${registrationCode}`,
+      false,
+    );
   };
 
   /**
@@ -32,6 +35,10 @@ export default class ScannersEndpoint extends Endpoint {
     scannerApp: ScannerApp,
     deviceInfo: ScannerDeviceInfo,
   ): Promise<ApiKey | null> => {
-    return await this.doPost<ApiKey | null>(`${endpoint}/register/${scannerApp.id}`, deviceInfo);
+    return await this.doPost<ApiKey | null>(
+      `${endpoint}/register/${scannerApp.id}`,
+      deviceInfo,
+      false,
+    );
   };
 }
