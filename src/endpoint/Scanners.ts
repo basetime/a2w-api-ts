@@ -29,15 +29,17 @@ export default class ScannersEndpoint extends Endpoint {
    * Exchanges a scanner app for an API key.
    *
    * @param scannerApp The scanner app to register.
+   * @param pushToken The push token.
    * @param deviceInfo The device info.
    */
   public registerScanner = async (
     scannerApp: ScannerApp,
+    pushToken: string,
     deviceInfo: ScannerDeviceInfo,
   ): Promise<ApiKey | null> => {
     return await this.doPost<ApiKey | null>(
       `${endpoint}/register/${scannerApp.id}`,
-      deviceInfo,
+      { deviceInfo, pushToken },
       false,
     );
   };
