@@ -26,3 +26,4 @@ export type { ScannerInvite } from './types/ScannerInvite';
 export type { ApiKey } from './types/ApiKey';
 export type { ScannerApp } from './types/ScannerApp';
 export type { Attributes, AttributeItem, AttributeType } from './types/Attributes';
+export type { ScannerDeviceInfo } from './types/ScannerDeviceInfo';
