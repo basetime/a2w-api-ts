@@ -55,6 +55,11 @@ export interface ScannerApp {
   webviewStandbyUrl: string;
 
   /**
+   * The password for the webview.
+   */
+  webviewPassword: string;
+
+  /**
    * The passcode to enter the scanner settings screen.
    */
   passCode?: string;
