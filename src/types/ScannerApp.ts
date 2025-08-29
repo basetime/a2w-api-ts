@@ -35,6 +35,11 @@ export interface ScannerApp {
   parentId: string;
 
   /**
+   * The tags associated with the scanner app.
+   */
+  tags: string[];
+
+  /**
    * The ID of the attributes or the entity.
    */
   attributes: Attributes;
