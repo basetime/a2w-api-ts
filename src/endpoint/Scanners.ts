@@ -26,13 +26,13 @@ export default class ScannersEndpoint extends Endpoint {
   };
 
   /**
-   * Exchanges a scanner app for an API key.
+   * Registers a new scanner device.
    *
-   * @param scannerApp The scanner app to register.
-   * @param pushToken The push token.
+   * @param scannerApp The scanner app being registered.
+   * @param pushToken The push token to send notifications to the device.
    * @param deviceInfo The device info.
    */
-  public registerScanner = async (
+  public registerDevice = async (
     scannerApp: ScannerApp,
     pushToken: string,
     deviceInfo: ScannerDeviceInfo,
@@ -42,5 +42,14 @@ export default class ScannersEndpoint extends Endpoint {
       { deviceInfo, pushToken },
       false,
     );
+  };
+
+  /**
+   * Deregisters a scanner device.
+   *
+   * @param apiKey The API received when registering the device.
+   */
+  public deregisterDevice = async (apiKey: ApiKey): Promise<void> => {
+    return await this.doDelete<void>(`${endpoint}/deregister/${apiKey.id}`);
   };
 }
