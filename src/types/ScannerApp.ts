@@ -83,4 +83,9 @@ export interface ScannerApp {
    * The number of scanners that have been registered.
    */
   scannerCount: number;
+
+  /**
+   * Additional scanner app settings.
+   */
+  settings: Record<string, any>;
 }
