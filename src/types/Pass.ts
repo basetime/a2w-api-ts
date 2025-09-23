@@ -29,9 +29,14 @@ export interface Pass {
   /**
    * The data stored inside the pass.
    *
-   * This data typically comes from a csv file.
+   * @deprecated Use the objectStore instead.
    */
   data: Record<string, string>;
+
+  /**
+   * The object store.
+   */
+  objectStore: Record<string, string | number | boolean | null>;
 
   /**
    * MD5 of the data for easier comparison.
@@ -89,6 +94,11 @@ export interface Pass {
   isScanned: boolean;
 
   /**
+   * Whether the pass has been redeemed.
+   */
+  isRedeemed: boolean;
+
+  /**
    * The date the pass was created
    */
   createdMillis?: number;
@@ -97,4 +107,9 @@ export interface Pass {
    * The date the pass was last updated.
    */
   updatedDate: Date;
+
+  /**
+   * The date the pass was created.
+   */
+  createdDate: Date;
 }
