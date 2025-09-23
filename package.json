@@ -1,6 +1,6 @@
 {
   "name": "@basetime/a2w-api-ts",
-  "version": "0.1.64",
+  "version": "0.1.65",
   "private": false,
   "description": "Client library that communicates with the addtowallet API.",
   "keywords": [
