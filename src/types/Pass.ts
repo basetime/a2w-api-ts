@@ -1,5 +1,3 @@
-import { Campaign } from './Campaign';
-
 /**
  * Information needed to generate a pass.
  */
