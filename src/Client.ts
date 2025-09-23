@@ -6,6 +6,7 @@ import ClaimsEndpoint from './endpoint/ClaimsEndpoint';
 import OrganizationsEndpoint from './endpoint/OrganizationsEndpoint';
 import ScannersEndpoint from './endpoint/Scanners';
 import TemplatesEndpoint from './endpoint/TemplatesEndpoint';
+import WorkflowsEndpoint from './endpoint/WorkflowsEndpoint';
 import { AuthProvider } from './provider/AuthProvider';
 import { Requester } from './types/Requester';
 
@@ -47,6 +48,11 @@ export default class Client implements Requester {
    * The scanners endpoint.
    */
   protected _scanners?: ScannersEndpoint;
+
+  /**
+   * The workflows endpoint.
+   */
+  protected _workflows?: WorkflowsEndpoint;
 
   /**
    * Constructor.
@@ -137,6 +143,17 @@ export default class Client implements Requester {
     }
 
     return this._scanners;
+  }
+
+  /**
+   * Returns the workflows endpoint.
+   */
+  public get workflows(): WorkflowsEndpoint {
+    if (!this._workflows) {
+      this._workflows = new WorkflowsEndpoint(this);
+    }
+
+    return this._workflows;
   }
 
   /**

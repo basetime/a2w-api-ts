@@ -27,3 +27,6 @@ export type { ApiKey } from './types/ApiKey';
 export type { ScannerApp } from './types/ScannerApp';
 export type { Attributes, AttributeItem, AttributeType } from './types/Attributes';
 export type { ScannerDeviceInfo } from './types/ScannerDeviceInfo';
+export type { Workflow } from './types/Workflow';
+export type { WorkflowJob, WorkflowJobStatus } from './types/WorkflowJob';
+export type { WorkflowMessage } from './types/WorkflowMessage';

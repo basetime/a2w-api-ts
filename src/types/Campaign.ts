@@ -23,9 +23,9 @@ export interface Campaign {
   client: Organization;
 
   /**
-   * The template used by the campaign.
+   * The templates used by the campaign.
    */
-  template: Template;
+  templates: Template[];
 
   /**
    * The ID of the landing page.
@@ -36,6 +36,11 @@ export interface Campaign {
    * The name of the primary key to save from imported csv data.
    */
   primaryKey: string;
+
+  /**
+   * The tags associated with the campaign.
+   */
+  tags: string[];
 
   /**
    * The description of the campaign.
@@ -180,4 +185,9 @@ export interface Campaign {
    * The states that have accessed the campaign.
    */
   states: Record<string, number>;
+
+  /**
+   * The date the campaign was created.
+   */
+  createdDate: Date;
 }
