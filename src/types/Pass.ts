@@ -57,6 +57,11 @@ export interface Pass {
   campaignId: string;
 
   /**
+   * The organization the pass belongs to.
+   */
+  organizationId: string;
+
+  /**
    * The template ID.
    */
   templateId: string;
