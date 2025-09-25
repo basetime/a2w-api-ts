@@ -81,11 +81,21 @@ export default class CampaignsEndpoint extends Endpoint {
   public updatePass = async (
     campaignId: string,
     passId: string,
-    body: Partial<Pick<Pass, 'data' | 'templateId' | 'templateVersion' | 'passTypeIdentifier'>>,
+    body: Partial<
+      Pick<Pass, 'data' | 'objectStore' | 'templateId' | 'templateVersion' | 'passTypeIdentifier'>
+    >,
   ): Promise<Pass> => {
     const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
 
-    return await this.doPost<Pass>(url, body);
+    const cleaned = {
+      data: body.data,
+      objectStore: body.objectStore,
+      templateId: body.templateId,
+      templateVersion: body.templateVersion,
+      passTypeIdentifier: body.passTypeIdentifier,
+    };
+
+    return await this.doPost<Pass>(url, cleaned);
   };
 
   /**
@@ -100,7 +110,19 @@ export default class CampaignsEndpoint extends Endpoint {
   ): Promise<Pass[]> => {
     const url = `${endpoint}/${campaignId}/passes/details/passes`;
 
-    return await this.doPost<Pass[]>(url, { passes });
+    // Filter out the values that can't be updated via this endpoint.
+    const cleaned = passes.map((pass: Partial<Pass> & { id: string }) => {
+      return {
+        id: pass.id,
+        data: pass.data,
+        objectStore: pass.objectStore,
+        templateId: pass.templateId,
+        templateVersion: pass.templateVersion,
+        passTypeIdentifier: pass.passTypeIdentifier,
+      };
+    });
+
+    return await this.doPost<Pass[]>(url, { passes: cleaned });
   };
 
   /**
