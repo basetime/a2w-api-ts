@@ -96,11 +96,11 @@ export default class CampaignsEndpoint extends Endpoint {
    */
   public updatePasses = async (
     campaignId: string,
-    bodies: (Partial<Pass> & { id: string })[],
+    passes: (Partial<Pass> & { id: string })[],
   ): Promise<Pass[]> => {
     const url = `${endpoint}/${campaignId}/passes/details/passes`;
 
-    return await this.doPost<Pass[]>(url, bodies);
+    return await this.doPost<Pass[]>(url, { passes });
   };
 
   /**
