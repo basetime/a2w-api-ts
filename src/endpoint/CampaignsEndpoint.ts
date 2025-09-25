@@ -89,6 +89,21 @@ export default class CampaignsEndpoint extends Endpoint {
   };
 
   /**
+   * Updates multiple passes.
+   *
+   * @param campaignId The ID of the campaign the passes belong to.
+   * @param bodies The passes to update.
+   */
+  public updatePasses = async (
+    campaignId: string,
+    bodies: (Partial<Pass> & { id: string })[],
+  ): Promise<Pass[]> => {
+    const url = `${endpoint}/${campaignId}/passes/details/passes`;
+
+    return await this.doPost<Pass[]>(url, bodies);
+  };
+
+  /**
    * Appends a log to a pass.
    *
    * @param campaignId The ID of the campaign the pass belongs to.
