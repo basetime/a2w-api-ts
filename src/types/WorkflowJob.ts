@@ -33,6 +33,16 @@ export interface WorkflowJob {
   status: WorkflowJobStatus;
 
   /**
+   * The number of seconds the job ran for.
+   */
+  runTime: number;
+
+  /**
+   * The last error that was thrown.
+   */
+  error: string | null;
+
+  /**
    * The date the job was created.
    */
   createdDate: Date;
