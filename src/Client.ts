@@ -3,6 +3,7 @@ import NoopLogger from './NoopLogger';
 import { getBaseUrl, setBaseUrl } from './constants';
 import CampaignsEndpoint from './endpoint/CampaignsEndpoint';
 import ClaimsEndpoint from './endpoint/ClaimsEndpoint';
+import ImagesEndpoint from './endpoint/Images';
 import OrganizationsEndpoint from './endpoint/OrganizationsEndpoint';
 import ScannersEndpoint from './endpoint/Scanners';
 import TemplatesEndpoint from './endpoint/TemplatesEndpoint';
@@ -53,6 +54,11 @@ export default class Client implements Requester {
    * The workflows endpoint.
    */
   protected _workflows?: WorkflowsEndpoint;
+
+  /**
+   * The images endpoint.
+   */
+  protected _images?: ImagesEndpoint;
 
   /**
    * Constructor.
@@ -154,6 +160,17 @@ export default class Client implements Requester {
     }
 
     return this._workflows;
+  }
+
+  /**
+   * Returns the images endpoint.
+   */
+  public get images(): ImagesEndpoint {
+    if (!this._images) {
+      this._images = new ImagesEndpoint(this);
+    }
+
+    return this._images;
   }
 
   /**

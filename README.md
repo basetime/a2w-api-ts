@@ -19,6 +19,8 @@ Client library that communicates with the addtowallet API.
   - [Updating pass logs](#updating-pass-logs)
   - [Redeem a pass](#redeem-a-pass)
   - [Get the redeemed status of a pass](#get-the-redeemed-status-of-a-pass)
+  - [Get image by ID](#get-image-by-id)
+  - [Get images by IDs](#get-images-by-ids)
 
 ## Installing
 
@@ -213,4 +215,18 @@ const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
 const passId = '7gXYr76u3Maaf9ugAdWk';
 const redeemed = await client.campaigns.getRedeemedStatus(campaignId, passId);
 console.log(redeemed);
+```
+
+### Get image by ID
+
+```ts
+const image = await client.images.getById('bWVkrfizHBXyETJEIMk9');
+console.log(image);
+```
+
+### Get images by IDs
+
+```ts
+const images = await client.images.getByIds(['bWVkrfizHBXyETJEIMk9', 'pb6flbrYzrrz4rRSPA7l']);
+console.log(images);
 ```

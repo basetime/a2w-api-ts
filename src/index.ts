@@ -30,3 +30,4 @@ export type { ScannerDeviceInfo } from './types/ScannerDeviceInfo';
 export type { Workflow } from './types/Workflow';
 export type { WorkflowJob, WorkflowJobStatus } from './types/WorkflowJob';
 export type { WorkflowMessage } from './types/WorkflowMessage';
+export type { Image } from './types/Image';
