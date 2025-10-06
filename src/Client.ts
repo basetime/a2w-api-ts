@@ -203,8 +203,13 @@ export default class Client implements Requester {
     // set. The caller *might* want to override the json headers (like when
     // uploading a multipart file), so we don't overwrite them if they are set.
     if (authenticate && this.auth) {
-      const bearerToken = await this.auth.authenticate();
-      headers.set('Authorization', `Bearer ${bearerToken}`);
+      const authed = this.auth.getAuthed();
+      if (authed) {
+        headers.set('Authorization', `Bearer ${authed.idToken}`);
+      } else {
+        const bearerToken = await this.auth.authenticate();
+        headers.set('Authorization', `Bearer ${bearerToken}`);
+      }
     }
 
     this.logger.debug(
