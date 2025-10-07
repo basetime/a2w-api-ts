@@ -51,8 +51,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The passes.
    */
   public getPasses = async (campaignId: string): Promise<Pass[]> => {
-    const resp = await this.doGet<{ passes: Pass[] }>(`${endpoint}/${campaignId}/passes`);
-    return resp.passes;
+    return await this.doGet<Pass[]>(`${endpoint}/${campaignId}/passes`);
   };
 
   /**
