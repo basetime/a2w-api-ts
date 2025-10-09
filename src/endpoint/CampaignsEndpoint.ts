@@ -81,13 +81,11 @@ export default class CampaignsEndpoint extends Endpoint {
     campaignId: string,
     passId: string,
     body: Partial<
-      Pick<Pass, 'data' | 'objectStore' | 'templateId' | 'templateVersion' | 'passTypeIdentifier'>
+      Pick<Pass, 'objectStore' | 'templateId' | 'templateVersion' | 'passTypeIdentifier'>
     >,
   ): Promise<Pass> => {
     const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
-
     const cleaned = {
-      data: body.data,
       objectStore: body.objectStore,
       templateId: body.templateId,
       templateVersion: body.templateVersion,
@@ -113,7 +111,6 @@ export default class CampaignsEndpoint extends Endpoint {
     const cleaned = passes.map((pass: Partial<Pass> & { id: string }) => {
       return {
         id: pass.id,
-        data: pass.data,
         objectStore: pass.objectStore,
         templateId: pass.templateId,
         templateVersion: pass.templateVersion,

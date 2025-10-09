@@ -25,13 +25,6 @@ export interface Pass {
   serialNumber: string;
 
   /**
-   * The data stored inside the pass.
-   *
-   * @deprecated Use the objectStore instead.
-   */
-  data: Record<string, string>;
-
-  /**
    * The object store.
    */
   objectStore: Record<string, string | number | boolean | null>;
@@ -39,7 +32,7 @@ export interface Pass {
   /**
    * MD5 of the data for easier comparison.
    */
-  dataMD5: string;
+  objectStoreMD5: string;
 
   /**
    * The value of the primary key in the data.

@@ -164,12 +164,12 @@ console.log(templates);
 
 ### Updating a pass
 
-Updates the data inside of a pass. This will also have a2w send the updated pass
+Updates the object store. This will also have a2w send the updated pass
 to the wallets that contain it. Only the following values can be updated:
 
 - `templateId`
 - `templateVersion`
-- `data`
+- `objectStore`
 - `passTypeIdentifier`
 
 ```ts
@@ -180,7 +180,7 @@ const passId = '7gXYr76u3Maaf9ugAdWk';
 const updatedPass = await client.campaigns.updatePass(campaignId, passId, {
   templateId: '123123123',
   templateVersion: 2,
-  data: {
+  objectStore: {
     points: '42',
   },
 });
