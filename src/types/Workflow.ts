@@ -33,6 +33,13 @@ export interface Workflow {
   code: string;
 
   /**
+   * The packages to install.
+   *
+   * This is a list of NPM package names in the form of `package-name@version`.
+   */
+  packages: string[];
+
+  /**
    * The date the workflow was created.
    */
   createdDate: Date;
