@@ -1,3 +1,4 @@
+import { SnippetLibrary } from '../types/SnippetLibrary';
 import { Workflow } from '../types/Workflow';
 import { WorkflowJob } from '../types/WorkflowJob';
 import { WorkflowMessage } from '../types/WorkflowMessage';
@@ -92,5 +93,12 @@ export default class WorkflowsEndpoint extends Endpoint {
    */
   public addJobLog = async (jobId: string, message: WorkflowMessage): Promise<WorkflowJob> => {
     return await this.doPost<WorkflowJob>(`${endpoint}/jobs/${jobId}/logs`, message);
+  };
+
+  /**
+   * Returns the snippets for the authenticated organization.
+   */
+  public getSnippets = async (): Promise<SnippetLibrary[]> => {
+    return await this.doGet<SnippetLibrary[]>(`${endpoint}/libraries`);
   };
 }
