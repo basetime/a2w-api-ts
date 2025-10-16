@@ -23,6 +23,13 @@ export interface SnippetLibrary {
   code: string;
 
   /**
+   * The packages to install.
+   *
+   * This is a list of NPM package names in the form of `package-name@version`.
+   */
+  packages: string[];
+
+  /**
    * The organization that owns the snippet library.
    */
   organization: string;
