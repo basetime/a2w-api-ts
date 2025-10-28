@@ -21,6 +21,11 @@ Client library that communicates with the addtowallet API.
   - [Get the redeemed status of a pass](#get-the-redeemed-status-of-a-pass)
   - [Get image by ID](#get-image-by-id)
   - [Get images by IDs](#get-images-by-ids)
+  - [Fetching all scanner apps](#fetching-all-scanner-apps)
+  - [Fetching a scanner app by ID](#fetching-a-scanner-app-by-id)
+  - [Creating a scanner app](#creating-a-scanner-app)
+  - [Updating a scanner app](#updating-a-scanner-app)
+  - [Deleting a scanner app](#deleting-a-scanner-app)
 
 ## Installing
 
@@ -229,4 +234,59 @@ console.log(image);
 ```ts
 const images = await client.images.getByIds(['bWVkrfizHBXyETJEIMk9', 'pb6flbrYzrrz4rRSPA7l']);
 console.log(images);
+```
+
+### Fetching all scanner apps
+
+```ts
+const apps = await client.scanners.getAll();
+console.log(apps);
+```
+
+### Fetching a scanner app by ID
+
+```ts
+const app = await client.scanners.getById('XVK0xIy2vQinDJWUbKnO');
+console.log(app);
+```
+
+### Creating a scanner app
+
+```ts
+const app = await client.scanners.createApp({
+  name: 'My Scanner',
+  description: 'My Scanner',
+  tags: ['tag1', 'tag2'],
+  webviewScanUrl: 'https://example.com/scan',
+  webviewStandbyUrl: 'https://example.com/standby',
+  webviewPassword: 'password',
+  passCode: '1234',
+  brandColor: '#ae00ff',
+  brandLogoUrl: 'https://example.com/logo.png',
+  isKioskMode: true,
+});
+console.log(app);
+```
+
+### Updating a scanner app
+
+```ts
+await client.scanners.updateApp('XVK0xIy2vQinDJWUbKnO', {
+  name: 'My Scanner',
+  description: 'My Scanner',
+  tags: ['tag1', 'tag2'],
+  webviewScanUrl: 'https://example.com/scan',
+  webviewStandbyUrl: 'https://example.com/standby',
+  webviewPassword: 'password',
+  passCode: '1234',
+  brandColor: '#ae00ff',
+  brandLogoUrl: 'https://example.com/logo.png',
+  isKioskMode: true,
+});
+```
+
+### Deleting a scanner app
+
+```ts
+await client.scanners.deleteApp('XVK0xIy2vQinDJWUbKnO');
 ```

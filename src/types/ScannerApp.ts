@@ -87,5 +87,5 @@ export interface ScannerApp {
   /**
    * Additional scanner app settings.
    */
-  settings: Record<string, any>;
+  settings?: Record<string, any>;
 }
