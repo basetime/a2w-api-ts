@@ -96,6 +96,36 @@ export default class CampaignsEndpoint extends Endpoint {
   };
 
   /**
+   * Merges a pass object store into the existing object store.
+   *
+   * @param campaignId The ID of the campaign the pass belongs to.
+   * @param passId The ID of the pass to merge.
+   * @param body The new pass values with objectStore key.
+   */
+  public mergeObjectStore = async (campaignId: string, passId: string, body: Partial<
+    Pick<Pass, 'objectStore'>
+  >,): Promise<Pass> => {
+    const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
+
+    return await this.doPut<Pass>(url, {
+      objectStore: body.objectStore,
+    });
+  }
+
+  /**
+   * Deletes keys from a pass object store.
+   *
+   * @param campaignId The ID of the campaign the pass belongs to.
+   * @param passId The ID of the pass to delete the keys from.
+   * @param objectStoreKeys The keys to delete from the object store.
+   */
+  public deleteObjectStoreKeys = async (campaignId: string, passId: string, objectStoreKeys: string[]): Promise<Pass> => {
+    const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
+
+    return await this.doDelete<Pass>(url, true, { objectStoreKeys });
+  }
+
+  /**
    * Updates multiple passes.
    *
    * @param campaignId The ID of the campaign the passes belong to.

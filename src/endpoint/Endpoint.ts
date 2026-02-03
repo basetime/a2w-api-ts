@@ -9,7 +9,7 @@ export default abstract class Endpoint {
    *
    * @param req The object to use to make requests.
    */
-  constructor(protected req: Requester) {}
+  constructor(protected req: Requester) { }
 
   /**
    * Makes a GET request.
@@ -46,16 +46,42 @@ export default abstract class Endpoint {
   };
 
   /**
+   * Makes a PUT request.
+   *
+   * @param url The url to fetch.
+   * @param body The body to send.
+   */
+  protected doPut = async <T>(url: string, body: any, authenticate = true): Promise<T> => {
+    const options: RequestInit = {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    };
+
+    return await this.req.fetch<T>(url, options, authenticate);
+  };
+
+  /**
    * Makes a DELETE request.
    *
    * @param url The url to fetch.
+   * @param authenticate Whether to authenticate the request.
+   * @param body The body to send.
    */
-  protected doDelete = async <T>(url: string, authenticate = true): Promise<T> => {
+  protected doDelete = async <T>(url: string, authenticate = true, body: any = undefined): Promise<T> => {
+    const options: RequestInit = {
+      method: 'DELETE',
+    };
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+
     return await this.req.fetch<T>(
       url,
-      {
-        method: 'DELETE',
-      },
+      options,
       authenticate,
     );
   };

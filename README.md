@@ -16,6 +16,7 @@ Client library that communicates with the addtowallet API.
   - [Fetching all campaigns](#fetching-all-campaigns)
   - [Fetching all templates](#fetching-all-templates)
   - [Updating a pass](#updating-a-pass)
+  - [Patching an Object Store](#patching-pass-object-store)
   - [Updating pass logs](#updating-pass-logs)
   - [Redeem a pass](#redeem-a-pass)
   - [Get the redeemed status of a pass](#get-the-redeemed-status-of-a-pass)
@@ -189,6 +190,36 @@ const updatedPass = await client.campaigns.updatePass(campaignId, passId, {
     points: '42',
   },
 });
+console.log(updatedPass);
+```
+
+### Patching Pass Object Store
+
+Merges the given object store values with the existing object store values.
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+
+// Each value is optional.
+const updatedPass = await client.campaigns.mergeObjectStore(campaignId, passId, {
+  objectStore: {
+    points: '42',
+  },
+});
+console.log(updatedPass);
+```
+
+### Deleting Object Store Values
+
+Deletes values from an object store by specifying the keys.
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+
+// Each value is optional.
+const updatedPass = await client.campaigns.deleteObjectStoreKeys(campaignId, passId, ['points']);
 console.log(updatedPass);
 ```
 
