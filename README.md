@@ -101,11 +101,15 @@ console.log(pass);
 
 ### Querying for Passes
 
+Fetching all of the passes in the campaign.
+
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
 const passes = await client.campaigns.queryPasses(campaignId);
 console.log(passes);
 ```
+
+Fetching passes where the primaryKey = '123455'.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -114,6 +118,8 @@ const passes = await client.campaigns.queryPasses(campaignId, {
 });
 console.log(passes);
 ```
+
+Fetching passes where the object store value 'amount' = '30'.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
