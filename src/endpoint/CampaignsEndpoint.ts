@@ -75,10 +75,14 @@ export default class CampaignsEndpoint extends Endpoint {
    * @param queries The queries to run.
    * @returns The passes.
    */
-  public queryPasses = async (campaignId: string, queries: Record<string, any>): Promise<Pass[]> => {
-    const e = encodeURIComponent;
-    const queryString = Object.entries(queries).map(([key, value]) => `query[]=${e(key)}:${e(value)}`).join('&');
-    const url = `${endpoint}/${campaignId}/passes/query?${queryString}`;
+  public queryPasses = async (campaignId: string, queries: Record<string, any> = {}): Promise<Pass[]> => {
+    let url = `${endpoint}/${campaignId}/passes/query`;
+
+    if (Object.keys(queries).length > 0) {
+      const e = encodeURIComponent;
+      const queryString = Object.entries(queries).map(([key, value]) => `query[]=${e(key)}:${e(value)}`).join('&');
+      url = `${url}?${queryString}`;
+    }
 
     return await this.doGet<Pass[]>(url);
   };
