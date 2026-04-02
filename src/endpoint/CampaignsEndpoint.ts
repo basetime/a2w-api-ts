@@ -69,6 +69,21 @@ export default class CampaignsEndpoint extends Endpoint {
   };
 
   /**
+   * Queries the passes for a campaign.
+   *
+   * @param campaignId The ID of the campaign.
+   * @param queries The queries to run.
+   * @returns The passes.
+   */
+  public queryPasses = async (campaignId: string, queries: Record<string, any>): Promise<Pass[]> => {
+    const e = encodeURIComponent;
+    const queryString = Object.entries(queries).map(([key, value]) => `query[]=${e(key)}:${e(value)}`).join('&');
+    const url = `${endpoint}/${campaignId}/passes/query?${queryString}`;
+
+    return await this.doGet<Pass[]>(url);
+  };
+
+  /**
    * Updates the details of a pass.
    *
    * This method also updates the wallets that contain the pass.
