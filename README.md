@@ -11,6 +11,7 @@ Client library that communicates with the addtowallet API.
   - [Fetching a template by ID](#fetching-a-template-by-id)
   - [Fetching templates by tag](#fetching-templates-by-tag)
   - [Fetching a pass](#fetching-a-pass)
+  - [Querying for Passes](#querying-for-passes)
   - [Creating a pass bundle](#creating-a-pass-bundle)
   - [Fetching the authenticated organization](#fetching-the-authenticated-organization)
   - [Fetching all campaigns](#fetching-all-campaigns)
@@ -99,6 +100,14 @@ console.log(pass);
 ```
 
 ### Querying for Passes
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passes = await client.campaigns.queryPasses(campaignId, {
+  primaryKey: '123455',
+});
+console.log(passes);
+```
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
