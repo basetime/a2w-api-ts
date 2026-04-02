@@ -103,6 +103,12 @@ console.log(pass);
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passes = await client.campaigns.queryPasses(campaignId);
+console.log(passes);
+```
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
 const passes = await client.campaigns.queryPasses(campaignId, {
   primaryKey: '123455',
 });
