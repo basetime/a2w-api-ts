@@ -98,6 +98,16 @@ const pass = await client.campaigns.getPass(campaignId, passId);
 console.log(pass);
 ```
 
+### Querying for Passes
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passes = await client.campaigns.queryPasses(campaignId, {
+  'objectStore.amount': '30',
+});
+console.log(passes);
+```
+
 ### Creating a pass bundle
 
 ```ts
