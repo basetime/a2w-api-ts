@@ -55,6 +55,11 @@ export interface ScannerApp {
   webviewStandbyUrl: string;
 
   /**
+   * The URL of the webview shown when an error occurs.
+   */
+  webviewErrorUrl: string;
+
+  /**
    * The password for the webview.
    */
   webviewPassword: string;
