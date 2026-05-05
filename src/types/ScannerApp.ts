@@ -85,6 +85,21 @@ export interface ScannerApp {
   isKioskMode?: boolean;
 
   /**
+   * Is the scanner configured via JSON?
+   */
+  isJsonConfigured?: boolean;
+
+  /**
+   * The JSON configuration for the scanner.
+   */
+  jsonConfig?: string;
+
+  /**
+   * The URL of the JSON configuration for the scanner.
+   */
+  jsonConfigUrl?: string;
+
+  /**
    * The number of scanners that have been registered.
    */
   scannerCount: number;
@@ -94,3 +109,40 @@ export interface ScannerApp {
    */
   settings?: Record<string, any>;
 }
+
+type ScannerAppServerManagedField =
+  | 'id'
+  | 'organizationId'
+  | 'parentId'
+  | 'registrationCode'
+  | 'scannerCount'
+  | 'createdDate';
+
+type ScannerAppSettableFields = Omit<ScannerApp, ScannerAppServerManagedField>;
+
+type ScannerAppJsonConfigurationField = 'isJsonConfigured' | 'jsonConfig' | 'jsonConfigUrl';
+
+type ScannerAppStandardField = Exclude<
+  keyof ScannerAppSettableFields,
+  ScannerAppJsonConfigurationField
+>;
+
+type ScannerAppJsonConfiguredInput = Pick<
+  ScannerAppSettableFields,
+  'jsonConfig' | 'jsonConfigUrl'
+> & {
+  isJsonConfigured: true;
+} & {
+  [Field in ScannerAppStandardField]?: never;
+};
+
+type ScannerAppStandardInput = Omit<
+  ScannerAppSettableFields,
+  ScannerAppJsonConfigurationField
+> & {
+  isJsonConfigured?: false;
+  jsonConfig?: never;
+  jsonConfigUrl?: never;
+};
+
+export type ScannerAppInput = ScannerAppJsonConfiguredInput | ScannerAppStandardInput;

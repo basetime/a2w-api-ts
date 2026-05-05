@@ -1,5 +1,5 @@
 import { ApiKey } from '../types/ApiKey';
-import { ScannerApp } from '../types/ScannerApp';
+import { ScannerApp, ScannerAppInput } from '../types/ScannerApp';
 import { ScannerDeviceInfo } from '../types/ScannerDeviceInfo';
 import Endpoint from './Endpoint';
 
@@ -74,12 +74,7 @@ export default class ScannersEndpoint extends Endpoint {
    *
    * @param app The scanner app to create.
    */
-  public createApp = async (
-    app: Omit<
-      ScannerApp,
-      'id' | 'organizationId' | 'parentId' | 'registrationCode' | 'scannerCount' | 'createdDate'
-    >,
-  ): Promise<ScannerApp | null> => {
+  public createApp = async (app: ScannerAppInput): Promise<ScannerApp | null> => {
     return await this.doPost<ScannerApp | null>(`${endpoint}/organizations/apps`, app);
   };
 
@@ -89,13 +84,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @param id The ID of the scanner app.
    * @param app The scanner app to update.
    */
-  public updateApp = async (
-    id: string,
-    app: Omit<
-      ScannerApp,
-      'id' | 'organizationId' | 'parentId' | 'registrationCode' | 'scannerCount' | 'createdDate'
-    >,
-  ): Promise<ScannerApp | null> => {
+  public updateApp = async (id: string, app: ScannerAppInput): Promise<ScannerApp | null> => {
     return await this.doPost<ScannerApp | null>(`${endpoint}/organizations/${id}`, app);
   };
 
