@@ -8,6 +8,7 @@ Client library that communicates with the addtowallet API.
 - [Examples](#examples)
   - [Creating a new client with keys](#creating-a-new-client-with-keys)
   - [Creating a new client with oauth](#creating-a-new-client-with-oauth)
+  - [Setting a custom user agent](#setting-a-custom-user-agent)
   - [Fetching a template by ID](#fetching-a-template-by-id)
   - [Fetching templates by tag](#fetching-templates-by-tag)
   - [Fetching a pass](#fetching-a-pass)
@@ -74,6 +75,13 @@ import { Client, OAuthProvider } from '@basetime/a2w-api-ts';
 const appId = 'a2w-inspector';
 const oauth = new OAuthProvider('a2w-inspector');
 const client = new Client(oauth);
+```
+
+### Setting a custom user agent
+
+```ts
+const client = new Client();
+client.setUserAgent('my-custom-user-agent/1.0.0');
 ```
 
 ### Fetching a template by ID
