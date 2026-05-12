@@ -28,6 +28,11 @@ export default class Client implements Requester {
   protected logger: Logger;
 
   /**
+   * The user agent string.
+   */
+  protected userAgent: string = '';
+
+  /**
    * The campaigns endpoint.
    */
   protected _campaigns?: CampaignsEndpoint;
@@ -92,6 +97,15 @@ export default class Client implements Requester {
   public setAuth = (auth: AuthProvider) => {
     this.auth = auth;
     this.auth.setLogger(this.logger);
+  };
+
+  /**
+   * Sets the user agent string.
+   *
+   * @param userAgent The user agent string to use.
+   */
+  public setUserAgent = (userAgent: string) => {
+    this.userAgent = userAgent;
   };
 
   /**
@@ -194,14 +208,17 @@ export default class Client implements Requester {
     url = `${getBaseUrl()}${url}${sep}api=true`;
 
     const headers = options.headers ? new Headers(options.headers) : new Headers();
+    if (this.userAgent) {
+      headers.set('User-Agent', this.userAgent);
+    }
+    if (!headers.has('User-Agent')) {
+      headers.set('User-Agent', `a2w-api-ts/${version} (Node.js ${process.version}) (${os.platform()} ${os.arch()})`);
+    }
     if (!headers.has('Accept')) {
       headers.set('Accept', 'application/json');
     }
     if (!headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
-    }
-    if (!headers.has('User-Agent')) {
-      headers.set('User-Agent', `a2w-api-ts/${version} (Node.js ${process.version}) (${os.platform()} ${os.arch()})`);
     }
 
     // Adds the bearer token to the headers, and ensures the json headers are
