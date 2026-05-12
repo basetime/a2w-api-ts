@@ -2,3 +2,4 @@ dist
 node_modules
 *.log
 example.mjs
+src/version.ts
