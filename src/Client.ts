@@ -1,3 +1,4 @@
+import { version } from '../package.json';
 import { Logger } from './Logger';
 import NoopLogger from './NoopLogger';
 import { getBaseUrl, setBaseUrl } from './constants';
@@ -10,6 +11,7 @@ import TemplatesEndpoint from './endpoint/TemplatesEndpoint';
 import WorkflowsEndpoint from './endpoint/WorkflowsEndpoint';
 import { AuthProvider } from './provider/AuthProvider';
 import { Requester } from './types/Requester';
+import os from 'os';
 
 /**
  * Client class that communicates with the the addtowallet API.
@@ -197,6 +199,9 @@ export default class Client implements Requester {
     }
     if (!headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
+    }
+    if (!headers.has('User-Agent')) {
+      headers.set('User-Agent', `a2w-api-ts/${version} (Node.js ${process.version}) (${os.platform()} ${os.arch()})`);
     }
 
     // Adds the bearer token to the headers, and ensures the json headers are
