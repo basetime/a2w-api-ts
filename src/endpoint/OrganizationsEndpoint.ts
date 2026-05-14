@@ -13,7 +13,7 @@ const endpoint = '/organization';
  */
 export default class OrganizationsEndpoint extends Endpoint {
   /**
-   * Returns the authenticated organization.
+   * Fetches the details of the authenticated organization.
    *
    * @returns The organization.
    */

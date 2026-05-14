@@ -9,6 +9,7 @@ Client library that communicates with the addtowallet API.
   - [Creating a new client with keys](#creating-a-new-client-with-keys)
   - [Creating a new client with oauth](#creating-a-new-client-with-oauth)
   - [Setting a custom user agent](#setting-a-custom-user-agent)
+  - [Custom fetch](#custom-fetch)
   - [Fetching a template by ID](#fetching-a-template-by-id)
   - [Fetching templates by tag](#fetching-templates-by-tag)
   - [Fetching a pass](#fetching-a-pass)
@@ -82,6 +83,15 @@ const client = new Client(oauth);
 ```ts
 const client = new Client();
 client.setUserAgent('my-custom-user-agent/1.0.0');
+```
+
+### Custom fetch
+
+When the client is not pre-configured to use a specific API endpoint, you can use the `fetch` method to make requests to the API, and authentication will be handled automatically.
+
+```ts
+const t = await client.fetch('/templates/simple/l74mNQLcjWnN2AoRRKG0');
+console.log(t);
 ```
 
 ### Fetching a template by ID

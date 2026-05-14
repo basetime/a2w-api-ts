@@ -195,20 +195,20 @@ export default class CampaignsEndpoint extends Endpoint {
    *
    * @param campaignId The campaign the pass belongs to.
    * @param metaValues The meta values to set.
-   * @param formValues The form values to set.
+   * @param objectStore The object store to set.
    * @param utm The UTM values to pass along to the api.
    */
   public createBundle = async (
     campaignId: string,
     metaValues: MetaValues = {},
-    formValues: Record<string, any> = {},
+    objectStore: Record<string, any> = {},
     utm: Record<string, string> = {},
   ): Promise<string> => {
     const url = `${endpoint}/${campaignId}/passes/bundle`;
 
     return await this.doPost<string>(url, {
       metaValues,
-      formValues,
+      objectStore,
       utm,
     });
   };
