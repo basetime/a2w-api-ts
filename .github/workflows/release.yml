@@ -109,7 +109,9 @@ jobs:
           # either guard if a maintainer ever pulls and checks out this commit.
           git add package.json CHANGELOG.md
           git commit -m "chore(changelog): release v${VERSION} [skip ci]"
-          git tag "v${VERSION}"
+          # Annotated tag (-a) so `git push --follow-tags` actually pushes it;
+          # lightweight tags are not pushed by --follow-tags.
+          git tag -a "v${VERSION}" -m "Release v${VERSION}"
           git push origin HEAD:main --follow-tags
 
       - name: Publish to npm

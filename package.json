@@ -11,9 +11,13 @@
     "typescript",
     "nodejs"
   ],
-  "homepage": "https://github.com/basetime/aw2-api-ts",
+  "homepage": "https://github.com/basetime/a2w-api-ts",
   "bugs": {
-    "url": "https://github.com/basetime/aw2-api-ts/issues"
+    "url": "https://github.com/basetime/a2w-api-ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/basetime/a2w-api-ts.git"
   },
   "engines": {
     "node": ">=18"

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Updates package.json to correct the homepage and bugs URL, and adds repository information. Modifies release workflow to create annotated tags for version releases.. (`40b3813`)
+
 ## 0.4.9 - 2026-05-15
 
 - Enhances AGENTS.md with details on re-enabling tests in CI, updates package.json to include release scripts for versioning, and modifies test files to use getBaseUrl for improved consistency in API endpoint definitions.. (`0c054ab`)
