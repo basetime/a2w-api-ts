@@ -1,4 +1,4 @@
-import { Template } from 'passkit-generator/lib/schemas';
+import { Template } from '../types/Template';
 import { TemplateThumbnail } from '../types/TemplateThumbnail';
 import Endpoint from './Endpoint';
 
