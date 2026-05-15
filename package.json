@@ -20,6 +20,7 @@
   },
   "license": "MIT",
   "author": "Avagate",
+  "packageManager": "pnpm@10.17.1",
   "main": "dist/index.js",
   "exports": {
     ".": {
