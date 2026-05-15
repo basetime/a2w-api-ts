@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { baseUrl } from '../src/constants';
+import { getBaseUrl } from '../src/constants';
 import { OAuthProvider } from '../src/index';
+
+const baseUrl = getBaseUrl();
 
 describe('OAuthProvider', () => {
   /**

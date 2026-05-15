@@ -14,3 +14,23 @@
   `## Unreleased` to `## <new version> - <YYYY-MM-DD>` when a maintainer triggers a release.
 - Don't run `pnpm version` locally; use the GitHub Actions `Release` workflow instead so the
   changelog and tags stay in sync.
+
+## Tests
+
+The test runner is currently disabled in CI (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
+The test files in [`tests/`](tests/) compile cleanly but mocha cannot load them because the
+project mixes ESM source (`tsconfig.json` `"module": "esnext"`) with a root `package.json` that
+has no `"type": "module"`, so ts-node's ESM loader (`.mocharc.json` -> `loader=ts-node/esm`)
+treats `src/*.ts` as CJS and the test imports fail with `Named export 'Client' not found`.
+
+To restore tests, options are:
+
+- Add `"type": "module"` to the root `package.json` and rename the CJS bundle output to
+  `dist/index.cjs` (and update the `exports` map). This is the "correct" fix but affects
+  consumers; verify with a tarball install before publishing.
+- Or, switch tests to a compile-first flow: a `tsconfig.test.json` that emits to
+  `dist-tests/`, then run mocha against the compiled `.js` files. Keeps the package's module
+  type as-is.
+
+Until then, run `pnpm test` locally on a Node version where the loader happens to work, and
+manually verify changes to public API.

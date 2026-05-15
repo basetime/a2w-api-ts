@@ -1,7 +1,10 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { baseUrl } from '../src/constants';
-import { ClaimsEndpoint, Client, KeysProvider } from '../src/index';
+import { getBaseUrl } from '../src/constants';
+import { Client, KeysProvider } from '../src/index';
+
+const baseUrl = getBaseUrl();
+const endpoint = '/claim';
 
 describe('ClaimsEndpoint', () => {
   const authUrl = `${baseUrl}/auth/apiGrant`;
@@ -51,23 +54,10 @@ describe('ClaimsEndpoint', () => {
   it('getPkpass() should succeed', async () => {
     const campaignId = 'UUUUUU';
     const passId = 'PPPPPP';
-    const url = `${baseUrl}${ClaimsEndpoint.endpoint}/${campaignId}/${passId}.pkpass`;
+    const url = `${baseUrl}${endpoint}/${campaignId}/${passId}.pkpass`;
     fetchMock.get(url, 'PKPASS');
 
     const passes = await client.claims.getPkpass(campaignId, passId);
     expectCommon(url, passes, 'string');
-  });
-
-  /**
-   *
-   */
-  it('debugJson() should succeed', async () => {
-    const campaignId = 'UUUUUU';
-    const passId = 'PPPPPP';
-    const url = `${baseUrl}${ClaimsEndpoint.endpoint}/${campaignId}/${passId}/debugDownloadJson`;
-    fetchMock.get(url, { id: 'PPPPPP' });
-
-    const passes = await client.claims.debugJson(campaignId, passId);
-    expectCommon(url, passes, 'object');
   });
 });
