@@ -33,7 +33,7 @@
     "build:cjs": "pnpm esbuild --bundle --platform=node --target=node14 --outfile=dist/index.cjs.js --format=cjs src/index.ts",
     "sync-version": "node scripts/sync-version.mjs",
     "clean": "rm -rf dist",
-    "prepare": "pnpm clean && pnpm build",
+    "prepare": "git config --local core.hooksPath .githooks 2>/dev/null || true && pnpm clean && pnpm build",
     "test": "mocha",
     "test:watch": "mocha --watch",
     "watch": "nodemon --exec 'pnpm run build' --watch src --ext ts",
