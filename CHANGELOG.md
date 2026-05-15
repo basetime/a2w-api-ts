@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.4.10 - 2026-05-15
+
 - Updates package.json to correct the homepage and bugs URL, and adds repository information. Modifies release workflow to create annotated tags for version releases.. (`40b3813`)
 
 ## 0.4.9 - 2026-05-15
