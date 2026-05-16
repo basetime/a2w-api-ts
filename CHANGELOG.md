@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Updates package.json to change the repository URL from HTTPS to SSH format for improved access and security.. (`d8f5d5c`)
 - **Breaking:** Extract `HttpRequester` from `Client`. Move `fetch`, `setBaseUrl`,
   `setAuth`, and `setUserAgent` to `HttpRequester` and expose it as `client.http`.
   Migrate `client.fetch(...)` -> `client.http.fetch(...)` and the setters similarly.

@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/basetime/a2w-api-ts.git"
+    "url": "git+ssh://git@github.com/basetime/a2w-api-ts.git"
   },
   "engines": {
     "node": ">=18"
