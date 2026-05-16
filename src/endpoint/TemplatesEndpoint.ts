@@ -22,7 +22,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @param id The ID of the template.
    */
   public getById = async (id: string): Promise<TemplateThumbnail> => {
-    return await this.do.get<TemplateThumbnail>(`/simple/${id}`);
+    return await this.do.get(`/simple/${id}`);
   };
 
   /**
@@ -31,7 +31,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @returns The templates.
    */
   public getAll = async (): Promise<Template[]> => {
-    return await this.do.get<Template[]>('/organization');
+    return await this.do.get('/organization');
   };
 
   /**
@@ -41,6 +41,6 @@ export default class TemplatesEndpoint extends Endpoint {
    * @returns The templates.
    */
   public getByTag = async (tag: string): Promise<TemplateThumbnail[]> => {
-    return await this.do.get<TemplateThumbnail[]>(`/tagged/${tag}`);
+    return await this.do.get(`/tagged/${tag}`);
   };
 }

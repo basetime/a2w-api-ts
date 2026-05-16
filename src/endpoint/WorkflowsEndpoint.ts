@@ -22,7 +22,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * Returns all of the workflows for authenticated organization.
    */
   public getAll = async (): Promise<Workflow[]> => {
-    return await this.do.get<Workflow[]>('');
+    return await this.do.get('');
   };
 
   /**
@@ -31,7 +31,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param id The ID of the workflow.
    */
   public getById = async (id: string): Promise<Workflow> => {
-    return await this.do.get<Workflow>(`/${id}`);
+    return await this.do.get(`/${id}`);
   };
 
   /**
@@ -40,7 +40,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param workflow The workflow to create.
    */
   public create = async (workflow: Omit<Workflow, 'id' | 'createdDate'>): Promise<Workflow> => {
-    return await this.do.post<Workflow>('', workflow);
+    return await this.do.post('', workflow);
   };
 
   /**
@@ -50,7 +50,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param workflow The workflow to update.
    */
   public update = async (workflowId: string, workflow: Partial<Workflow>): Promise<Workflow> => {
-    return await this.do.post<Workflow>(`/${workflowId}`, workflow);
+    return await this.do.post(`/${workflowId}`, workflow);
   };
 
   /**
@@ -59,7 +59,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param workflowId The ID of the workflow.
    */
   public delete = async (workflowId: string): Promise<void> => {
-    return await this.do.del<void>(`/${workflowId}`);
+    return await this.do.del(`/${workflowId}`);
   };
 
   /**
@@ -68,7 +68,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param workflowId The ID of the workflow.
    */
   public getJobs = async (workflowId: string): Promise<WorkflowJob[]> => {
-    return await this.do.get<WorkflowJob[]>(`/${workflowId}/jobs`);
+    return await this.do.get(`/${workflowId}/jobs`);
   };
 
   /**
@@ -77,7 +77,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param jobId The ID of the job.
    */
   public getJob = async (jobId: string): Promise<WorkflowJob> => {
-    return await this.do.get<WorkflowJob>(`/jobs/${jobId}`);
+    return await this.do.get(`/jobs/${jobId}`);
   };
 
   /**
@@ -87,7 +87,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param body The job body.
    */
   public updateJob = async (jobId: string, body: Partial<WorkflowJob>): Promise<WorkflowJob> => {
-    return await this.do.post<WorkflowJob>(`/jobs/${jobId}`, body);
+    return await this.do.post(`/jobs/${jobId}`, body);
   };
 
   /**
@@ -97,13 +97,13 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param message The message to log.
    */
   public addJobLog = async (jobId: string, message: WorkflowMessage): Promise<WorkflowJob> => {
-    return await this.do.post<WorkflowJob>(`/jobs/${jobId}/logs`, message);
+    return await this.do.post(`/jobs/${jobId}/logs`, message);
   };
 
   /**
    * Returns the snippets for the authenticated organization.
    */
   public getSnippets = async (): Promise<SnippetLibrary[]> => {
-    return await this.do.get<SnippetLibrary[]>('/libraries');
+    return await this.do.get('/libraries');
   };
 }

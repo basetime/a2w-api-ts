@@ -26,7 +26,7 @@ export default class ClaimsEndpoint extends Endpoint {
       .addParam('campaign', campaignId)
       .addParam('pass', passId);
 
-    return await this.do.fetch<string>(url, {
+    return await this.do.fetch(url, {
       method: 'GET',
       headers: {
         Accept: 'application/vnd.apple.pkpass',

@@ -21,7 +21,7 @@ export default class ImagesEndpoint extends Endpoint {
    * @param id The ID of the image.
    */
   public getById = async (id: string): Promise<Image | null> => {
-    return await this.do.get<Image | null>(`/${id}`);
+    return await this.do.get(`/${id}`);
   };
 
   /**
@@ -31,6 +31,6 @@ export default class ImagesEndpoint extends Endpoint {
    */
   public getByIds = async (ids: string[]): Promise<Image[]> => {
     const url = this.qb.create('/ids').addQuery('ids', ids.join(','));
-    return await this.do.get<Image[]>(url);
+    return await this.do.get(url);
   };
 }

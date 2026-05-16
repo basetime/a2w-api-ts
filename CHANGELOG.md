@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Refactors endpoint methods to remove generic type parameters from `do` method calls, enhancing code simplicity and readability across CampaignsEndpoint, ClaimsEndpoint, ImagesEndpoint, OrganizationsEndpoint, ScannersEndpoint, TemplatesEndpoint, and WorkflowsEndpoint.. (`59f1f5a`)
 - Refactors endpoint classes to replace legacy URL handling with a new `do` method for request operations, improving code clarity and consistency.. (`50ce0c1`)
 - Refactors endpoint classes to utilize a QueryBuilder for URL construction, enhancing readability and maintainability.. (`36a2f14`)
 - Updates package.json to change the repository URL from HTTPS to SSH format for improved access and security.. (`d8f5d5c`)

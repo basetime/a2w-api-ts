@@ -24,7 +24,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @returns The organization.
    */
   public getMine = async (): Promise<Organization> => {
-    return await this.do.get<Organization>('');
+    return await this.do.get('');
   };
 
   /**
@@ -33,7 +33,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param code The invite code.
    */
   public getScannerInvite = async (code: string): Promise<ScannerInvite | null> => {
-    return await this.do.get<ScannerInvite>(`/scanners/invites/${code}`, false);
+    return await this.do.get(`/scanners/invites/${code}`, false);
   };
 
   /**
@@ -42,7 +42,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param code The invite code.
    */
   public startScannerExchange = async (code: string): Promise<ScannerInvite | null> => {
-    return await this.do.get<ScannerInvite>(`/scanners/invites/${code}/start`, false);
+    return await this.do.get(`/scanners/invites/${code}/start`, false);
   };
 
   /**
@@ -57,7 +57,7 @@ export default class OrganizationsEndpoint extends Endpoint {
     pushToken: string,
     scannerDeviceInfo: ScannerDeviceInfo,
   ): Promise<ApiKey> => {
-    return await this.do.post<ApiKey>(
+    return await this.do.post(
       '/scanners/invites',
       {
         code,
@@ -72,7 +72,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    * Returns the API keys for the authenticated organization.
    */
   public getApiKeys = async (): Promise<ApiKey[]> => {
-    return await this.do.get<ApiKey[]>('/apiKeys');
+    return await this.do.get('/apiKeys');
   };
 
   /**
@@ -85,7 +85,7 @@ export default class OrganizationsEndpoint extends Endpoint {
       .addParam('id', id)
       .addQuery('scanner', JSON.stringify(scanner));
 
-    return await this.do.get<ApiKey | null>(url);
+    return await this.do.get(url);
   };
 
   /**
@@ -94,6 +94,6 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param id The ID of the API key.
    */
   public deleteApiKey = async (id: string): Promise<void> => {
-    return await this.do.del<void>(`/apiKeys/${id}`);
+    return await this.do.del(`/apiKeys/${id}`);
   };
 }
