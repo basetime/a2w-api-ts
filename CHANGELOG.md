@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Refactors endpoint classes to streamline request handling by consolidating method signatures and enhancing type safety. Updates CampaignsEndpoint, ClaimsEndpoint, ImagesEndpoint, OrganizationsEndpoint, and WorkflowsEndpoint to improve consistency and maintainability across the codebase.. (`951ce5a`)
 - Refactors endpoint methods to remove generic type parameters from `do` method calls, enhancing code simplicity and readability across CampaignsEndpoint, ClaimsEndpoint, ImagesEndpoint, OrganizationsEndpoint, ScannersEndpoint, TemplatesEndpoint, and WorkflowsEndpoint.. (`59f1f5a`)
 - Refactors endpoint classes to replace legacy URL handling with a new `do` method for request operations, improving code clarity and consistency.. (`50ce0c1`)
 - Refactors endpoint classes to utilize a QueryBuilder for URL construction, enhancing readability and maintainability.. (`36a2f14`)
