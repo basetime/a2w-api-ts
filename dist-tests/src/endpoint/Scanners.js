@@ -12,8 +12,13 @@ const endpoint = '/scanners';
  * Communicate with the scanners endpoints.
  */
 class ScannersEndpoint extends Endpoint_1.default {
-    constructor() {
-        super(...arguments);
+    /**
+     * Constructor.
+     *
+     * @param req The object to use to make requests.
+     */
+    constructor(req) {
+        super(req, endpoint);
         /**
          * Returns the scanner app by registration code.
          *

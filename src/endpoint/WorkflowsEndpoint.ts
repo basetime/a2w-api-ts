@@ -1,3 +1,4 @@
+import { Requester } from '../http/Requester';
 import { SnippetLibrary } from '../types/SnippetLibrary';
 import { Workflow } from '../types/Workflow';
 import { WorkflowJob } from '../types/WorkflowJob';
@@ -13,6 +14,15 @@ const endpoint = '/workflows';
  * Communicate with the workflows endpoints.
  */
 export default class WorkflowsEndpoint extends Endpoint {
+  /**
+   * Constructor.
+   *
+   * @param req The object to use to make requests.
+   */
+  constructor(req: Requester) {
+    super(req, endpoint);
+  }
+
   /**
    * Returns all of the workflows for authenticated organization.
    */

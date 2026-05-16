@@ -1,5 +1,7 @@
+import { Requester } from '../http/Requester';
 import { ApiKey } from '../types/ApiKey';
 import { Organization } from '../types/Organization';
+import { ScannerDeviceInfo } from '../types/ScannerDeviceInfo';
 import { ScannerInvite } from '../types/ScannerInvite';
 import Endpoint from './Endpoint';
 
@@ -12,6 +14,15 @@ const endpoint = '/organization';
  * Communicate with the organizations endpoints.
  */
 export default class OrganizationsEndpoint extends Endpoint {
+  /**
+   * Constructor.
+   *
+   * @param req The object to use to make requests.
+   */
+  constructor(req: Requester) {
+    super(req, endpoint);
+  }
+
   /**
    * Fetches the details of the authenticated organization.
    *
@@ -49,7 +60,7 @@ export default class OrganizationsEndpoint extends Endpoint {
   public finishScannerExchange = async (
     code: string,
     pushToken: string,
-    scannerDeviceInfo: any,
+    scannerDeviceInfo: ScannerDeviceInfo,
   ): Promise<ApiKey> => {
     return await this.doPost<ApiKey>(
       `${endpoint}/scanners/invites`,
@@ -75,8 +86,9 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param id The ID of the API key.
    */
   public getApiKey = async (id: string, scanner: any = ''): Promise<ApiKey | null> => {
-    const scannerStr = encodeURIComponent(JSON.stringify(scanner));
-    const url = `${endpoint}/apiKeys/${id}?scanner=${scannerStr}`;
+    const url = this.qb.create('/apiKeys/{id}')
+      .addParam('id', id)
+      .addQuery('scanner', JSON.stringify(scanner));
 
     return await this.doGet<ApiKey | null>(url);
   };

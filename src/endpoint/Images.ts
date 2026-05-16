@@ -1,3 +1,4 @@
+import { Requester } from '../http/Requester';
 import { Image } from '../types/Image';
 import Endpoint from './Endpoint';
 
@@ -10,6 +11,15 @@ const endpoint = '/images';
  * Communicate with the images endpoints.
  */
 export default class ImagesEndpoint extends Endpoint {
+  /**
+   * Constructor.
+   *
+   * @param req The object to use to make requests.
+   */
+  constructor(req: Requester) {
+    super(req, endpoint);
+  }
+
   /**
    * Returns the image with the given ID.
    *
@@ -25,6 +35,7 @@ export default class ImagesEndpoint extends Endpoint {
    * @param ids The IDs of the images.
    */
   public getByIds = async (ids: string[]): Promise<Image[]> => {
-    return await this.doGet<Image[]>(`${endpoint}/ids?ids=${ids.join(',')}`);
+    const url = this.qb.create('/ids').addQuery('ids', ids.join(','));
+    return await this.doGet<Image[]>(url);
   };
 }

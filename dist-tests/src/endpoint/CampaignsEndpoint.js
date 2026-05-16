@@ -16,8 +16,13 @@ const enrollmentEndpoint = '/e';
  * Communicate with the campaigns endpoints.
  */
 class CampaignsEndpoint extends Endpoint_1.default {
-    constructor() {
-        super(...arguments);
+    /**
+     * Constructor.
+     *
+     * @param req The object to use to make requests.
+     */
+    constructor(req) {
+        super(req, endpoint);
         /**
          * Returns all of the campaigns for authenticated organization.
          *
@@ -51,8 +56,10 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @param scanner Only used by scanners. The scanner that's being used to request the pass.
          */
         this.getPass = async (campaignId, passId, scanner = '') => {
-            const scannerStr = encodeURIComponent(JSON.stringify(scanner));
-            const url = `${endpoint}/${campaignId}/passes/details/${passId}?scanner=${scannerStr}`;
+            const url = this.qb.create('/{campaign}/passes/details/{pass}')
+                .addParam('campaign', campaignId)
+                .addParam('pass', passId)
+                .addQuery('scanner', JSON.stringify(scanner));
             return await this.doGet(url);
         };
         /**
@@ -63,12 +70,8 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns The passes.
          */
         this.queryPasses = async (campaignId, queries = {}) => {
-            let url = `${endpoint}/${campaignId}/passes/query`;
-            if (Object.keys(queries).length > 0) {
-                const e = encodeURIComponent;
-                const queryString = Object.entries(queries).map(([key, value]) => `query[]=${e(key)}:${e(value)}`).join('&');
-                url = `${url}?${queryString}`;
-            }
+            const url = this.qb.create('/{campaign}/passes/query').addParam('campaign', campaignId);
+            Object.entries(queries).forEach(([key, value]) => url.addQuery('query[]', `${key}:${value}`));
             return await this.doGet(url);
         };
         /**

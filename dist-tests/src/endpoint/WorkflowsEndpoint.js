@@ -12,8 +12,13 @@ const endpoint = '/workflows';
  * Communicate with the workflows endpoints.
  */
 class WorkflowsEndpoint extends Endpoint_1.default {
-    constructor() {
-        super(...arguments);
+    /**
+     * Constructor.
+     *
+     * @param req The object to use to make requests.
+     */
+    constructor(req) {
+        super(req, endpoint);
         /**
          * Returns all of the workflows for authenticated organization.
          */

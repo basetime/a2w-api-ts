@@ -12,8 +12,13 @@ const endpoint = '/organization';
  * Communicate with the organizations endpoints.
  */
 class OrganizationsEndpoint extends Endpoint_1.default {
-    constructor() {
-        super(...arguments);
+    /**
+     * Constructor.
+     *
+     * @param req The object to use to make requests.
+     */
+    constructor(req) {
+        super(req, endpoint);
         /**
          * Fetches the details of the authenticated organization.
          *
@@ -64,8 +69,9 @@ class OrganizationsEndpoint extends Endpoint_1.default {
          * @param id The ID of the API key.
          */
         this.getApiKey = async (id, scanner = '') => {
-            const scannerStr = encodeURIComponent(JSON.stringify(scanner));
-            const url = `${endpoint}/apiKeys/${id}?scanner=${scannerStr}`;
+            const url = this.qb.create('/apiKeys/{id}')
+                .addParam('id', id)
+                .addQuery('scanner', JSON.stringify(scanner));
             return await this.doGet(url);
         };
         /**

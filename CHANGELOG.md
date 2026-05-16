@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Refactors endpoint classes to utilize a QueryBuilder for URL construction, enhancing readability and maintainability.. (`36a2f14`)
 - Updates package.json to change the repository URL from HTTPS to SSH format for improved access and security.. (`d8f5d5c`)
 - **Breaking:** Extract `HttpRequester` from `Client`. Move `fetch`, `setBaseUrl`,
   `setAuth`, and `setUserAgent` to `HttpRequester` and expose it as `client.http`.

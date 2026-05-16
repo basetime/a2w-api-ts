@@ -1,3 +1,4 @@
+import { Requester } from '../http/Requester';
 import { Campaign } from '../types/Campaign';
 import { CampaignStats } from '../types/CampaignStats';
 import { Claim } from '../types/Claim';
@@ -25,6 +26,15 @@ export default class CampaignsEndpoint extends Endpoint {
    * A function to encode the data into a jwt. Used by the enrollment endpoint.
    */
   public jwtEncode?: (data: Record<string, any>) => Promise<string>;
+
+  /**
+   * Constructor.
+   *
+   * @param req The object to use to make requests.
+   */
+  constructor(req: Requester) {
+    super(req, endpoint);
+  }
 
   /**
    * Returns all of the campaigns for authenticated organization.
@@ -62,8 +72,10 @@ export default class CampaignsEndpoint extends Endpoint {
    * @param scanner Only used by scanners. The scanner that's being used to request the pass.
    */
   public getPass = async (campaignId: string, passId: string, scanner: any = ''): Promise<Pass> => {
-    const scannerStr = encodeURIComponent(JSON.stringify(scanner));
-    const url = `${endpoint}/${campaignId}/passes/details/${passId}?scanner=${scannerStr}`;
+    const url = this.qb.create('/{campaign}/passes/details/{pass}')
+      .addParam('campaign', campaignId)
+      .addParam('pass', passId)
+      .addQuery('scanner', JSON.stringify(scanner));
 
     return await this.doGet<Pass>(url);
   };
@@ -76,13 +88,8 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The passes.
    */
   public queryPasses = async (campaignId: string, queries: Record<string, any> = {}): Promise<Pass[]> => {
-    let url = `${endpoint}/${campaignId}/passes/query`;
-
-    if (Object.keys(queries).length > 0) {
-      const e = encodeURIComponent;
-      const queryString = Object.entries(queries).map(([key, value]) => `query[]=${e(key)}:${e(value)}`).join('&');
-      url = `${url}?${queryString}`;
-    }
+    const url = this.qb.create('/{campaign}/passes/query').addParam('campaign', campaignId);
+    Object.entries(queries).forEach(([key, value]) => url.addQuery('query[]', `${key}:${value}`));
 
     return await this.doGet<Pass[]>(url);
   };

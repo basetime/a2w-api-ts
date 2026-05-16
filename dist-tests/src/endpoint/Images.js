@@ -12,8 +12,13 @@ const endpoint = '/images';
  * Communicate with the images endpoints.
  */
 class ImagesEndpoint extends Endpoint_1.default {
-    constructor() {
-        super(...arguments);
+    /**
+     * Constructor.
+     *
+     * @param req The object to use to make requests.
+     */
+    constructor(req) {
+        super(req, endpoint);
         /**
          * Returns the image with the given ID.
          *
@@ -28,7 +33,8 @@ class ImagesEndpoint extends Endpoint_1.default {
          * @param ids The IDs of the images.
          */
         this.getByIds = async (ids) => {
-            return await this.doGet(`${endpoint}/ids?ids=${ids.join(',')}`);
+            const url = this.qb.create('/ids').addQuery('ids', ids.join(','));
+            return await this.doGet(url);
         };
     }
 }

@@ -1,3 +1,4 @@
+import { Requester } from '../http/Requester';
 import { ApiKey } from '../types/ApiKey';
 import { ScannerApp, ScannerAppInput } from '../types/ScannerApp';
 import { ScannerDeviceInfo } from '../types/ScannerDeviceInfo';
@@ -12,6 +13,15 @@ const endpoint = '/scanners';
  * Communicate with the scanners endpoints.
  */
 export default class ScannersEndpoint extends Endpoint {
+  /**
+   * Constructor.
+   *
+   * @param req The object to use to make requests.
+   */
+  constructor(req: Requester) {
+    super(req, endpoint);
+  }
+
   /**
    * Returns the scanner app by registration code.
    *

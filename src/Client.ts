@@ -4,7 +4,7 @@ import CampaignsEndpoint from './endpoint/CampaignsEndpoint';
 import ClaimsEndpoint from './endpoint/ClaimsEndpoint';
 import ImagesEndpoint from './endpoint/Images';
 import OrganizationsEndpoint from './endpoint/OrganizationsEndpoint';
-import ScannersEndpoint from './endpoint/Scanners';
+import ScannersEndpoint from './endpoint/ScannersEndpoint';
 import TemplatesEndpoint from './endpoint/TemplatesEndpoint';
 import WorkflowsEndpoint from './endpoint/WorkflowsEndpoint';
 import { AuthProvider } from './provider/AuthProvider';

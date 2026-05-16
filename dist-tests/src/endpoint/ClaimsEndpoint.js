@@ -12,8 +12,13 @@ const endpoint = '/claim';
  * Communicate with the claims endpoints.
  */
 class ClaimsEndpoint extends Endpoint_1.default {
-    constructor() {
-        super(...arguments);
+    /**
+     * Constructor.
+     *
+     * @param req The object to use to make requests.
+     */
+    constructor(req) {
+        super(req, endpoint);
         /**
          * Returns the pkpass file for a campaign and pass.
          *
@@ -22,8 +27,10 @@ class ClaimsEndpoint extends Endpoint_1.default {
          * @returns The pkpass file.
          */
         this.getPkpass = async (campaignId, passId) => {
-            const url = `${endpoint}/${campaignId}/${passId}.pkpass`;
-            return await this.req.fetch(url, {
+            const url = this.qb.create('/{campaign}/{pass}.pkpass')
+                .addParam('campaign', campaignId)
+                .addParam('pass', passId);
+            return await this.doFetch(url, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/vnd.apple.pkpass',

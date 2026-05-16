@@ -1,3 +1,4 @@
+import { Requester } from '../http/Requester';
 import { Template } from '../types/Template';
 import { TemplateThumbnail } from '../types/TemplateThumbnail';
 import Endpoint from './Endpoint';
@@ -11,6 +12,15 @@ const endpoint = '/templates';
  * Communicate with the templates endpoints.
  */
 export default class TemplatesEndpoint extends Endpoint {
+  /**
+   * Constructor.
+   *
+   * @param req The object to use to make requests.
+   */
+  constructor(req: Requester) {
+    super(req, endpoint);
+  }
+
   /**
    * Returns a template by ID.
    *
