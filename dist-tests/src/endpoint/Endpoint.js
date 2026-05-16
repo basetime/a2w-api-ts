@@ -1,0 +1,73 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+/**
+ * Parent class for other endpoints.
+ *
+ * Provides a stable, protected request surface (`doGet`/`doPost`/`doPut`/`doDelete`) for
+ * subclasses to call. The actual HTTP work is delegated to the injected `Requester`, which keeps
+ * subclasses free of any direct dependency on `HttpRequester` and trivially testable with a
+ * stub requester.
+ */
+class Endpoint {
+    /**
+     * Constructor.
+     *
+     * The requester is typically the shared `HttpRequester` owned by the parent `Client`, but
+     * tests may pass any object that satisfies the `Requester` interface.
+     *
+     * @param req The object to use to make requests.
+     */
+    constructor(req) {
+        this.req = req;
+        /**
+         * Makes a GET request.
+         *
+         * Forwards to the injected `Requester`. Provided so subclasses don't have to reach through
+         * `this.req` for the common case.
+         *
+         * @param url The url to fetch.
+         * @param authenticate Whether to authenticate the request.
+         */
+        this.doGet = async (url, authenticate = true) => {
+            return await this.req.doGet(url, authenticate);
+        };
+        /**
+         * Makes a POST request.
+         *
+         * Forwards to the injected `Requester`, which handles JSON serialisation and headers.
+         *
+         * @param url The url to fetch.
+         * @param body The body to send.
+         * @param authenticate Whether to authenticate the request.
+         */
+        this.doPost = async (url, body, authenticate = true) => {
+            return await this.req.doPost(url, body, authenticate);
+        };
+        /**
+         * Makes a PUT request.
+         *
+         * Forwards to the injected `Requester`, which handles JSON serialisation and headers.
+         *
+         * @param url The url to fetch.
+         * @param body The body to send.
+         * @param authenticate Whether to authenticate the request.
+         */
+        this.doPut = async (url, body, authenticate = true) => {
+            return await this.req.doPut(url, body, authenticate);
+        };
+        /**
+         * Makes a DELETE request.
+         *
+         * Forwards to the injected `Requester`. The body is optional; when supplied it is sent as
+         * JSON, otherwise the request goes out without one.
+         *
+         * @param url The url to fetch.
+         * @param authenticate Whether to authenticate the request.
+         * @param body The body to send.
+         */
+        this.doDelete = async (url, authenticate = true, body = undefined) => {
+            return await this.req.doDelete(url, authenticate, body);
+        };
+    }
+}
+exports.default = Endpoint;

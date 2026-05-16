@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Breaking:** Extract `HttpRequester` from `Client`. Move `fetch`, `setBaseUrl`,
+  `setAuth`, and `setUserAgent` to `HttpRequester` and expose it as `client.http`.
+  Migrate `client.fetch(...)` -> `client.http.fetch(...)` and the setters similarly.
+
 ## 0.4.10 - 2026-05-15
 
 - Updates package.json to correct the homepage and bugs URL, and adds repository information. Modifies release workflow to create annotated tags for version releases.. (`40b3813`)

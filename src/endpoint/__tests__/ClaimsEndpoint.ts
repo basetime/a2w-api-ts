@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl } from '../src/constants';
-import { Client, KeysProvider } from '../src/index';
+import { getBaseUrl } from '../../constants';
+import { Client, KeysProvider } from '../../index';
 
 const baseUrl = getBaseUrl();
 const endpoint = '/claim';
@@ -54,7 +54,7 @@ describe('ClaimsEndpoint', () => {
   it('getPkpass() should succeed', async () => {
     const campaignId = 'UUUUUU';
     const passId = 'PPPPPP';
-    const url = `${baseUrl}${endpoint}/${campaignId}/${passId}.pkpass`;
+    const url = `${baseUrl}${endpoint}/${campaignId}/${passId}.pkpass?api=true`;
     fetchMock.get(url, 'PKPASS');
 
     const passes = await client.claims.getPkpass(campaignId, passId);

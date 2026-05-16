@@ -18,10 +18,14 @@
 ## Tests
 
 The test runner is currently disabled in CI (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
-The test files in [`tests/`](tests/) compile cleanly but mocha cannot load them because the
-project mixes ESM source (`tsconfig.json` `"module": "esnext"`) with a root `package.json` that
-has no `"type": "module"`, so ts-node's ESM loader (`.mocharc.json` -> `loader=ts-node/esm`)
-treats `src/*.ts` as CJS and the test imports fail with `Named export 'Client' not found`.
+Test files live in `__tests__` subdirectories next to the code they cover (e.g.
+[`src/http/__tests__/HttpRequester.ts`](src/http/__tests__/HttpRequester.ts)) and are picked up
+via the `src/**/__tests__/**/*.ts` glob in [`.mocharc.json`](.mocharc.json). They compile
+cleanly but mocha cannot load them because the project mixes ESM source
+(`tsconfig.json` `"module": "esnext"`) with a root `package.json` that has no
+`"type": "module"`, so ts-node's ESM loader (`.mocharc.json` -> `loader=ts-node/esm`) treats
+`src/*.ts` as CJS and the test imports fail (currently with `ERR_REQUIRE_CYCLE_MODULE` on
+recent Node, previously with `Named export 'Client' not found`).
 
 To restore tests, options are:
 

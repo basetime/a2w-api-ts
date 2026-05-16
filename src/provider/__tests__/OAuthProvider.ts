@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl } from '../src/constants';
-import { OAuthProvider } from '../src/index';
+import { getBaseUrl } from '../../constants';
+import { OAuthProvider } from '../../index';
 
 const baseUrl = getBaseUrl();
 
@@ -14,7 +14,7 @@ describe('OAuthProvider', () => {
     const oauth = new OAuthProvider(app, '@', console);
     const url = oauth.getCodeUrl('redirect', ['scope1', 'scope2'], 'state');
     expect(url).to.be.equal(
-      `${baseUrl}/oauth/code?app=${app}&redirect_uri=redirect&scope=scope1 scope2&state=state`,
+      `${baseUrl}/auth/oauth/code?app=${app}&redirectUrl=redirect&scope=scope1%20scope2&state=state`,
     );
   });
 
@@ -24,7 +24,7 @@ describe('OAuthProvider', () => {
   it('authenticate() should return an idToken', async () => {
     const idToken = 'xxxxxxxx';
     const refreshToken = 'yyyyyyyy';
-    fetchMock.post(`${baseUrl}/oauth/token`, {
+    fetchMock.post(`${baseUrl}/auth/oauth/token`, {
       idToken,
       refreshToken,
       expiresAt: Date.now() + 1000,

@@ -1,0 +1,45 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Endpoint_1 = __importDefault(require("./Endpoint"));
+/**
+ * The templates endpoint.
+ */
+const endpoint = '/templates';
+/**
+ * Communicate with the templates endpoints.
+ */
+class TemplatesEndpoint extends Endpoint_1.default {
+    constructor() {
+        super(...arguments);
+        /**
+         * Returns a template by ID.
+         *
+         * @param id The ID of the template.
+         */
+        this.getById = async (id) => {
+            const url = `${endpoint}/simple/${id}`;
+            return await this.doGet(url);
+        };
+        /**
+         * Returns all of the templates for authenticated organization.
+         *
+         * @returns The templates.
+         */
+        this.getAll = async () => {
+            return await this.doGet(`${endpoint}/organization`);
+        };
+        /**
+         * Returns all of the templates for a specific tag.
+         *
+         * @param tag The tag.
+         * @returns The templates.
+         */
+        this.getByTag = async (tag) => {
+            return await this.doGet(`${endpoint}/tagged/${tag}`);
+        };
+    }
+}
+exports.default = TemplatesEndpoint;

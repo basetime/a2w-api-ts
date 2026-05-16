@@ -1,7 +1,5 @@
-import { version } from './version';
+import HttpRequester from './http/HttpRequester';
 import { Logger } from './Logger';
-import NoopLogger from './NoopLogger';
-import { getBaseUrl, setBaseUrl } from './constants';
 import CampaignsEndpoint from './endpoint/CampaignsEndpoint';
 import ClaimsEndpoint from './endpoint/ClaimsEndpoint';
 import ImagesEndpoint from './endpoint/Images';
@@ -10,265 +8,94 @@ import ScannersEndpoint from './endpoint/Scanners';
 import TemplatesEndpoint from './endpoint/TemplatesEndpoint';
 import WorkflowsEndpoint from './endpoint/WorkflowsEndpoint';
 import { AuthProvider } from './provider/AuthProvider';
-import { Requester } from './types/Requester';
 
 /**
  * Client class that communicates with the the addtowallet API.
+ *
+ * The library's main entry point. Owns an `HttpRequester` (exposed as `http`) and constructs a
+ * set of endpoint helpers — one per API resource — that share that same requester. Construct one
+ * per credential set; the underlying `HttpRequester` is safe to reuse across many concurrent
+ * requests.
  */
-export default class Client implements Requester {
+export default class Client {
   /**
-   * The authentication object.
+   * The HTTP client used for all requests to the API.
+   *
+   * Exposed publicly so callers can issue ad-hoc `fetch`/`doGet`/etc. requests against endpoints
+   * that don't yet have a dedicated helper. All bundled endpoints share this same instance, so
+   * configuration changes (base URL, auth, user agent) apply uniformly.
    */
-  public auth?: AuthProvider;
-
-  /**
-   * The logger.
-   */
-  protected logger: Logger;
-
-  /**
-   * The user agent string.
-   */
-  protected userAgent: string = '';
+  public readonly http: HttpRequester;
 
   /**
    * The campaigns endpoint.
+   *
+   * CRUD operations, stats, and enrollment helpers for campaigns owned by the authenticated
+   * organization.
    */
-  protected _campaigns?: CampaignsEndpoint;
+  public readonly campaigns: CampaignsEndpoint;
 
   /**
    * The claims endpoint.
+   *
+   * Manages pass claims — fetching, claiming, and inspecting claim state.
    */
-  protected _claims?: ClaimsEndpoint;
+  public readonly claims: ClaimsEndpoint;
 
   /**
    * The templates endpoint.
+   *
+   * Reads and writes pass templates (Apple Wallet and Google Wallet) and their thumbnails.
    */
-  protected _templates?: TemplatesEndpoint;
+  public readonly templates: TemplatesEndpoint;
 
   /**
    * The organizations endpoint.
+   *
+   * Manages the authenticated organization, its members, API keys, and related settings.
    */
-  protected _organizations?: OrganizationsEndpoint;
+  public readonly organizations: OrganizationsEndpoint;
 
   /**
    * The scanners endpoint.
+   *
+   * Manages scanner apps, invites, and per-device state used by the Addtowallet scanner
+   * companion.
    */
-  protected _scanners?: ScannersEndpoint;
+  public readonly scanners: ScannersEndpoint;
 
   /**
    * The workflows endpoint.
+   *
+   * Drives automated workflows — triggers, jobs, and messages associated with them.
    */
-  protected _workflows?: WorkflowsEndpoint;
+  public readonly workflows: WorkflowsEndpoint;
 
   /**
    * The images endpoint.
+   *
+   * Uploads, lists, and deletes images stored against the authenticated organization.
    */
-  protected _images?: ImagesEndpoint;
+  public readonly images: ImagesEndpoint;
 
   /**
    * Constructor.
+   *
+   * The auth provider is optional so an unauthenticated client can be used for public endpoints;
+   * any subsequent calls that hit authenticated routes will fail until one is wired up via
+   * `client.http.setAuth(...)`. When the logger is omitted, debug output is silently discarded.
    *
    * @param auth The authentication provider.
    * @param logger The logger to use.
    */
   constructor(auth?: AuthProvider, logger?: Logger) {
-    this.logger = logger || new NoopLogger();
-    if (auth) {
-      this.setAuth(auth);
-    }
+    this.http = new HttpRequester(auth, logger);
+    this.campaigns = new CampaignsEndpoint(this.http);
+    this.claims = new ClaimsEndpoint(this.http);
+    this.templates = new TemplatesEndpoint(this.http);
+    this.organizations = new OrganizationsEndpoint(this.http);
+    this.scanners = new ScannersEndpoint(this.http);
+    this.workflows = new WorkflowsEndpoint(this.http);
+    this.images = new ImagesEndpoint(this.http);
   }
-
-  /**
-   * Sets the base URL for all requests to the API.
-   *
-   * @param url The base URL for all requests to the API.
-   */
-  public setBaseUrl = (url: string) => {
-    setBaseUrl(url);
-  };
-
-  /**
-   * Sets the auth provider to use.
-   *
-   * @param auth The auth provider to use.
-   */
-  public setAuth = (auth: AuthProvider) => {
-    this.auth = auth;
-    this.auth.setLogger(this.logger);
-  };
-
-  /**
-   * Sets the user agent string.
-   *
-   * @param userAgent The user agent string to use.
-   */
-  public setUserAgent = (userAgent: string) => {
-    this.userAgent = userAgent;
-  };
-
-  /**
-   * Returns the campaigns endpoint.
-   *
-   * @returns {CampaignsEndpoint} The campaigns endoint.
-   */
-  public get campaigns(): CampaignsEndpoint {
-    if (!this._campaigns) {
-      this._campaigns = new CampaignsEndpoint(this);
-    }
-
-    return this._campaigns;
-  }
-
-  /**
-   * Returns the claims endpoint.
-   *
-   * @returns {ClaimsEndpoint} The claims endpoint.
-   */
-  public get claims(): ClaimsEndpoint {
-    if (!this._claims) {
-      this._claims = new ClaimsEndpoint(this);
-    }
-
-    return this._claims;
-  }
-
-  /**
-   * Returns the templates endpoint.
-   */
-  public get templates(): TemplatesEndpoint {
-    if (!this._templates) {
-      this._templates = new TemplatesEndpoint(this);
-    }
-
-    return this._templates;
-  }
-
-  /**
-   * Returns the organizations endpoint.
-   */
-  public get organizations(): OrganizationsEndpoint {
-    if (!this._organizations) {
-      this._organizations = new OrganizationsEndpoint(this);
-    }
-
-    return this._organizations;
-  }
-
-  /**
-   * Returns the scanners endpoint.
-   */
-  public get scanners(): ScannersEndpoint {
-    if (!this._scanners) {
-      this._scanners = new ScannersEndpoint(this);
-    }
-
-    return this._scanners;
-  }
-
-  /**
-   * Returns the workflows endpoint.
-   */
-  public get workflows(): WorkflowsEndpoint {
-    if (!this._workflows) {
-      this._workflows = new WorkflowsEndpoint(this);
-    }
-
-    return this._workflows;
-  }
-
-  /**
-   * Returns the images endpoint.
-   */
-  public get images(): ImagesEndpoint {
-    if (!this._images) {
-      this._images = new ImagesEndpoint(this);
-    }
-
-    return this._images;
-  }
-
-  /**
-   * Sends a request using the fetcher and returns the response.
-   *
-   * Adds the bearer token to the headers and catches errors.
-   *
-   * @param url The url to send the request to.
-   * @param options The fetch options.
-   * @param authenticate Whether to authenticate the request.
-   * @returns The response from the endpoint.
-   */
-  public fetch = async <T>(
-    url: string,
-    options: RequestInit = {},
-    authenticate = true,
-  ): Promise<T> => {
-    const sep = url.includes('?') ? '&' : '?';
-    url = `${getBaseUrl()}${url}${sep}api=true`;
-
-    const headers = options.headers ? new Headers(options.headers) : new Headers();
-    if (this.userAgent) {
-      headers.set('User-Agent', this.userAgent);
-    }
-    if (!headers.has('User-Agent')) {
-      headers.set('User-Agent', `a2w-api-ts/${version} (Node.js ${process.version})`);
-    }
-    if (!headers.has('Accept')) {
-      headers.set('Accept', 'application/json');
-    }
-    if (!headers.has('Content-Type')) {
-      headers.set('Content-Type', 'application/json');
-    }
-
-    // Adds the bearer token to the headers, and ensures the json headers are
-    // set. The caller *might* want to override the json headers (like when
-    // uploading a multipart file), so we don't overwrite them if they are set.
-    if (authenticate && this.auth) {
-      const authed = this.auth.getAuthed();
-      if (authed) {
-        headers.set('Authorization', `Bearer ${authed.idToken}`);
-      } else {
-        const bearerToken = await this.auth.authenticate();
-        headers.set('Authorization', `Bearer ${bearerToken}`);
-      }
-    }
-
-    this.logger.debug(
-      `${options?.method || 'GET'} ${url}, ${authenticate ? 'authenticate' : 'no authenticate'}, body: ${options.body ? JSON.stringify(options.body) : 'none'}`,
-    );
-
-    const opts: RequestInit = {
-      ...options,
-      headers,
-    };
-
-    return await fetch(url, opts)
-      .then(async (resp) => {
-        if (resp.ok) {
-          if (headers.get('Accept') === 'application/json') {
-            return resp.json() as T;
-          }
-          return resp.text() as unknown as T;
-        }
-
-        const body = await resp.text();
-        let json: any = body;
-        try {
-          json = JSON.parse(body);
-        } catch (err) {
-          // Do nothing
-        }
-
-        if (typeof json === 'string') {
-          throw new Error(`Response failed: ${resp.status} ${body}`);
-        }
-        if (json.error) {
-          throw new Error(`${resp.status} ${json.error}`);
-        }
-        throw new Error(`Response failed: ${resp.status} ${resp.statusText}`);
-      })
-      .catch((err: any) => {
-        throw new Error(`Response failed: ${err.toString()}`);
-      });
-  };
 }

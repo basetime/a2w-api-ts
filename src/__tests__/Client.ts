@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl } from '../src/constants';
-import { CampaignsEndpoint, ClaimsEndpoint, Client, KeysProvider } from '../src/index';
+import { getBaseUrl } from '../constants';
+import { CampaignsEndpoint, ClaimsEndpoint, Client, KeysProvider } from '../index';
 
 const baseUrl = getBaseUrl();
 
@@ -37,12 +37,12 @@ describe('Client', () => {
    *
    */
   it('fetch() should succeed', async () => {
-    fetchMock.get(`${baseUrl}/campaigns`, { campaigns: [] });
-    await client.fetch('/campaigns', {});
+    fetchMock.get(`${baseUrl}/campaigns?api=true`, { campaigns: [] });
+    await client.http.fetch('/campaigns', {});
 
     const lastCalled = fetchMock.lastCall();
     expect(lastCalled).to.not.be.undefined;
-    expect(lastCalled?.[0]).to.be.equal(`${baseUrl}/campaigns`);
+    expect(lastCalled?.[0]).to.be.equal(`${baseUrl}/campaigns?api=true`);
   });
 
   /**

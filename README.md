@@ -97,15 +97,15 @@ const client = new Client(oauth);
 
 ```ts
 const client = new Client();
-client.setUserAgent('my-custom-user-agent/1.0.0');
+client.http.setUserAgent('my-custom-user-agent/1.0.0');
 ```
 
 ### Custom fetch
 
-When the client is not pre-configured to use a specific API endpoint, you can use the `fetch` method to make requests to the API, and authentication will be handled automatically.
+All HTTP concerns live on `client.http`, an instance of `HttpRequester` that can also be constructed standalone (for example, in tests). When the client is not pre-configured to use a specific API endpoint, you can use the `fetch` method to make requests to the API, and authentication will be handled automatically.
 
 ```ts
-const t = await client.fetch('/templates/simple/l74mNQLcjWnN2AoRRKG0');
+const t = await client.http.fetch('/templates/simple/l74mNQLcjWnN2AoRRKG0');
 console.log(t);
 ```
 

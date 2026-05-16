@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl } from '../src/constants';
-import { KeysProvider } from '../src/index';
+import { getBaseUrl } from '../../constants';
+import { KeysProvider } from '../../index';
 
 const baseUrl = getBaseUrl();
 

@@ -1,4 +1,5 @@
 export { default as Client } from './Client';
+export { default as HttpRequester } from './http/HttpRequester';
 export { default as ClaimsEndpoint } from './endpoint/ClaimsEndpoint';
 export { default as CampaignsEndpoint } from './endpoint/CampaignsEndpoint';
 export { default as TemplatesEndpoint } from './endpoint/TemplatesEndpoint';
@@ -17,7 +18,7 @@ export type { Template } from './types/Template';
 export type { TemplateThumbnail } from './types/TemplateThumbnail';
 export type { User } from './types/User';
 export type { Domain } from './types/Domain';
-export type { Requester } from './types/Requester';
+export type { Requester } from './http/Requester';
 export type { Claim } from './types/Claim';
 export type { Enrollment } from './types/Enrollment';
 export type { AuthProvider } from './provider/AuthProvider';
