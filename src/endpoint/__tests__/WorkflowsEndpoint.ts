@@ -194,4 +194,48 @@ describe('WorkflowsEndpoint', () => {
     const result = await client.workflows.getSnippets();
     expectCommon(url, result, 'array');
   });
+
+  /**
+   *
+   */
+  it('run() should POST /workflows/run with the supplied body', async () => {
+    const url = `${baseUrl}${endpoint}/run?api=true`;
+    fetchMock.post(url, { id: 'JOB01', status: 'pending' });
+
+    const body = { workflowId: 'WF01', code: 'console.log("hi")', campaign: 'C01', pass: 'P01' };
+    const result = await client.workflows.run(body);
+    expectCommon(url, result, 'object');
+
+    const init = fetchMock.lastCall(url)?.[1] as RequestInit;
+    expect(init.method).to.equal('POST');
+    expect(init.body).to.equal(JSON.stringify(body));
+  });
+
+  /**
+   *
+   */
+  it('run() should accept the minimal body of just workflowId', async () => {
+    const url = `${baseUrl}${endpoint}/run?api=true`;
+    fetchMock.post(url, { id: 'JOB01', status: 'pending' });
+
+    const body = { workflowId: 'WF01' };
+    await client.workflows.run(body);
+
+    const init = fetchMock.lastCall(url)?.[1] as RequestInit;
+    expect(init.body).to.equal(JSON.stringify(body));
+  });
+
+  /**
+   *
+   */
+  it('getJobStatus() should GET /workflows/jobs/:jobId/status', async () => {
+    const id = 'JOB01';
+    const url = `${baseUrl}${endpoint}/jobs/${id}/status?api=true`;
+    fetchMock.get(url, JSON.stringify('pending'));
+
+    const result = await client.workflows.getJobStatus(id);
+    expect(fetchMock.called(authUrl)).to.be.true;
+    expect(fetchMock.called(url)).to.be.true;
+    expect(result).to.equal('pending');
+  });
 });

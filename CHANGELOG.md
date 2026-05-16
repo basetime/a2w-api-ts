@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Add workflow execution (`client.workflows.run` + `getJobStatus`), campaign CRUD
+  (`update` / `createSimple` / `clone` / `delete`), `campaigns.workflows` and
+  `campaigns.wallets` sub-endpoints, `campaigns.passes.getScannerLogs`,
+  `organizations.webhooks` / `dataStores` / `exporters` sub-endpoints, template lifecycle
+  methods (`clone` / `export` / `import` / `delete`), and new top-level `client.barcodes`
+  and `client.widgets` endpoints. Includes matching types, mocha tests, and README
+  examples. `HttpRequester.fetch` now also accepts absolute URLs (so endpoints can target
+  routes outside `/api/v1`) and skips its default JSON `Content-Type` for `FormData`
+  bodies so multipart uploads work.
 - Refactors CampaignsEndpoint to split per-resource methods into dedicated sub-endpoints, enhancing organization and clarity. Updates README to reflect new method usage and examples for fetching campaigns and passes. Adjusts test cases to align with the new endpoint structure, ensuring consistency across the codebase.. (`328bbf1`)
 - Refactors endpoint classes to streamline request handling by consolidating method signatures and enhancing type safety. Updates CampaignsEndpoint, ClaimsEndpoint, ImagesEndpoint, OrganizationsEndpoint, and WorkflowsEndpoint to improve consistency and maintainability across the codebase.. (`951ce5a`)
 - Refactors endpoint methods to remove generic type parameters from `do` method calls, enhancing code simplicity and readability across CampaignsEndpoint, ClaimsEndpoint, ImagesEndpoint, OrganizationsEndpoint, ScannersEndpoint, TemplatesEndpoint, and WorkflowsEndpoint.. (`59f1f5a`)
@@ -22,4 +31,3 @@
 - Updates package.json and pnpm-lock.yaml to include @types/node version 25.8.0, and modifies import path in TemplatesEndpoint for improved type management.. (`d139278`)
 - Updates package.json to specify pnpm version and enhances README with a new section on publishing the package to npm.. (`b4523f6`)
 - Migrate pnpm-lock.yaml to lockfileVersion 9.0. (`57777d4`)
-

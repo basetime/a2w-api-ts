@@ -94,6 +94,25 @@ class WorkflowsEndpoint extends Endpoint_1.default {
         this.getSnippets = async () => {
             return await this.do.get('/libraries');
         };
+        /**
+         * Runs a workflow.
+         *
+         * Creates a new {@link WorkflowJob} and dispatches it to the workflow runner. The returned
+         * job will be in the `pending` status; poll {@link getJobStatus} to track progress.
+         *
+         * @param body The run request.
+         */
+        this.run = async (body) => {
+            return await this.do.post('/run', body);
+        };
+        /**
+         * Returns the current status of a workflow job.
+         *
+         * @param jobId The ID of the workflow job.
+         */
+        this.getJobStatus = async (jobId) => {
+            return await this.do.get(`/jobs/${jobId}/status`);
+        };
     }
 }
 exports.default = WorkflowsEndpoint;

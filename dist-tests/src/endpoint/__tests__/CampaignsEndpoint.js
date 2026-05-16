@@ -63,4 +63,60 @@ describe('CampaignsEndpoint', () => {
         const result = await client.campaigns.getById(id);
         expectCommon(url, result, 'object');
     });
+    /**
+     *
+     */
+    it('update() should POST /campaigns/:id with the supplied body', async () => {
+        const id = 'C01';
+        const url = `${baseUrl}${endpoint}/${id}?api=true`;
+        fetch_mock_1.default.post(url, { id });
+        const body = { name: 'Renamed', templates: ['T01'] };
+        await client.campaigns.update(id, body);
+        const init = fetch_mock_1.default.lastCall(url)?.[1];
+        (0, chai_1.expect)(init.method).to.equal('POST');
+        (0, chai_1.expect)(init.body).to.equal(JSON.stringify(body));
+    });
+    /**
+     *
+     */
+    it('createSimple() should POST /campaigns/:id/simple with the supplied body', async () => {
+        const id = '__new';
+        const url = `${baseUrl}${endpoint}/${id}/simple?api=true`;
+        fetch_mock_1.default.post(url, { id: 'C99' });
+        const body = {
+            campaign: { name: 'New Simple' },
+            templateId: 'T01',
+            placeholders: { logo: 'data:image/png;base64,xxx' },
+        };
+        const result = await client.campaigns.createSimple(id, body);
+        expectCommon(url, result, 'object');
+        const init = fetch_mock_1.default.lastCall(url)?.[1];
+        (0, chai_1.expect)(init.method).to.equal('POST');
+        (0, chai_1.expect)(init.body).to.equal(JSON.stringify(body));
+    });
+    /**
+     *
+     */
+    it('clone() should POST /campaigns/:id/clone with an empty body', async () => {
+        const id = 'C01';
+        const url = `${baseUrl}${endpoint}/${id}/clone?api=true`;
+        fetch_mock_1.default.post(url, JSON.stringify('C99'));
+        const result = await client.campaigns.clone(id);
+        (0, chai_1.expect)(fetch_mock_1.default.called(url)).to.be.true;
+        (0, chai_1.expect)(result).to.equal('C99');
+        const init = fetch_mock_1.default.lastCall(url)?.[1];
+        (0, chai_1.expect)(init.method).to.equal('POST');
+        (0, chai_1.expect)(init.body).to.equal(JSON.stringify({}));
+    });
+    /**
+     *
+     */
+    it('delete() should DELETE /campaigns/:id', async () => {
+        const id = 'C01';
+        const url = `${baseUrl}${endpoint}/${id}?api=true`;
+        fetch_mock_1.default.delete(url, JSON.stringify('ok'));
+        await client.campaigns.delete(id);
+        const init = fetch_mock_1.default.lastCall(url)?.[1];
+        (0, chai_1.expect)(init.method).to.equal('DELETE');
+    });
 });

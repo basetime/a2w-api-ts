@@ -174,6 +174,17 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
         this.getRedeemedStatus = async (campaignId, passId) => {
             return await this.do.get(`/${campaignId}/passes/${passId}/redeemed`);
         };
+        /**
+         * Returns the scanner logs recorded against a pass.
+         *
+         * Each entry records one scan made by a registered scanner device.
+         *
+         * @param campaignId The ID of the campaign.
+         * @param passId The ID of the pass.
+         */
+        this.getScannerLogs = async (campaignId, passId) => {
+            return await this.do.get(`/${campaignId}/passes/${passId}/scannerLogs`);
+        };
     }
 }
 exports.default = CampaignPassesEndpoint;

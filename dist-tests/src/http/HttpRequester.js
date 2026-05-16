@@ -83,10 +83,16 @@ class HttpRequester {
         };
         /**
          * @inheritdoc
+         *
+         * When `url` is a fully-qualified URL (starts with `http://` or `https://`) it is used
+         * as-is without prepending the configured API base URL. This lets endpoint helpers
+         * target routes that live outside `/api/v1` (e.g. `/barcodes`, `/widgets`) while still
+         * benefiting from the shared header, auth, and error-handling logic.
          */
         this.fetch = async (url, options = {}, authenticate = true) => {
+            const isAbsolute = /^https?:\/\//i.test(url);
             const sep = url.includes('?') ? '&' : '?';
-            url = `${(0, constants_1.getBaseUrl)()}${url}${sep}api=true`;
+            url = `${isAbsolute ? '' : (0, constants_1.getBaseUrl)()}${url}${sep}api=true`;
             const headers = options.headers ? new Headers(options.headers) : new Headers();
             if (this.userAgent) {
                 headers.set('User-Agent', this.userAgent);
@@ -97,7 +103,10 @@ class HttpRequester {
             if (!headers.has('Accept')) {
                 headers.set('Accept', 'application/json');
             }
-            if (!headers.has('Content-Type')) {
+            // Default to JSON when the body is a string (or absent). Skip for FormData/Blob/etc.
+            // so the runtime can attach the correct multipart boundary automatically.
+            const isStringBody = typeof options.body === 'string' || options.body == null;
+            if (!headers.has('Content-Type') && isStringBody) {
                 headers.set('Content-Type', 'application/json');
             }
             // Adds the bearer token to the headers, and ensures the json headers are

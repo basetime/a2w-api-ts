@@ -261,4 +261,15 @@ describe('CampaignPassesEndpoint', () => {
         (0, chai_1.expect)(fetch_mock_1.default.called(url)).to.be.true;
         (0, chai_1.expect)(result).to.equal(true);
     });
+    /**
+     *
+     */
+    it('getScannerLogs() should GET /campaigns/:id/passes/:passId/scannerLogs', async () => {
+        const campaignId = 'C01';
+        const passId = 'P01';
+        const url = `${baseUrl}${endpoint}/${campaignId}/passes/${passId}/scannerLogs?api=true`;
+        fetch_mock_1.default.get(url, [{ id: 'LOG01' }]);
+        const result = await client.campaigns.passes.getScannerLogs(campaignId, passId);
+        expectCommon(url, result, 'array');
+    });
 });

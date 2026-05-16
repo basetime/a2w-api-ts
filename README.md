@@ -33,6 +33,30 @@ Client library that communicates with the addtowallet API.
   - [Creating a scanner app](#creating-a-scanner-app)
   - [Updating a scanner app](#updating-a-scanner-app)
   - [Deleting a scanner app](#deleting-a-scanner-app)
+  - [Updating a campaign](#updating-a-campaign)
+  - [Creating a simple campaign](#creating-a-simple-campaign)
+  - [Cloning a campaign](#cloning-a-campaign)
+  - [Deleting a campaign](#deleting-a-campaign)
+  - [Getting scanner logs for a pass](#getting-scanner-logs-for-a-pass)
+  - [Listing wallets for a campaign](#listing-wallets-for-a-campaign)
+  - [Getting wallet push logs for a pass](#getting-wallet-push-logs-for-a-pass)
+  - [Pushing template updates to wallets](#pushing-template-updates-to-wallets)
+  - [Dismissing pending wallet pushes](#dismissing-pending-wallet-pushes)
+  - [Listing workflows attached to a campaign](#listing-workflows-attached-to-a-campaign)
+  - [Attaching a workflow to a campaign](#attaching-a-workflow-to-a-campaign)
+  - [Updating a campaign workflow](#updating-a-campaign-workflow)
+  - [Detaching a workflow from a campaign](#detaching-a-workflow-from-a-campaign)
+  - [Running a workflow](#running-a-workflow)
+  - [Getting a workflow job status](#getting-a-workflow-job-status)
+  - [Managing webhooks](#managing-webhooks)
+  - [Managing data stores](#managing-data-stores)
+  - [Managing exporters](#managing-exporters)
+  - [Cloning a template](#cloning-a-template)
+  - [Exporting a template](#exporting-a-template)
+  - [Importing a template](#importing-a-template)
+  - [Deleting a template](#deleting-a-template)
+  - [Rendering a barcode](#rendering-a-barcode)
+  - [Signing a JWT with widgets](#signing-a-jwt-with-widgets)
 
 ## Installing
 
@@ -413,4 +437,330 @@ await client.scanners.updateApp('XVK0xIy2vQinDJWUbKnO', {
 
 ```ts
 await client.scanners.deleteApp('XVK0xIy2vQinDJWUbKnO');
+```
+
+### Updating a campaign
+
+Mirrors the backend Joi schema permissively. `templates` accepts a list of template IDs
+to associate with the campaign.
+
+```ts
+const updated = await client.campaigns.update('h8X2JxgrnEsu2U0dI8KN', {
+  name: 'Renamed Campaign',
+  templates: ['T01', 'T02'],
+});
+console.log(updated);
+```
+
+### Creating a simple campaign
+
+Creates a campaign from an existing template plus placeholder values. Pass `'__new'` as
+the ID to create a brand-new campaign, or an existing campaign ID to update one in place.
+
+```ts
+const created = await client.campaigns.createSimple('__new', {
+  campaign: { name: 'My Coupon' },
+  templateId: 'T01',
+  placeholders: {
+    logo: 'https://example.com/logo.png',
+    backgroundColor: '#ae00ff',
+  },
+});
+console.log(created);
+```
+
+### Cloning a campaign
+
+Returns the ID of the newly created campaign.
+
+```ts
+const newCampaignId = await client.campaigns.clone('h8X2JxgrnEsu2U0dI8KN');
+console.log(newCampaignId);
+```
+
+### Deleting a campaign
+
+```ts
+await client.campaigns.delete('h8X2JxgrnEsu2U0dI8KN');
+```
+
+### Getting scanner logs for a pass
+
+Returns every scan recorded by a registered scanner against the pass.
+
+```ts
+const logs = await client.campaigns.passes.getScannerLogs(
+  'h8X2JxgrnEsu2U0dI8KN',
+  '7gXYr76u3Maaf9ugAdWk',
+);
+console.log(logs);
+```
+
+### Listing wallets for a campaign
+
+Returns request logs grouped by bundle, plus the matching bundle entities. Supports
+optional pagination.
+
+```ts
+const wallets = await client.campaigns.wallets.getAll('h8X2JxgrnEsu2U0dI8KN', {
+  page: 1,
+  perPage: 50,
+});
+console.log(wallets);
+```
+
+You can also fetch a single wallet enrollment:
+
+```ts
+const enrollment = await client.campaigns.wallets.getEnrollment(
+  'h8X2JxgrnEsu2U0dI8KN',
+  'enrollment-id',
+);
+console.log(enrollment);
+```
+
+### Getting wallet push logs for a pass
+
+Returns the history of pushes sent to wallets that have the pass installed.
+
+```ts
+const pushes = await client.campaigns.wallets.getPushLogs(
+  'h8X2JxgrnEsu2U0dI8KN',
+  '7gXYr76u3Maaf9ugAdWk',
+);
+console.log(pushes);
+```
+
+### Pushing template updates to wallets
+
+Pushes the latest template changes to every wallet that contains a pass tied to one of
+the supplied templates. Returns the number of passes queued for update.
+
+```ts
+const count = await client.campaigns.wallets.pushTemplates(
+  'h8X2JxgrnEsu2U0dI8KN',
+  ['T01', 'T02'],
+);
+console.log(count);
+```
+
+### Dismissing pending wallet pushes
+
+Clears the "pending changes" notice on a campaign without actually pushing.
+
+```ts
+await client.campaigns.wallets.dismissPushes('h8X2JxgrnEsu2U0dI8KN');
+```
+
+### Listing workflows attached to a campaign
+
+```ts
+const attached = await client.campaigns.workflows.getAll('h8X2JxgrnEsu2U0dI8KN');
+console.log(attached);
+```
+
+### Attaching a workflow to a campaign
+
+`runsWhen` controls when the workflow fires (`'enrolled'`, `'claimed'`, `'installed'`,
+`'redeemed'`, `'updated'`, `'scanned'`, or `'scheduled'`). Pass a `schedule` when
+`runsWhen` is `'scheduled'`.
+
+```ts
+const attached = await client.campaigns.workflows.attach('h8X2JxgrnEsu2U0dI8KN', {
+  workflowId: 'WF01',
+  runsWhen: 'redeemed',
+});
+console.log(attached);
+```
+
+### Updating a campaign workflow
+
+```ts
+await client.campaigns.workflows.update('h8X2JxgrnEsu2U0dI8KN', 'CWF01', {
+  runsWhen: 'scheduled',
+  schedule: { when: 'daily', weekday: '', monthday: '', time: '09:00' },
+});
+```
+
+### Detaching a workflow from a campaign
+
+Returns the remaining workflow attachments.
+
+```ts
+const remaining = await client.campaigns.workflows.detach(
+  'h8X2JxgrnEsu2U0dI8KN',
+  'CWF01',
+);
+console.log(remaining);
+```
+
+### Running a workflow
+
+Creates a new workflow job and dispatches it to the runner. Returns the job in the
+`pending` status; poll {@link Client#workflows#getJobStatus} to track progress.
+
+```ts
+const job = await client.workflows.run({
+  workflowId: 'WF01',
+  campaign: 'h8X2JxgrnEsu2U0dI8KN',
+  pass: '7gXYr76u3Maaf9ugAdWk',
+});
+console.log(job.id);
+```
+
+### Getting a workflow job status
+
+```ts
+const status = await client.workflows.getJobStatus('JOB01');
+console.log(status); // 'pending' | 'running' | 'success' | 'error'
+```
+
+### Managing webhooks
+
+```ts
+const webhooks = await client.organizations.webhooks.getAll();
+
+const created = await client.organizations.webhooks.create({
+  displayName: 'Redemption Notifier',
+  url: 'https://example.com/hooks/redemption',
+  event: 'redeemed',
+  password: 'shared-secret',
+});
+
+await client.organizations.webhooks.update(created.id, {
+  ...created,
+  displayName: 'Renamed',
+});
+
+await client.organizations.webhooks.delete(created.id);
+
+const logs = await client.organizations.webhooks.getLogs();
+console.log(logs);
+```
+
+### Managing data stores
+
+```ts
+const stores = await client.organizations.dataStores.getAll();
+
+const created = await client.organizations.dataStores.create({
+  name: 'Member tiers',
+  source: 'key-value',
+  keyValue: [
+    { key: 'gold', value: '1000' },
+    { key: 'silver', value: '500' },
+  ],
+});
+
+const fetched = await client.organizations.dataStores.getById(created.id);
+
+await client.organizations.dataStores.update(created.id, {
+  ...created,
+  name: 'Renamed',
+});
+
+await client.organizations.dataStores.delete(created.id);
+```
+
+### Managing exporters
+
+```ts
+const exporters = await client.organizations.exporters.getAll();
+
+const created = await client.organizations.exporters.create({
+  name: 'Nightly SFTP',
+  what: 'enrollments',
+  when: 'daily',
+  time: '03:00',
+  source: 'sftp',
+  config: {
+    hostname: 'sftp.example.com',
+    username: 'a2w',
+    password: 'secret',
+    filename: 'enrollments.csv',
+  },
+});
+
+const ex = created[0];
+await client.organizations.exporters.run(ex.id);
+
+const logs = await client.organizations.exporters.getLogs(ex.id);
+console.log(logs);
+
+await client.organizations.exporters.delete(ex.id);
+```
+
+### Cloning a template
+
+```ts
+const cloned = await client.templates.clone('TPL01');
+console.log(cloned);
+```
+
+### Exporting a template
+
+Returns the JSON bundle that can be re-imported into another organization.
+
+```ts
+const bundle = await client.templates.export('TPL01');
+console.log(bundle);
+```
+
+### Importing a template
+
+Pass a `Blob`/`File` or a `{ name, content }` shape and the SDK constructs the multipart
+upload for you.
+
+```ts
+const imported = await client.templates.import({
+  name: 'tpl.json',
+  content: JSON.stringify(bundle),
+});
+console.log(imported);
+```
+
+### Deleting a template
+
+```ts
+await client.templates.delete('TPL01');
+```
+
+### Rendering a barcode
+
+The barcode endpoint lives at the site root (outside `/api/v1`). The PNG body is returned
+as a string.
+
+```ts
+const png = await client.barcodes.render({
+  type: 'qrcode',
+  data: 'hello',
+  width: 300,
+  height: 300,
+});
+```
+
+### Signing a JWT with widgets
+
+`signJwt` signs an arbitrary payload with an explicit secret. `signCampaignJwt` signs
+using a campaign's stored `openEnrollmentJwtSecret`, which is what
+`client.campaigns.enrollments.create` needs. Wiring it in:
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+
+client.campaigns.enrollments.jwtEncode = (data) =>
+  client.widgets.signCampaignJwt(campaignId, data);
+
+const enrollment = await client.campaigns.enrollments.create(
+  campaignId,
+  { backgroundColor: '#ae00ff' },
+  { primaryKey: '1234567890', firstName: 'John', lastName: 'Doe' },
+);
+console.log(enrollment.pass, enrollment.errors);
+```
+
+Or sign an arbitrary payload directly:
+
+```ts
+const token = await client.widgets.signJwt({ sub: 'user-1' }, 'shared-secret');
 ```

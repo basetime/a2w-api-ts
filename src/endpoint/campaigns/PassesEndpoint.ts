@@ -1,6 +1,7 @@
 import { Requester } from '../../http/Requester';
 import { MetaValues } from '../../types/MetaValues';
 import { Pass } from '../../types/Pass';
+import { ScannerLog } from '../../types/ScannerLog';
 import Endpoint from '../Endpoint';
 
 /**
@@ -211,5 +212,20 @@ export default class CampaignPassesEndpoint extends Endpoint {
    */
   public getRedeemedStatus = async (campaignId: string, passId: string): Promise<boolean> => {
     return await this.do.get(`/${campaignId}/passes/${passId}/redeemed`);
+  };
+
+  /**
+   * Returns the scanner logs recorded against a pass.
+   *
+   * Each entry records one scan made by a registered scanner device.
+   *
+   * @param campaignId The ID of the campaign.
+   * @param passId The ID of the pass.
+   */
+  public getScannerLogs = async (
+    campaignId: string,
+    passId: string,
+  ): Promise<ScannerLog[]> => {
+    return await this.do.get(`/${campaignId}/passes/${passId}/scannerLogs`);
   };
 }

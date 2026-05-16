@@ -8,6 +8,8 @@ const EnrollmentsEndpoint_1 = __importDefault(require("./campaigns/EnrollmentsEn
 const JobsEndpoint_1 = __importDefault(require("./campaigns/JobsEndpoint"));
 const PassesEndpoint_1 = __importDefault(require("./campaigns/PassesEndpoint"));
 const StatsEndpoint_1 = __importDefault(require("./campaigns/StatsEndpoint"));
+const WalletsEndpoint_1 = __importDefault(require("./campaigns/WalletsEndpoint"));
+const WorkflowsEndpoint_1 = __importDefault(require("./campaigns/WorkflowsEndpoint"));
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
  * Communicate with the campaigns endpoints.
@@ -40,11 +42,55 @@ class CampaignsEndpoint extends Endpoint_1.default {
         this.getById = async (id) => {
             return await this.do.get(`/${id}`);
         };
+        /**
+         * Updates a campaign.
+         *
+         * Mirrors the backend Joi schema permissively as `Partial<Campaign>`; only fields
+         * accepted by the backend will be applied. `templates` is overridden to accept a list of
+         * template IDs (the wire format used by the update route), not the populated
+         * {@link Template} array returned by reads.
+         *
+         * @param id The ID of the campaign.
+         * @param body The campaign updates.
+         */
+        this.update = async (id, body) => {
+            return await this.do.post(`/${id}`, body);
+        };
+        /**
+         * Creates or updates a "simple" campaign from a template and placeholder values.
+         *
+         * Pass `'__new'` as the ID to create a new campaign; pass an existing campaign ID to
+         * update one in place.
+         *
+         * @param id The campaign ID, or `'__new'` to create a new campaign.
+         * @param body The simple campaign body.
+         */
+        this.createSimple = async (id, body) => {
+            return await this.do.post(`/${id}/simple`, body);
+        };
+        /**
+         * Clones a campaign and returns the ID of the new campaign.
+         *
+         * @param id The ID of the campaign to clone.
+         */
+        this.clone = async (id) => {
+            return await this.do.post(`/${id}/clone`, {});
+        };
+        /**
+         * Deletes a campaign.
+         *
+         * @param id The ID of the campaign to delete.
+         */
+        this.delete = async (id) => {
+            return await this.do.del(`/${id}`);
+        };
         this.passes = new PassesEndpoint_1.default(req);
         this.claims = new ClaimsEndpoint_1.default(req);
         this.jobs = new JobsEndpoint_1.default(req);
         this.stats = new StatsEndpoint_1.default(req);
         this.enrollments = new EnrollmentsEndpoint_1.default(req);
+        this.wallets = new WalletsEndpoint_1.default(req);
+        this.workflows = new WorkflowsEndpoint_1.default(req);
     }
 }
 exports.default = CampaignsEndpoint;

@@ -3,9 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const DataStoresEndpoint_1 = __importDefault(require("./organizations/DataStoresEndpoint"));
+const ExportersEndpoint_1 = __importDefault(require("./organizations/ExportersEndpoint"));
+const WebhooksEndpoint_1 = __importDefault(require("./organizations/WebhooksEndpoint"));
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
  * Communicate with the organizations endpoints.
+ *
+ * Top-level methods cover the org itself, scanner-invite handshake, and API keys. Resource
+ * sub-endpoints (webhooks, dataStores, exporters) are exposed as `public readonly` props,
+ * mirroring the composition pattern of {@link ../Client | Client}.
  */
 class OrganizationsEndpoint extends Endpoint_1.default {
     /**
@@ -78,6 +85,9 @@ class OrganizationsEndpoint extends Endpoint_1.default {
         this.deleteApiKey = async (id) => {
             return await this.do.del(`/apiKeys/${id}`);
         };
+        this.webhooks = new WebhooksEndpoint_1.default(req);
+        this.dataStores = new DataStoresEndpoint_1.default(req);
+        this.exporters = new ExportersEndpoint_1.default(req);
     }
 }
 exports.default = OrganizationsEndpoint;

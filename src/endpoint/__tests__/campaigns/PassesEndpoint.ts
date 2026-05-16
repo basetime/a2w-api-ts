@@ -302,4 +302,17 @@ describe('CampaignPassesEndpoint', () => {
     expect(fetchMock.called(url)).to.be.true;
     expect(result).to.equal(true);
   });
+
+  /**
+   *
+   */
+  it('getScannerLogs() should GET /campaigns/:id/passes/:passId/scannerLogs', async () => {
+    const campaignId = 'C01';
+    const passId = 'P01';
+    const url = `${baseUrl}${endpoint}/${campaignId}/passes/${passId}/scannerLogs?api=true`;
+    fetchMock.get(url, [{ id: 'LOG01' }]);
+
+    const result = await client.campaigns.passes.getScannerLogs(campaignId, passId);
+    expectCommon(url, result, 'array');
+  });
 });

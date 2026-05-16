@@ -1,9 +1,38 @@
 import { Requester } from '../http/Requester';
 import { SnippetLibrary } from '../types/SnippetLibrary';
 import { Workflow } from '../types/Workflow';
-import { WorkflowJob } from '../types/WorkflowJob';
+import { WorkflowJob, WorkflowJobStatus } from '../types/WorkflowJob';
 import { WorkflowMessage } from '../types/WorkflowMessage';
 import Endpoint from './Endpoint';
+
+/**
+ * Body accepted by {@link WorkflowsEndpoint.run}.
+ *
+ * `workflowId` selects the workflow to execute; `code` is an optional override that lets
+ * callers run an edited copy of the workflow without persisting the change.
+ * `campaign` and `pass` populate the workflow's runtime context.
+ */
+export interface WorkflowRunBody {
+  /**
+   * The ID of the workflow to run.
+   */
+  workflowId: string;
+
+  /**
+   * Optional code override. When omitted the workflow's stored code is used.
+   */
+  code?: string;
+
+  /**
+   * Optional campaign ID to inject into the workflow context.
+   */
+  campaign?: string;
+
+  /**
+   * Optional pass ID to inject into the workflow context. Requires `campaign`.
+   */
+  pass?: string;
+}
 
 /**
  * Communicate with the workflows endpoints.
@@ -105,5 +134,26 @@ export default class WorkflowsEndpoint extends Endpoint {
    */
   public getSnippets = async (): Promise<SnippetLibrary[]> => {
     return await this.do.get('/libraries');
+  };
+
+  /**
+   * Runs a workflow.
+   *
+   * Creates a new {@link WorkflowJob} and dispatches it to the workflow runner. The returned
+   * job will be in the `pending` status; poll {@link getJobStatus} to track progress.
+   *
+   * @param body The run request.
+   */
+  public run = async (body: WorkflowRunBody): Promise<WorkflowJob> => {
+    return await this.do.post('/run', body);
+  };
+
+  /**
+   * Returns the current status of a workflow job.
+   *
+   * @param jobId The ID of the workflow job.
+   */
+  public getJobStatus = async (jobId: string): Promise<WorkflowJobStatus> => {
+    return await this.do.get(`/jobs/${jobId}/status`);
   };
 }

@@ -4,12 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const HttpRequester_1 = __importDefault(require("./http/HttpRequester"));
+const BarcodesEndpoint_1 = __importDefault(require("./endpoint/BarcodesEndpoint"));
 const CampaignsEndpoint_1 = __importDefault(require("./endpoint/CampaignsEndpoint"));
 const ClaimsEndpoint_1 = __importDefault(require("./endpoint/ClaimsEndpoint"));
 const Images_1 = __importDefault(require("./endpoint/Images"));
 const OrganizationsEndpoint_1 = __importDefault(require("./endpoint/OrganizationsEndpoint"));
 const ScannersEndpoint_1 = __importDefault(require("./endpoint/ScannersEndpoint"));
 const TemplatesEndpoint_1 = __importDefault(require("./endpoint/TemplatesEndpoint"));
+const WidgetsEndpoint_1 = __importDefault(require("./endpoint/WidgetsEndpoint"));
 const WorkflowsEndpoint_1 = __importDefault(require("./endpoint/WorkflowsEndpoint"));
 /**
  * Client class that communicates with the the addtowallet API.
@@ -39,6 +41,8 @@ class Client {
         this.scanners = new ScannersEndpoint_1.default(this.http);
         this.workflows = new WorkflowsEndpoint_1.default(this.http);
         this.images = new Images_1.default(this.http);
+        this.barcodes = new BarcodesEndpoint_1.default(this.http);
+        this.widgets = new WidgetsEndpoint_1.default(this.http);
     }
 }
 exports.default = Client;

@@ -7,8 +7,15 @@ export { default as CampaignClaimsEndpoint } from './endpoint/campaigns/ClaimsEn
 export { default as CampaignJobsEndpoint } from './endpoint/campaigns/JobsEndpoint';
 export { default as CampaignStatsEndpoint } from './endpoint/campaigns/StatsEndpoint';
 export { default as CampaignEnrollmentsEndpoint } from './endpoint/campaigns/EnrollmentsEndpoint';
+export { default as CampaignWalletsEndpoint } from './endpoint/campaigns/WalletsEndpoint';
+export { default as CampaignWorkflowsEndpoint } from './endpoint/campaigns/WorkflowsEndpoint';
 export { default as TemplatesEndpoint } from './endpoint/TemplatesEndpoint';
 export { default as OrganizationsEndpoint } from './endpoint/OrganizationsEndpoint';
+export { default as OrganizationWebhooksEndpoint } from './endpoint/organizations/WebhooksEndpoint';
+export { default as OrganizationDataStoresEndpoint } from './endpoint/organizations/DataStoresEndpoint';
+export { default as OrganizationExportersEndpoint } from './endpoint/organizations/ExportersEndpoint';
+export { default as BarcodesEndpoint } from './endpoint/BarcodesEndpoint';
+export { default as WidgetsEndpoint } from './endpoint/WidgetsEndpoint';
 export { default as KeysProvider } from './provider/KeysProvider';
 export { default as OAuthProvider } from './provider/OAuthProvider';
 export { default as StoredProvider } from './provider/StoredProvider';
@@ -21,6 +28,7 @@ export type { CampaignStats, DetailedStats, DailyStats } from './types/CampaignS
 export type { Job, JobStatus, JobMode, Task } from './types/Job';
 export type { Template } from './types/Template';
 export type { TemplateThumbnail } from './types/TemplateThumbnail';
+export type { TemplateImportFile } from './endpoint/TemplatesEndpoint';
 export type { User } from './types/User';
 export type { Domain } from './types/Domain';
 export type { Requester } from './http/Requester';
@@ -36,5 +44,29 @@ export type { ScannerDeviceInfo } from './types/ScannerDeviceInfo';
 export type { Workflow } from './types/Workflow';
 export type { WorkflowJob, WorkflowJobStatus } from './types/WorkflowJob';
 export type { WorkflowMessage } from './types/WorkflowMessage';
+export type { WorkflowRunBody } from './endpoint/WorkflowsEndpoint';
 export type { Image } from './types/Image';
 export type { SnippetLibrary } from './types/SnippetLibrary';
+export type {
+  CampaignWorkflow,
+  CampaignWorkflowInput,
+  CampaignWorkflowRunsWhen,
+} from './types/CampaignWorkflow';
+export type { WalletUpdate, WalletUpdateReason } from './types/WalletUpdate';
+export type { Webhook, WebhookInput, WebhookEvent } from './types/Webhook';
+export type { WebhookLog } from './types/WebhookLog';
+export type { DataStore, DataStoreInput, DataStoreKeyValue, DataStoreSource } from './types/DataStore';
+export type {
+  Exporter,
+  ExporterInput,
+  ExporterSource,
+  ExporterWhen,
+} from './types/Exporter';
+export type { ExporterLog, ExporterLogStatus } from './types/ExporterLog';
+export type { ScannerLog } from './types/ScannerLog';
+export type { Barcode, BarcodeType, BarcodeRenderInput } from './types/Barcode';
+export type {
+  CampaignWalletsPagination,
+  CampaignWalletsResponse,
+  CampaignWalletEnrollmentResponse,
+} from './endpoint/campaigns/WalletsEndpoint';

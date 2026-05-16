@@ -1,11 +1,13 @@
 import HttpRequester from './http/HttpRequester';
 import { Logger } from './Logger';
+import BarcodesEndpoint from './endpoint/BarcodesEndpoint';
 import CampaignsEndpoint from './endpoint/CampaignsEndpoint';
 import ClaimsEndpoint from './endpoint/ClaimsEndpoint';
 import ImagesEndpoint from './endpoint/Images';
 import OrganizationsEndpoint from './endpoint/OrganizationsEndpoint';
 import ScannersEndpoint from './endpoint/ScannersEndpoint';
 import TemplatesEndpoint from './endpoint/TemplatesEndpoint';
+import WidgetsEndpoint from './endpoint/WidgetsEndpoint';
 import WorkflowsEndpoint from './endpoint/WorkflowsEndpoint';
 import { AuthProvider } from './provider/AuthProvider';
 
@@ -79,6 +81,22 @@ export default class Client {
   public readonly images: ImagesEndpoint;
 
   /**
+   * The barcodes endpoint.
+   *
+   * Renders a single barcode image given a symbology and data. Lives at the site root
+   * (outside `/api/v1`).
+   */
+  public readonly barcodes: BarcodesEndpoint;
+
+  /**
+   * The widgets endpoint.
+   *
+   * Convenience helpers for signing JWTs against either an explicit secret or a
+   * campaign's stored open-enrollment secret. Lives at the site root (outside `/api/v1`).
+   */
+  public readonly widgets: WidgetsEndpoint;
+
+  /**
    * Constructor.
    *
    * The auth provider is optional so an unauthenticated client can be used for public endpoints;
@@ -97,5 +115,7 @@ export default class Client {
     this.scanners = new ScannersEndpoint(this.http);
     this.workflows = new WorkflowsEndpoint(this.http);
     this.images = new ImagesEndpoint(this.http);
+    this.barcodes = new BarcodesEndpoint(this.http);
+    this.widgets = new WidgetsEndpoint(this.http);
   }
 }
