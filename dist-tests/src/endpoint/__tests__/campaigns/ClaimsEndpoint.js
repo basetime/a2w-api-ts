@@ -5,11 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const chai_1 = require("chai");
 const fetch_mock_1 = __importDefault(require("fetch-mock"));
-const constants_1 = require("../../constants");
-const index_1 = require("../../index");
+const constants_1 = require("../../../constants");
+const index_1 = require("../../../index");
 const baseUrl = (0, constants_1.getBaseUrl)();
 const endpoint = '/campaigns';
-describe('CampaignsEndpoint', () => {
+describe('CampaignClaimsEndpoint', () => {
     const authUrl = `${baseUrl}/auth/apiGrant`;
     const key = 'api_key';
     const secret = 'api_secret';
@@ -33,34 +33,15 @@ describe('CampaignsEndpoint', () => {
         fetch_mock_1.default.reset();
     });
     /**
-     * Run for all tests.
      *
-     * @param url The url that should have been called.
-     * @param result The result of the fetch call.
-     * @param type The type of the result.
      */
-    const expectCommon = (url, result, type) => {
+    it('getAll() should GET /campaigns/:id/claims', async () => {
+        const campaignId = 'UUUUUU';
+        const url = `${baseUrl}${endpoint}/${campaignId}/claims?api=true`;
+        fetch_mock_1.default.get(url, [{ id: 'PPPPPP' }]);
+        const claims = await client.campaigns.claims.getAll(campaignId);
         (0, chai_1.expect)(fetch_mock_1.default.called(authUrl)).to.be.true;
         (0, chai_1.expect)(fetch_mock_1.default.called(url)).to.be.true;
-        (0, chai_1.expect)(result).to.be.an(type);
-    };
-    /**
-     *
-     */
-    it('getAll() should GET /campaigns', async () => {
-        const url = `${baseUrl}${endpoint}?api=true`;
-        fetch_mock_1.default.get(url, [{ id: 'C01' }]);
-        const result = await client.campaigns.getAll();
-        expectCommon(url, result, 'array');
-    });
-    /**
-     *
-     */
-    it('getById() should GET /campaigns/:id', async () => {
-        const id = 'C01';
-        const url = `${baseUrl}${endpoint}/${id}?api=true`;
-        fetch_mock_1.default.get(url, { id });
-        const result = await client.campaigns.getById(id);
-        expectCommon(url, result, 'object');
+        (0, chai_1.expect)(claims).to.be.an('array');
     });
 });

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Refactors CampaignsEndpoint to split per-resource methods into dedicated sub-endpoints, enhancing organization and clarity. Updates README to reflect new method usage and examples for fetching campaigns and passes. Adjusts test cases to align with the new endpoint structure, ensuring consistency across the codebase.. (`328bbf1`)
 - Refactors endpoint classes to streamline request handling by consolidating method signatures and enhancing type safety. Updates CampaignsEndpoint, ClaimsEndpoint, ImagesEndpoint, OrganizationsEndpoint, and WorkflowsEndpoint to improve consistency and maintainability across the codebase.. (`951ce5a`)
 - Refactors endpoint methods to remove generic type parameters from `do` method calls, enhancing code simplicity and readability across CampaignsEndpoint, ClaimsEndpoint, ImagesEndpoint, OrganizationsEndpoint, ScannersEndpoint, TemplatesEndpoint, and WorkflowsEndpoint.. (`59f1f5a`)
 - Refactors endpoint classes to replace legacy URL handling with a new `do` method for request operations, improving code clarity and consistency.. (`50ce0c1`)

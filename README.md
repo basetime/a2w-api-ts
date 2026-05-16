@@ -5,24 +5,27 @@ Client library that communicates with the addtowallet API.
 - [Installing](#installing)
 - [Developing](#developing)
 - [Building](#building)
+- [Publishing](#publishing)
 - [Examples](#examples)
   - [Creating a new client with keys](#creating-a-new-client-with-keys)
   - [Creating a new client with oauth](#creating-a-new-client-with-oauth)
   - [Setting a custom user agent](#setting-a-custom-user-agent)
   - [Custom fetch](#custom-fetch)
-  - [Fetching a template by ID](#fetching-a-template-by-id)
-  - [Fetching templates by tag](#fetching-templates-by-tag)
+  - [Fetching all campaigns](#fetching-all-campaigns)
   - [Fetching a pass](#fetching-a-pass)
   - [Querying for Passes](#querying-for-passes)
-  - [Creating a pass bundle](#creating-a-pass-bundle)
-  - [Fetching the authenticated organization](#fetching-the-authenticated-organization)
-  - [Fetching all campaigns](#fetching-all-campaigns)
-  - [Fetching all templates](#fetching-all-templates)
   - [Updating a pass](#updating-a-pass)
-  - [Patching an Object Store](#patching-pass-object-store)
+  - [Patching Pass Object Store](#patching-pass-object-store)
+  - [Deleting Object Store Values](#deleting-object-store-values)
   - [Updating pass logs](#updating-pass-logs)
   - [Redeem a pass](#redeem-a-pass)
   - [Get the redeemed status of a pass](#get-the-redeemed-status-of-a-pass)
+  - [Creating a pass bundle](#creating-a-pass-bundle)
+  - [Creating an enrollment](#creating-an-enrollment)
+  - [Fetching all templates](#fetching-all-templates)
+  - [Fetching a template by ID](#fetching-a-template-by-id)
+  - [Fetching templates by tag](#fetching-templates-by-tag)
+  - [Fetching the authenticated organization](#fetching-the-authenticated-organization)
   - [Get image by ID](#get-image-by-id)
   - [Get images by IDs](#get-images-by-ids)
   - [Fetching all scanner apps](#fetching-all-scanner-apps)
@@ -109,18 +112,13 @@ const t = await client.http.fetch('/templates/simple/l74mNQLcjWnN2AoRRKG0');
 console.log(t);
 ```
 
-### Fetching a template by ID
+### Fetching all campaigns
+
+Fetches the campaigns for the authenticated organization.
 
 ```ts
-const template = await client.templates.getById('id');
-console.log(template);
-```
-
-### Fetching templates by tag
-
-```ts
-const templates = await client.templates.getByTag('tag');
-console.log(templates);
+const campaigns = await client.campaigns.getAll();
+console.log(campaigns);
 ```
 
 ### Fetching a pass
@@ -128,7 +126,7 @@ console.log(templates);
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
 const passId = '7gXYr76u3Maaf9ugAdWk';
-const pass = await client.campaigns.getPass(campaignId, passId);
+const pass = await client.campaigns.passes.getById(campaignId, passId);
 console.log(pass);
 ```
 
@@ -138,7 +136,7 @@ Fetching all of the passes in the campaign.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passes = await client.campaigns.queryPasses(campaignId);
+const passes = await client.campaigns.passes.query(campaignId);
 console.log(passes);
 ```
 
@@ -146,7 +144,7 @@ Fetching passes where the primaryKey = '123455'.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passes = await client.campaigns.queryPasses(campaignId, {
+const passes = await client.campaigns.passes.query(campaignId, {
   primaryKey: '123455',
 });
 console.log(passes);
@@ -156,10 +154,97 @@ Fetching passes where the object store value 'amount' = '30'.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passes = await client.campaigns.queryPasses(campaignId, {
+const passes = await client.campaigns.passes.query(campaignId, {
   'objectStore.amount': '30',
 });
 console.log(passes);
+```
+
+### Updating a pass
+
+Updates the object store. This will also have a2w send the updated pass
+to the wallets that contain it. Only the following values can be updated:
+
+- `templateId`
+- `templateVersion`
+- `objectStore`
+- `passTypeIdentifier`
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+
+// Each value is optional.
+const updatedPass = await client.campaigns.passes.update(campaignId, passId, {
+  templateId: '123123123',
+  templateVersion: 2,
+  objectStore: {
+    points: '42',
+  },
+});
+console.log(updatedPass);
+```
+
+### Patching Pass Object Store
+
+Merges the given object store values with the existing object store values.
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+
+// Each value is optional.
+const updatedPass = await client.campaigns.passes.mergeObjectStore(campaignId, passId, {
+  objectStore: {
+    points: '42',
+  },
+});
+console.log(updatedPass);
+```
+
+### Deleting Object Store Values
+
+Deletes values from an object store by specifying the keys.
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+
+// Each value is optional.
+const updatedPass = await client.campaigns.passes.deleteObjectStoreKeys(campaignId, passId, [
+  'points',
+]);
+console.log(updatedPass);
+```
+
+### Updating pass logs
+
+Appends a new log to a pass.
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+
+const ok = await client.campaigns.passes.appendLog(campaignId, passId, 'This is a log message');
+console.log(ok);
+```
+
+### Redeem a pass
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+const redeemed = await client.campaigns.passes.redeem(campaignId, passId);
+console.log(redeemed);
+```
+
+### Get the redeemed status of a pass
+
+```ts
+const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
+const passId = '7gXYr76u3Maaf9ugAdWk';
+const redeemed = await client.campaigns.passes.getRedeemedStatus(campaignId, passId);
+console.log(redeemed);
 ```
 
 ### Creating a pass bundle
@@ -180,7 +265,7 @@ const form = {
   primaryKey: '1234567890',
 };
 
-const url = await client.campaigns.createBundle(campaignId, meta, form);
+const url = await client.campaigns.passes.createBundle(campaignId, meta, form);
 console.log(url);
 ```
 
@@ -203,24 +288,8 @@ const form = {
 };
 
 // Returns the bundle ID and any errors.
-const enrollment = await client.campaigns.createEnrollment(campaignId, meta, form);
+const enrollment = await client.campaigns.enrollments.create(campaignId, meta, form);
 console.log(enrollment.pass, enrollment.errors);
-```
-
-### Fetching the authenticated organization
-
-```ts
-const organization = await client.organizations.getMine();
-console.log(organization);
-```
-
-### Fetching all campaigns
-
-Fetches the campaigns for the authenticated organization.
-
-```ts
-const campaigns = await client.campaigns.getAll();
-console.log(campaigns);
 ```
 
 ### Fetching all templates
@@ -232,89 +301,25 @@ const templates = await client.templates.getAll();
 console.log(templates);
 ```
 
-### Updating a pass
-
-Updates the object store. This will also have a2w send the updated pass
-to the wallets that contain it. Only the following values can be updated:
-
-- `templateId`
-- `templateVersion`
-- `objectStore`
-- `passTypeIdentifier`
+### Fetching a template by ID
 
 ```ts
-const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passId = '7gXYr76u3Maaf9ugAdWk';
-
-// Each value is optional.
-const updatedPass = await client.campaigns.updatePass(campaignId, passId, {
-  templateId: '123123123',
-  templateVersion: 2,
-  objectStore: {
-    points: '42',
-  },
-});
-console.log(updatedPass);
+const template = await client.templates.getById('id');
+console.log(template);
 ```
 
-### Patching Pass Object Store
-
-Merges the given object store values with the existing object store values.
+### Fetching templates by tag
 
 ```ts
-const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passId = '7gXYr76u3Maaf9ugAdWk';
-
-// Each value is optional.
-const updatedPass = await client.campaigns.mergeObjectStore(campaignId, passId, {
-  objectStore: {
-    points: '42',
-  },
-});
-console.log(updatedPass);
+const templates = await client.templates.getByTag('tag');
+console.log(templates);
 ```
 
-### Deleting Object Store Values
-
-Deletes values from an object store by specifying the keys.
+### Fetching the authenticated organization
 
 ```ts
-const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passId = '7gXYr76u3Maaf9ugAdWk';
-
-// Each value is optional.
-const updatedPass = await client.campaigns.deleteObjectStoreKeys(campaignId, passId, ['points']);
-console.log(updatedPass);
-```
-
-### Updating pass logs
-
-Appends a new log to a pass.
-
-```ts
-const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passId = '7gXYr76u3Maaf9ugAdWk';
-
-const ok = await client.campaigns.appendLog(campaignId, passId, 'This is a log message');
-console.log(ok);
-```
-
-### Redeem a pass
-
-```ts
-const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passId = '7gXYr76u3Maaf9ugAdWk';
-const redeemed = await client.campaigns.redeemPass(campaignId, passId);
-console.log(redeemed);
-```
-
-### Get the redeemed status of a pass
-
-```ts
-const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
-const passId = '7gXYr76u3Maaf9ugAdWk';
-const redeemed = await client.campaigns.getRedeemedStatus(campaignId, passId);
-console.log(redeemed);
+const organization = await client.organizations.getMine();
+console.log(organization);
 ```
 
 ### Get image by ID
