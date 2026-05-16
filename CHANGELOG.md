@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0 - 2026-05-16
+
 - Add workflow execution (`client.workflows.run` + `getJobStatus`), campaign CRUD
   (`update` / `createSimple` / `clone` / `delete`), `campaigns.workflows` and
   `campaigns.wallets` sub-endpoints, `campaigns.passes.getScannerLogs`,
