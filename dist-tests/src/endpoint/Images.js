@@ -5,10 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
- * The organizations endpoint.
- */
-const endpoint = '/images';
-/**
  * Communicate with the images endpoints.
  */
 class ImagesEndpoint extends Endpoint_1.default {
@@ -18,14 +14,14 @@ class ImagesEndpoint extends Endpoint_1.default {
      * @param req The object to use to make requests.
      */
     constructor(req) {
-        super(req, endpoint);
+        super(req, '/images');
         /**
          * Returns the image with the given ID.
          *
          * @param id The ID of the image.
          */
         this.getById = async (id) => {
-            return await this.doGet(`${endpoint}/${id}`);
+            return await this.do.get(`/${id}`);
         };
         /**
          * Returns the images with the given IDs.
@@ -34,7 +30,7 @@ class ImagesEndpoint extends Endpoint_1.default {
          */
         this.getByIds = async (ids) => {
             const url = this.qb.create('/ids').addQuery('ids', ids.join(','));
-            return await this.doGet(url);
+            return await this.do.get(url);
         };
     }
 }

@@ -8,7 +8,7 @@ const CampaignsEndpoint_1 = __importDefault(require("./endpoint/CampaignsEndpoin
 const ClaimsEndpoint_1 = __importDefault(require("./endpoint/ClaimsEndpoint"));
 const Images_1 = __importDefault(require("./endpoint/Images"));
 const OrganizationsEndpoint_1 = __importDefault(require("./endpoint/OrganizationsEndpoint"));
-const Scanners_1 = __importDefault(require("./endpoint/Scanners"));
+const ScannersEndpoint_1 = __importDefault(require("./endpoint/ScannersEndpoint"));
 const TemplatesEndpoint_1 = __importDefault(require("./endpoint/TemplatesEndpoint"));
 const WorkflowsEndpoint_1 = __importDefault(require("./endpoint/WorkflowsEndpoint"));
 /**
@@ -36,7 +36,7 @@ class Client {
         this.claims = new ClaimsEndpoint_1.default(this.http);
         this.templates = new TemplatesEndpoint_1.default(this.http);
         this.organizations = new OrganizationsEndpoint_1.default(this.http);
-        this.scanners = new Scanners_1.default(this.http);
+        this.scanners = new ScannersEndpoint_1.default(this.http);
         this.workflows = new WorkflowsEndpoint_1.default(this.http);
         this.images = new Images_1.default(this.http);
     }

@@ -5,10 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
- * The claims endpoint.
- */
-const endpoint = '/claim';
-/**
  * Communicate with the claims endpoints.
  */
 class ClaimsEndpoint extends Endpoint_1.default {
@@ -18,7 +14,7 @@ class ClaimsEndpoint extends Endpoint_1.default {
      * @param req The object to use to make requests.
      */
     constructor(req) {
-        super(req, endpoint);
+        super(req, '/claim');
         /**
          * Returns the pkpass file for a campaign and pass.
          *
@@ -30,7 +26,7 @@ class ClaimsEndpoint extends Endpoint_1.default {
             const url = this.qb.create('/{campaign}/{pass}.pkpass')
                 .addParam('campaign', campaignId)
                 .addParam('pass', passId);
-            return await this.doFetch(url, {
+            return await this.do.fetch(url, {
                 method: 'GET',
                 headers: {
                     Accept: 'application/vnd.apple.pkpass',

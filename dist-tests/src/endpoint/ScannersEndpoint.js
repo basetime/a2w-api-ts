@@ -5,10 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
- * The scanners endpoint.
- */
-const endpoint = '/scanners';
-/**
  * Communicate with the scanners endpoints.
  */
 class ScannersEndpoint extends Endpoint_1.default {
@@ -18,7 +14,7 @@ class ScannersEndpoint extends Endpoint_1.default {
      * @param req The object to use to make requests.
      */
     constructor(req) {
-        super(req, endpoint);
+        super(req, '/scanners');
         /**
          * Returns the scanner app by registration code.
          *
@@ -26,7 +22,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @returns The scanner app.
          */
         this.getByRegistrationCode = async (registrationCode) => {
-            return await this.doGet(`${endpoint}/registrationCode/${registrationCode}`, false);
+            return await this.do.get(`/registrationCode/${registrationCode}`, false);
         };
         /**
          * Registers a new scanner device.
@@ -36,7 +32,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param deviceInfo The device info.
          */
         this.registerDevice = async (scannerApp, pushToken, deviceInfo) => {
-            return await this.doPost(`${endpoint}/register/${scannerApp.id}`, { deviceInfo, pushToken }, false);
+            return await this.do.post(`/register/${scannerApp.id}`, { deviceInfo, pushToken }, false);
         };
         /**
          * Deregisters a scanner device.
@@ -44,13 +40,13 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param apiKey The API received when registering the device.
          */
         this.deregisterDevice = async (apiKey) => {
-            return await this.doDelete(`${endpoint}/deregister/${apiKey.id}`);
+            return await this.do.del(`/deregister/${apiKey.id}`);
         };
         /**
          * Returns all the scanner apps for the authenticated organization.
          */
         this.getAll = async () => {
-            return await this.doGet(`${endpoint}/organizations/apps`);
+            return await this.do.get('/organizations/apps');
         };
         /**
          * Returns the scanner app with the given ID.
@@ -58,7 +54,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param id The ID of the scanner app.
          */
         this.getById = async (id) => {
-            return await this.doGet(`${endpoint}/organizations/${id}`);
+            return await this.do.get(`/organizations/${id}`);
         };
         /**
          * Creates a new scanner app.
@@ -66,7 +62,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param app The scanner app to create.
          */
         this.createApp = async (app) => {
-            return await this.doPost(`${endpoint}/organizations/apps`, app);
+            return await this.do.post('/organizations/apps', app);
         };
         /**
          * Updates a scanner app.
@@ -75,7 +71,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param app The scanner app to update.
          */
         this.updateApp = async (id, app) => {
-            return await this.doPost(`${endpoint}/organizations/${id}`, app);
+            return await this.do.post(`/organizations/${id}`, app);
         };
         /**
          * Deletes a scanner app.
@@ -83,7 +79,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param id The ID of the scanner app.
          */
         this.deleteApp = async (id) => {
-            return await this.doDelete(`${endpoint}/organizations/apps/${id}`);
+            return await this.do.del(`/organizations/apps/${id}`);
         };
     }
 }

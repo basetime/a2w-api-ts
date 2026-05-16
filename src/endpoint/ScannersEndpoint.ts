@@ -5,11 +5,6 @@ import { ScannerDeviceInfo } from '../types/ScannerDeviceInfo';
 import Endpoint from './Endpoint';
 
 /**
- * The scanners endpoint.
- */
-const endpoint = '/scanners';
-
-/**
  * Communicate with the scanners endpoints.
  */
 export default class ScannersEndpoint extends Endpoint {
@@ -19,7 +14,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @param req The object to use to make requests.
    */
   constructor(req: Requester) {
-    super(req, endpoint);
+    super(req, '/scanners');
   }
 
   /**
@@ -29,10 +24,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @returns The scanner app.
    */
   public getByRegistrationCode = async (registrationCode: string): Promise<ScannerApp | null> => {
-    return await this.doGet<ScannerApp | null>(
-      `${endpoint}/registrationCode/${registrationCode}`,
-      false,
-    );
+    return await this.do.get<ScannerApp | null>(`/registrationCode/${registrationCode}`, false);
   };
 
   /**
@@ -47,8 +39,8 @@ export default class ScannersEndpoint extends Endpoint {
     pushToken: string,
     deviceInfo: ScannerDeviceInfo,
   ): Promise<ApiKey | null> => {
-    return await this.doPost<ApiKey | null>(
-      `${endpoint}/register/${scannerApp.id}`,
+    return await this.do.post<ApiKey | null>(
+      `/register/${scannerApp.id}`,
       { deviceInfo, pushToken },
       false,
     );
@@ -60,14 +52,14 @@ export default class ScannersEndpoint extends Endpoint {
    * @param apiKey The API received when registering the device.
    */
   public deregisterDevice = async (apiKey: ApiKey): Promise<void> => {
-    return await this.doDelete<void>(`${endpoint}/deregister/${apiKey.id}`);
+    return await this.do.del<void>(`/deregister/${apiKey.id}`);
   };
 
   /**
    * Returns all the scanner apps for the authenticated organization.
    */
   public getAll = async (): Promise<ScannerApp[]> => {
-    return await this.doGet<ScannerApp[]>(`${endpoint}/organizations/apps`);
+    return await this.do.get<ScannerApp[]>('/organizations/apps');
   };
 
   /**
@@ -76,7 +68,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @param id The ID of the scanner app.
    */
   public getById = async (id: string): Promise<ScannerApp | null> => {
-    return await this.doGet<ScannerApp | null>(`${endpoint}/organizations/${id}`);
+    return await this.do.get<ScannerApp | null>(`/organizations/${id}`);
   };
 
   /**
@@ -85,7 +77,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @param app The scanner app to create.
    */
   public createApp = async (app: ScannerAppInput): Promise<ScannerApp | null> => {
-    return await this.doPost<ScannerApp | null>(`${endpoint}/organizations/apps`, app);
+    return await this.do.post<ScannerApp | null>('/organizations/apps', app);
   };
 
   /**
@@ -95,7 +87,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @param app The scanner app to update.
    */
   public updateApp = async (id: string, app: ScannerAppInput): Promise<ScannerApp | null> => {
-    return await this.doPost<ScannerApp | null>(`${endpoint}/organizations/${id}`, app);
+    return await this.do.post<ScannerApp | null>(`/organizations/${id}`, app);
   };
 
   /**
@@ -104,6 +96,6 @@ export default class ScannersEndpoint extends Endpoint {
    * @param id The ID of the scanner app.
    */
   public deleteApp = async (id: string): Promise<void> => {
-    return await this.doDelete<void>(`${endpoint}/organizations/apps/${id}`);
+    return await this.do.del<void>(`/organizations/apps/${id}`);
   };
 }

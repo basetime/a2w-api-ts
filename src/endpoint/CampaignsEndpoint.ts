@@ -7,16 +7,7 @@ import { Job } from '../types/Job';
 import { MetaValues } from '../types/MetaValues';
 import { Pass } from '../types/Pass';
 import Endpoint from './Endpoint';
-
-/**
- * The campaigns endpoint.
- */
-const endpoint = '/campaigns';
-
-/**
- * The enrollment endpoint.
- */
-const enrollmentEndpoint = '/e';
+import EndpointDo from './EndpointDo';
 
 /**
  * Communicate with the campaigns endpoints.
@@ -28,12 +19,19 @@ export default class CampaignsEndpoint extends Endpoint {
   public jwtEncode?: (data: Record<string, any>) => Promise<string>;
 
   /**
+   * Verb wrapper for the unauthenticated enrollment endpoint (`/e`), which lives at a
+   * different prefix from the rest of this class.
+   */
+  private enrollment: EndpointDo;
+
+  /**
    * Constructor.
    *
    * @param req The object to use to make requests.
    */
   constructor(req: Requester) {
-    super(req, endpoint);
+    super(req, '/campaigns');
+    this.enrollment = new EndpointDo(req, '/e');
   }
 
   /**
@@ -42,7 +40,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The campaigns.
    */
   public getAll = async (): Promise<Campaign[]> => {
-    return await this.doGet<Campaign[]>(endpoint);
+    return await this.do.get<Campaign[]>('');
   };
 
   /**
@@ -51,7 +49,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @param id The ID of the campaign.
    */
   public getById = async (id: string): Promise<Campaign> => {
-    return await this.doGet<Campaign>(`${endpoint}/${id}`);
+    return await this.do.get<Campaign>(`/${id}`);
   };
 
   /**
@@ -61,7 +59,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The passes.
    */
   public getPasses = async (campaignId: string): Promise<Pass[]> => {
-    return await this.doGet<Pass[]>(`${endpoint}/${campaignId}/passes`);
+    return await this.do.get<Pass[]>(`/${campaignId}/passes`);
   };
 
   /**
@@ -77,7 +75,7 @@ export default class CampaignsEndpoint extends Endpoint {
       .addParam('pass', passId)
       .addQuery('scanner', JSON.stringify(scanner));
 
-    return await this.doGet<Pass>(url);
+    return await this.do.get<Pass>(url);
   };
 
   /**
@@ -91,7 +89,7 @@ export default class CampaignsEndpoint extends Endpoint {
     const url = this.qb.create('/{campaign}/passes/query').addParam('campaign', campaignId);
     Object.entries(queries).forEach(([key, value]) => url.addQuery('query[]', `${key}:${value}`));
 
-    return await this.doGet<Pass[]>(url);
+    return await this.do.get<Pass[]>(url);
   };
 
   /**
@@ -110,7 +108,6 @@ export default class CampaignsEndpoint extends Endpoint {
       Pick<Pass, 'objectStore' | 'templateId' | 'templateVersion' | 'passTypeIdentifier'>
     >,
   ): Promise<Pass> => {
-    const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
     const cleaned = {
       objectStore: body.objectStore,
       templateId: body.templateId,
@@ -118,7 +115,7 @@ export default class CampaignsEndpoint extends Endpoint {
       passTypeIdentifier: body.passTypeIdentifier,
     };
 
-    return await this.doPost<Pass>(url, cleaned);
+    return await this.do.post<Pass>(`/${campaignId}/passes/details/${passId}`, cleaned);
   };
 
   /**
@@ -131,9 +128,7 @@ export default class CampaignsEndpoint extends Endpoint {
   public mergeObjectStore = async (campaignId: string, passId: string, body: Partial<
     Pick<Pass, 'objectStore'>
   >,): Promise<Pass> => {
-    const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
-
-    return await this.doPut<Pass>(url, {
+    return await this.do.put<Pass>(`/${campaignId}/passes/details/${passId}`, {
       objectStore: body.objectStore,
     });
   }
@@ -146,9 +141,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @param objectStoreKeys The keys to delete from the object store.
    */
   public deleteObjectStoreKeys = async (campaignId: string, passId: string, objectStoreKeys: string[]): Promise<Pass> => {
-    const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
-
-    return await this.doDelete<Pass>(url, true, { objectStoreKeys });
+    return await this.do.del<Pass>(`/${campaignId}/passes/details/${passId}`, true, { objectStoreKeys });
   }
 
   /**
@@ -161,8 +154,6 @@ export default class CampaignsEndpoint extends Endpoint {
     campaignId: string,
     passes: (Partial<Pass> & { id: string })[],
   ): Promise<Pass[]> => {
-    const url = `${endpoint}/${campaignId}/passes/details/passes`;
-
     // Filter out the values that can't be updated via this endpoint.
     const cleaned = passes.map((pass: Partial<Pass> & { id: string }) => {
       return {
@@ -174,7 +165,7 @@ export default class CampaignsEndpoint extends Endpoint {
       };
     });
 
-    return await this.doPost<Pass[]>(url, { passes: cleaned });
+    return await this.do.post<Pass[]>(`/${campaignId}/passes/details/passes`, { passes: cleaned });
   };
 
   /**
@@ -185,9 +176,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @param log The message to append to the log.
    */
   public appendLog = async (campaignId: string, passId: string, log: string): Promise<Pass> => {
-    const url = `${endpoint}/${campaignId}/passes/${passId}/logs`;
-
-    return await this.doPost<Pass>(url, { log });
+    return await this.do.post<Pass>(`/${campaignId}/passes/${passId}/logs`, { log });
   };
 
   /**
@@ -211,9 +200,7 @@ export default class CampaignsEndpoint extends Endpoint {
     objectStore: Record<string, any> = {},
     utm: Record<string, string> = {},
   ): Promise<string> => {
-    const url = `${endpoint}/${campaignId}/passes/bundle`;
-
-    return await this.doPost<string>(url, {
+    return await this.do.post<string>(`/${campaignId}/passes/bundle`, {
       metaValues,
       objectStore,
       utm,
@@ -247,9 +234,8 @@ export default class CampaignsEndpoint extends Endpoint {
         formValues,
       }),
     };
-    const url = `${enrollmentEndpoint}/campaign/${campaignId}`;
 
-    return await this.doPost<EnrollmentResponse>(url, body);
+    return await this.enrollment.post<EnrollmentResponse>(`/campaign/${campaignId}`, body);
   };
 
   /**
@@ -260,7 +246,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The passes.
    */
   public getPassesByJob = async (campaignId: string, jobId: string): Promise<Pass[]> => {
-    return await this.doGet<Pass[]>(`${endpoint}/${campaignId}/passes/${jobId}`);
+    return await this.do.get<Pass[]>(`/${campaignId}/passes/${jobId}`);
   };
 
   /**
@@ -270,7 +256,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The claims.
    */
   public getClaims = async (campaignId: string): Promise<Claim[]> => {
-    return await this.doGet<Claim[]>(`${endpoint}/${campaignId}/claims`);
+    return await this.do.get<Claim[]>(`/${campaignId}/claims`);
   };
 
   /**
@@ -280,7 +266,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The jobs.
    */
   public getJobs = async (campaignId: string): Promise<Job[]> => {
-    return await this.doGet<Job[]>(`${endpoint}/${campaignId}/jobs`);
+    return await this.do.get<Job[]>(`/${campaignId}/jobs`);
   };
 
   /**
@@ -290,7 +276,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The statistics.
    */
   public getStats = async (campaignId: string): Promise<CampaignStats> => {
-    return await this.doGet<CampaignStats>(`${endpoint}/${campaignId}/stats`);
+    return await this.do.get<CampaignStats>(`/${campaignId}/stats`);
   };
 
   /**
@@ -300,7 +286,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The enrollments.
    */
   public getEnrollments = async (campaignId: string): Promise<Enrollment[]> => {
-    return await this.doGet<Enrollment[]>(`${endpoint}/${campaignId}/enrollments`);
+    return await this.do.get<Enrollment[]>(`/${campaignId}/enrollments`);
   };
 
   /**
@@ -311,9 +297,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns True if the pass was redeemed, false if it was already redeemed.
    */
   public redeemPass = async (campaignId: string, passId: string): Promise<boolean> => {
-    const url = `${endpoint}/${campaignId}/passes/${passId}/redeemed`;
-
-    return await this.doPost<boolean>(url, {});
+    return await this.do.post<boolean>(`/${campaignId}/passes/${passId}/redeemed`, {});
   };
 
   /**
@@ -324,8 +308,6 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The redeemed status.
    */
   public getRedeemedStatus = async (campaignId: string, passId: string): Promise<boolean> => {
-    const url = `${endpoint}/${campaignId}/passes/${passId}/redeemed`;
-
-    return await this.doGet<boolean>(url);
+    return await this.do.get<boolean>(`/${campaignId}/passes/${passId}/redeemed`);
   };
 }

@@ -4,14 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Endpoint_1 = __importDefault(require("./Endpoint"));
-/**
- * The campaigns endpoint.
- */
-const endpoint = '/campaigns';
-/**
- * The enrollment endpoint.
- */
-const enrollmentEndpoint = '/e';
+const EndpointDo_1 = __importDefault(require("./EndpointDo"));
 /**
  * Communicate with the campaigns endpoints.
  */
@@ -22,14 +15,14 @@ class CampaignsEndpoint extends Endpoint_1.default {
      * @param req The object to use to make requests.
      */
     constructor(req) {
-        super(req, endpoint);
+        super(req, '/campaigns');
         /**
          * Returns all of the campaigns for authenticated organization.
          *
          * @returns The campaigns.
          */
         this.getAll = async () => {
-            return await this.doGet(endpoint);
+            return await this.do.get('');
         };
         /**
          * Returns the details of a campaign.
@@ -37,7 +30,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @param id The ID of the campaign.
          */
         this.getById = async (id) => {
-            return await this.doGet(`${endpoint}/${id}`);
+            return await this.do.get(`/${id}`);
         };
         /**
          * Returns the passes for a campaign.
@@ -46,7 +39,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns The passes.
          */
         this.getPasses = async (campaignId) => {
-            return await this.doGet(`${endpoint}/${campaignId}/passes`);
+            return await this.do.get(`/${campaignId}/passes`);
         };
         /**
          * Returns the details for a pass.
@@ -60,7 +53,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
                 .addParam('campaign', campaignId)
                 .addParam('pass', passId)
                 .addQuery('scanner', JSON.stringify(scanner));
-            return await this.doGet(url);
+            return await this.do.get(url);
         };
         /**
          * Queries the passes for a campaign.
@@ -72,7 +65,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
         this.queryPasses = async (campaignId, queries = {}) => {
             const url = this.qb.create('/{campaign}/passes/query').addParam('campaign', campaignId);
             Object.entries(queries).forEach(([key, value]) => url.addQuery('query[]', `${key}:${value}`));
-            return await this.doGet(url);
+            return await this.do.get(url);
         };
         /**
          * Updates the details of a pass.
@@ -84,14 +77,13 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @param body The new pass values.
          */
         this.updatePass = async (campaignId, passId, body) => {
-            const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
             const cleaned = {
                 objectStore: body.objectStore,
                 templateId: body.templateId,
                 templateVersion: body.templateVersion,
                 passTypeIdentifier: body.passTypeIdentifier,
             };
-            return await this.doPost(url, cleaned);
+            return await this.do.post(`/${campaignId}/passes/details/${passId}`, cleaned);
         };
         /**
          * Merges a pass object store into the existing object store.
@@ -101,8 +93,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @param body The new pass values with objectStore key.
          */
         this.mergeObjectStore = async (campaignId, passId, body) => {
-            const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
-            return await this.doPut(url, {
+            return await this.do.put(`/${campaignId}/passes/details/${passId}`, {
                 objectStore: body.objectStore,
             });
         };
@@ -114,8 +105,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @param objectStoreKeys The keys to delete from the object store.
          */
         this.deleteObjectStoreKeys = async (campaignId, passId, objectStoreKeys) => {
-            const url = `${endpoint}/${campaignId}/passes/details/${passId}`;
-            return await this.doDelete(url, true, { objectStoreKeys });
+            return await this.do.del(`/${campaignId}/passes/details/${passId}`, true, { objectStoreKeys });
         };
         /**
          * Updates multiple passes.
@@ -124,7 +114,6 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @param bodies The passes to update.
          */
         this.updatePasses = async (campaignId, passes) => {
-            const url = `${endpoint}/${campaignId}/passes/details/passes`;
             // Filter out the values that can't be updated via this endpoint.
             const cleaned = passes.map((pass) => {
                 return {
@@ -135,7 +124,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
                     passTypeIdentifier: pass.passTypeIdentifier,
                 };
             });
-            return await this.doPost(url, { passes: cleaned });
+            return await this.do.post(`/${campaignId}/passes/details/passes`, { passes: cleaned });
         };
         /**
          * Appends a log to a pass.
@@ -145,8 +134,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @param log The message to append to the log.
          */
         this.appendLog = async (campaignId, passId, log) => {
-            const url = `${endpoint}/${campaignId}/passes/${passId}/logs`;
-            return await this.doPost(url, { log });
+            return await this.do.post(`/${campaignId}/passes/${passId}/logs`, { log });
         };
         /**
          * Creates a pass bundle and returns the URL to the claims page.
@@ -164,8 +152,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @param utm The UTM values to pass along to the api.
          */
         this.createBundle = async (campaignId, metaValues = {}, objectStore = {}, utm = {}) => {
-            const url = `${endpoint}/${campaignId}/passes/bundle`;
-            return await this.doPost(url, {
+            return await this.do.post(`/${campaignId}/passes/bundle`, {
                 metaValues,
                 objectStore,
                 utm,
@@ -191,8 +178,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
                     formValues,
                 }),
             };
-            const url = `${enrollmentEndpoint}/campaign/${campaignId}`;
-            return await this.doPost(url, body);
+            return await this.enrollment.post(`/campaign/${campaignId}`, body);
         };
         /**
          * Returns the passes for a job.
@@ -202,7 +188,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns The passes.
          */
         this.getPassesByJob = async (campaignId, jobId) => {
-            return await this.doGet(`${endpoint}/${campaignId}/passes/${jobId}`);
+            return await this.do.get(`/${campaignId}/passes/${jobId}`);
         };
         /**
          * Returns the claims for a campaign.
@@ -211,7 +197,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns The claims.
          */
         this.getClaims = async (campaignId) => {
-            return await this.doGet(`${endpoint}/${campaignId}/claims`);
+            return await this.do.get(`/${campaignId}/claims`);
         };
         /**
          * Returns the jobs for a campaign.
@@ -220,7 +206,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns The jobs.
          */
         this.getJobs = async (campaignId) => {
-            return await this.doGet(`${endpoint}/${campaignId}/jobs`);
+            return await this.do.get(`/${campaignId}/jobs`);
         };
         /**
          * Returns statistics for a campaign.
@@ -229,7 +215,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns The statistics.
          */
         this.getStats = async (campaignId) => {
-            return await this.doGet(`${endpoint}/${campaignId}/stats`);
+            return await this.do.get(`/${campaignId}/stats`);
         };
         /**
          * Returns the enrollments for a campaign.
@@ -238,7 +224,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns The enrollments.
          */
         this.getEnrollments = async (campaignId) => {
-            return await this.doGet(`${endpoint}/${campaignId}/enrollments`);
+            return await this.do.get(`/${campaignId}/enrollments`);
         };
         /**
          * Sets the redeemed status of a pass to true.
@@ -248,8 +234,7 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns True if the pass was redeemed, false if it was already redeemed.
          */
         this.redeemPass = async (campaignId, passId) => {
-            const url = `${endpoint}/${campaignId}/passes/${passId}/redeemed`;
-            return await this.doPost(url, {});
+            return await this.do.post(`/${campaignId}/passes/${passId}/redeemed`, {});
         };
         /**
          * Returns the redeemed status of a pass.
@@ -259,9 +244,9 @@ class CampaignsEndpoint extends Endpoint_1.default {
          * @returns The redeemed status.
          */
         this.getRedeemedStatus = async (campaignId, passId) => {
-            const url = `${endpoint}/${campaignId}/passes/${passId}/redeemed`;
-            return await this.doGet(url);
+            return await this.do.get(`/${campaignId}/passes/${passId}/redeemed`);
         };
+        this.enrollment = new EndpointDo_1.default(req, '/e');
     }
 }
 exports.default = CampaignsEndpoint;

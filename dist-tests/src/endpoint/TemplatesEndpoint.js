@@ -5,10 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
- * The templates endpoint.
- */
-const endpoint = '/templates';
-/**
  * Communicate with the templates endpoints.
  */
 class TemplatesEndpoint extends Endpoint_1.default {
@@ -18,15 +14,14 @@ class TemplatesEndpoint extends Endpoint_1.default {
      * @param req The object to use to make requests.
      */
     constructor(req) {
-        super(req, endpoint);
+        super(req, '/templates');
         /**
          * Returns a template by ID.
          *
          * @param id The ID of the template.
          */
         this.getById = async (id) => {
-            const url = `${endpoint}/simple/${id}`;
-            return await this.doGet(url);
+            return await this.do.get(`/simple/${id}`);
         };
         /**
          * Returns all of the templates for authenticated organization.
@@ -34,7 +29,7 @@ class TemplatesEndpoint extends Endpoint_1.default {
          * @returns The templates.
          */
         this.getAll = async () => {
-            return await this.doGet(`${endpoint}/organization`);
+            return await this.do.get('/organization');
         };
         /**
          * Returns all of the templates for a specific tag.
@@ -43,7 +38,7 @@ class TemplatesEndpoint extends Endpoint_1.default {
          * @returns The templates.
          */
         this.getByTag = async (tag) => {
-            return await this.doGet(`${endpoint}/tagged/${tag}`);
+            return await this.do.get(`/tagged/${tag}`);
         };
     }
 }

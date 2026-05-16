@@ -4,11 +4,6 @@ import { TemplateThumbnail } from '../types/TemplateThumbnail';
 import Endpoint from './Endpoint';
 
 /**
- * The templates endpoint.
- */
-const endpoint = '/templates';
-
-/**
  * Communicate with the templates endpoints.
  */
 export default class TemplatesEndpoint extends Endpoint {
@@ -18,7 +13,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @param req The object to use to make requests.
    */
   constructor(req: Requester) {
-    super(req, endpoint);
+    super(req, '/templates');
   }
 
   /**
@@ -27,8 +22,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @param id The ID of the template.
    */
   public getById = async (id: string): Promise<TemplateThumbnail> => {
-    const url = `${endpoint}/simple/${id}`;
-    return await this.doGet<TemplateThumbnail>(url);
+    return await this.do.get<TemplateThumbnail>(`/simple/${id}`);
   };
 
   /**
@@ -37,7 +31,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @returns The templates.
    */
   public getAll = async (): Promise<Template[]> => {
-    return await this.doGet<Template[]>(`${endpoint}/organization`);
+    return await this.do.get<Template[]>('/organization');
   };
 
   /**
@@ -47,6 +41,6 @@ export default class TemplatesEndpoint extends Endpoint {
    * @returns The templates.
    */
   public getByTag = async (tag: string): Promise<TemplateThumbnail[]> => {
-    return await this.doGet<TemplateThumbnail[]>(`${endpoint}/tagged/${tag}`);
+    return await this.do.get<TemplateThumbnail[]>(`/tagged/${tag}`);
   };
 }

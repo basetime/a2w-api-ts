@@ -2,11 +2,6 @@ import { Requester } from '../http/Requester';
 import Endpoint from './Endpoint';
 
 /**
- * The claims endpoint.
- */
-const endpoint = '/claim';
-
-/**
  * Communicate with the claims endpoints.
  */
 export default class ClaimsEndpoint extends Endpoint {
@@ -16,7 +11,7 @@ export default class ClaimsEndpoint extends Endpoint {
    * @param req The object to use to make requests.
    */
   constructor(req: Requester) {
-    super(req, endpoint);
+    super(req, '/claim');
   }
 
   /**
@@ -31,7 +26,7 @@ export default class ClaimsEndpoint extends Endpoint {
       .addParam('campaign', campaignId)
       .addParam('pass', passId);
 
-    return await this.doFetch<string>(url, {
+    return await this.do.fetch<string>(url, {
       method: 'GET',
       headers: {
         Accept: 'application/vnd.apple.pkpass',

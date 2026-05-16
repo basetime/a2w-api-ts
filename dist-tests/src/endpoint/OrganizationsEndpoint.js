@@ -5,10 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
- * The organizations endpoint.
- */
-const endpoint = '/organization';
-/**
  * Communicate with the organizations endpoints.
  */
 class OrganizationsEndpoint extends Endpoint_1.default {
@@ -18,14 +14,14 @@ class OrganizationsEndpoint extends Endpoint_1.default {
      * @param req The object to use to make requests.
      */
     constructor(req) {
-        super(req, endpoint);
+        super(req, '/organization');
         /**
          * Fetches the details of the authenticated organization.
          *
          * @returns The organization.
          */
         this.getMine = async () => {
-            return await this.doGet(endpoint);
+            return await this.do.get('');
         };
         /**
          * Returns a scanner invite by code.
@@ -33,7 +29,7 @@ class OrganizationsEndpoint extends Endpoint_1.default {
          * @param code The invite code.
          */
         this.getScannerInvite = async (code) => {
-            return await this.doGet(`${endpoint}/scanners/invites/${code}`, false);
+            return await this.do.get(`/scanners/invites/${code}`, false);
         };
         /**
          * Begins the scanner exchange.
@@ -41,7 +37,7 @@ class OrganizationsEndpoint extends Endpoint_1.default {
          * @param code The invite code.
          */
         this.startScannerExchange = async (code) => {
-            return await this.doGet(`${endpoint}/scanners/invites/${code}/start`, false);
+            return await this.do.get(`/scanners/invites/${code}/start`, false);
         };
         /**
          * Accepts an scanner app invite code and returns api keys.
@@ -51,7 +47,7 @@ class OrganizationsEndpoint extends Endpoint_1.default {
          * @param scannerDeviceInfo The scanner device info.
          */
         this.finishScannerExchange = async (code, pushToken, scannerDeviceInfo) => {
-            return await this.doPost(`${endpoint}/scanners/invites`, {
+            return await this.do.post('/scanners/invites', {
                 code,
                 pushToken,
                 scannerDeviceInfo,
@@ -61,7 +57,7 @@ class OrganizationsEndpoint extends Endpoint_1.default {
          * Returns the API keys for the authenticated organization.
          */
         this.getApiKeys = async () => {
-            return await this.doGet(`${endpoint}/apiKeys`);
+            return await this.do.get('/apiKeys');
         };
         /**
          * Returns an API key by ID.
@@ -72,7 +68,7 @@ class OrganizationsEndpoint extends Endpoint_1.default {
             const url = this.qb.create('/apiKeys/{id}')
                 .addParam('id', id)
                 .addQuery('scanner', JSON.stringify(scanner));
-            return await this.doGet(url);
+            return await this.do.get(url);
         };
         /**
          * Deletes an API key.
@@ -80,7 +76,7 @@ class OrganizationsEndpoint extends Endpoint_1.default {
          * @param id The ID of the API key.
          */
         this.deleteApiKey = async (id) => {
-            return await this.doDelete(`${endpoint}/apiKeys/${id}`);
+            return await this.do.del(`/apiKeys/${id}`);
         };
     }
 }
