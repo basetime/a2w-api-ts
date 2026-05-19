@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.1 - 2026-05-19
+
 - **Breaking:** Move `baseUrl` off the module global onto `HttpRequester` instance state. `setBaseUrl` / `getBaseUrl` mutate per-instance fields, providers learn the base URL from `setAuth(...)`, and `src/constants.ts` now exports only `DEFAULT_BASE_URL`. `Client` accepts an `{ baseUrl }` option forwarded to `HttpRequester`.
 - **Breaking:** Introduce a typed `ApiError` (status, statusText, body, url, cause) and have `HttpRequester.fetch` throw it directly on non-2xx responses instead of double-wrapping. Network errors propagate as-is.
 - **Breaking:** Add `BaseAuthProvider` with in-flight dedup, 30s clock-skew margin, and `/auth/apiRefresh`-based refresh; `HttpRequester` retries once on 401 after `auth.refresh()`. `KeysProvider`, `OAuthProvider`, and `StoredProvider` are now thin subclasses.
