@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refactors migration documentation for v1.0.0, clarifying changes to the Client and Requester interfaces, updating endpoint structures, and enhancing examples for subclassing and URL handling. Highlights the transition to new method signatures and the reorganization of endpoint classes for improved clarity and maintainability.. (`c3edd3f`)
+
 ## 1.0.0 - 2026-05-16
 
 - Add workflow execution (`client.workflows.run` + `getJobStatus`), campaign CRUD
