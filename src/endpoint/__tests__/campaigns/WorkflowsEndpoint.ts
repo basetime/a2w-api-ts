@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl } from '../../../constants';
+import { DEFAULT_BASE_URL } from '../../../constants';
 import { Client, KeysProvider } from '../../../index';
 
-const baseUrl = getBaseUrl();
+const baseUrl = DEFAULT_BASE_URL;
 const endpoint = '/campaigns';
 
 describe('CampaignWorkflowsEndpoint', () => {

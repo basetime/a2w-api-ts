@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Requester } from '../http/Requester';
-import { Campaign } from '../types/Campaign';
+import { Campaign, CampaignSchema } from '../types/Campaign';
 import CampaignClaimsEndpoint from './campaigns/ClaimsEndpoint';
 import CampaignEnrollmentsEndpoint from './campaigns/EnrollmentsEndpoint';
 import CampaignJobsEndpoint from './campaigns/JobsEndpoint';
@@ -15,6 +16,9 @@ import Endpoint from './Endpoint';
  * Top-level methods (`getAll`, `getById`) operate on the campaign collection itself. Per-campaign
  * sub-resources are grouped into dedicated sub-endpoints exposed as `public readonly` props,
  * mirroring the composition pattern of {@link ../Client | Client}.
+ *
+ * The sub-endpoints reuse this parent's `req`, `do`, and `qb` (via `super(parent)`) rather
+ * than each constructing their own `EndpointDo`/`QueryBuilder` rooted at `/campaigns`.
  */
 export default class CampaignsEndpoint extends Endpoint {
   /**
@@ -70,13 +74,13 @@ export default class CampaignsEndpoint extends Endpoint {
    */
   constructor(req: Requester) {
     super(req, '/campaigns');
-    this.passes = new CampaignPassesEndpoint(req);
-    this.claims = new CampaignClaimsEndpoint(req);
-    this.jobs = new CampaignJobsEndpoint(req);
-    this.stats = new CampaignStatsEndpoint(req);
-    this.enrollments = new CampaignEnrollmentsEndpoint(req);
-    this.wallets = new CampaignWalletsEndpoint(req);
-    this.workflows = new CampaignWorkflowsEndpoint(req);
+    this.passes = new CampaignPassesEndpoint(this);
+    this.claims = new CampaignClaimsEndpoint(this);
+    this.jobs = new CampaignJobsEndpoint(this);
+    this.stats = new CampaignStatsEndpoint(this);
+    this.enrollments = new CampaignEnrollmentsEndpoint(this);
+    this.wallets = new CampaignWalletsEndpoint(this);
+    this.workflows = new CampaignWorkflowsEndpoint(this);
   }
 
   /**
@@ -85,7 +89,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @returns The campaigns.
    */
   public getAll = async (): Promise<Campaign[]> => {
-    return await this.do.get('');
+    return await this.do.get('', z.array(CampaignSchema));
   };
 
   /**
@@ -94,7 +98,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @param id The ID of the campaign.
    */
   public getById = async (id: string): Promise<Campaign> => {
-    return await this.do.get(`/${id}`);
+    return await this.do.get(`/${id}`, CampaignSchema);
   };
 
   /**
@@ -112,7 +116,7 @@ export default class CampaignsEndpoint extends Endpoint {
     id: string,
     body: Omit<Partial<Campaign>, 'templates'> & { templates?: string[] },
   ): Promise<Campaign> => {
-    return await this.do.post(`/${id}`, body);
+    return await this.do.post(`/${id}`, body, CampaignSchema);
   };
 
   /**
@@ -141,7 +145,7 @@ export default class CampaignsEndpoint extends Endpoint {
       placeholders: Record<string, string>;
     },
   ): Promise<Campaign> => {
-    return await this.do.post(`/${id}/simple`, body);
+    return await this.do.post(`/${id}/simple`, body, CampaignSchema);
   };
 
   /**
@@ -150,7 +154,7 @@ export default class CampaignsEndpoint extends Endpoint {
    * @param id The ID of the campaign to clone.
    */
   public clone = async (id: string): Promise<string> => {
-    return await this.do.post(`/${id}/clone`, {});
+    return await this.do.post(`/${id}/clone`, {}, z.string());
   };
 
   /**
@@ -159,6 +163,6 @@ export default class CampaignsEndpoint extends Endpoint {
    * @param id The ID of the campaign to delete.
    */
   public delete = async (id: string): Promise<string> => {
-    return await this.do.del(`/${id}`);
+    return await this.do.del(`/${id}`, z.string());
   };
 }

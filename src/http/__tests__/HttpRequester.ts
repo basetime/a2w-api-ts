@@ -1,44 +1,53 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl, setBaseUrl } from '../../constants';
+import { DEFAULT_BASE_URL } from '../../constants';
 import { Authed } from '../../types/Authed';
 import { AuthProvider } from '../../provider/AuthProvider';
 import { Logger } from '../../Logger';
+import { ApiError } from '../ApiError';
 import HttpRequester from '../HttpRequester';
 import { version } from '../../version';
 
-const baseUrl = getBaseUrl();
+const baseUrl = DEFAULT_BASE_URL;
 
 /**
  * Stub auth provider that records interaction and lets each test control its
- * cached `Authed` value and what `authenticate()` resolves to.
+ * cached `Authed` value and what `authenticate()` / `refresh()` resolve to.
  */
 class StubAuthProvider implements AuthProvider {
   public authed: Authed | undefined;
   public token = 'fresh-token';
+  public refreshedToken = 'refreshed-token';
   public authenticateCalls = 0;
+  public refreshCalls = 0;
   public loggerSet = false;
+  public baseUrlSetTo: string | undefined;
 
-  /**
-   *
-   */
   setLogger = (_logger: Logger) => {
     this.loggerSet = true;
   };
 
-  /**
-   *
-   */
+  setBaseUrl = (url: string) => {
+    this.baseUrlSetTo = url;
+  };
+
   getAuthed = (): Authed | undefined => {
     return this.authed;
   };
 
-  /**
-   *
-   */
   authenticate = async (): Promise<string> => {
     this.authenticateCalls += 1;
     return this.token;
+  };
+
+  refresh = async (): Promise<string> => {
+    this.refreshCalls += 1;
+    this.authed = {
+      idToken: this.refreshedToken,
+      refreshToken: this.authed?.refreshToken ?? 'r',
+      expiresAt: Math.floor(Date.now() / 1000) + 3600,
+    };
+    return this.refreshedToken;
   };
 }
 
@@ -60,12 +69,40 @@ describe('HttpRequester', () => {
     return new Headers(init.headers as HeadersInit);
   };
 
+  describe('constructor', () => {
+    /**
+     *
+     */
+    it('should default to DEFAULT_BASE_URL', () => {
+      const http = new HttpRequester();
+      expect(http.getBaseUrl()).to.equal(DEFAULT_BASE_URL);
+    });
+
+    /**
+     *
+     */
+    it('should accept a baseUrl option', () => {
+      const custom = 'https://example.test/api/v1';
+      const http = new HttpRequester(undefined, undefined, { baseUrl: custom });
+      expect(http.getBaseUrl()).to.equal(custom);
+    });
+
+    /**
+     *
+     */
+    it('should derive the site base URL by stripping /api/v1', () => {
+      const http = new HttpRequester(undefined, undefined, {
+        baseUrl: 'https://example.test/api/v1',
+      });
+      expect(http.getSiteBaseUrl()).to.equal('https://example.test');
+    });
+  });
+
   describe('setBaseUrl()', () => {
     /**
      *
      */
     it('should change the base url used by fetch()', async () => {
-      const original = getBaseUrl();
       const custom = 'https://example.test/api/v1';
       const url = `${custom}/ping?api=true`;
       fetchMock.get(url, { ok: true });
@@ -73,12 +110,27 @@ describe('HttpRequester', () => {
       const http = new HttpRequester();
       http.setBaseUrl(custom);
 
-      try {
-        await http.fetch('/ping', {}, false);
-        expect(fetchMock.called(url)).to.be.true;
-      } finally {
-        setBaseUrl(original);
-      }
+      await http.fetch('/ping', {}, false);
+      expect(fetchMock.called(url)).to.be.true;
+    });
+
+    /**
+     *
+     */
+    it('should recompute the site base URL', () => {
+      const http = new HttpRequester();
+      http.setBaseUrl('https://example.test/api/v1');
+      expect(http.getSiteBaseUrl()).to.equal('https://example.test');
+    });
+
+    /**
+     *
+     */
+    it('should push the new base url into the auth provider', () => {
+      const auth = new StubAuthProvider();
+      const http = new HttpRequester(auth);
+      http.setBaseUrl('https://example.test/api/v1');
+      expect(auth.baseUrlSetTo).to.equal('https://example.test/api/v1');
     });
   });
 
@@ -98,6 +150,18 @@ describe('HttpRequester', () => {
     /**
      *
      */
+    it('should push the current base url into the auth provider', () => {
+      const auth = new StubAuthProvider();
+      const http = new HttpRequester(undefined, undefined, {
+        baseUrl: 'https://example.test/api/v1',
+      });
+      http.setAuth(auth);
+      expect(auth.baseUrlSetTo).to.equal('https://example.test/api/v1');
+    });
+
+    /**
+     *
+     */
     it('should be invoked from the constructor when an auth provider is supplied', () => {
       const auth = new StubAuthProvider();
       const http = new HttpRequester(auth);
@@ -107,7 +171,7 @@ describe('HttpRequester', () => {
     });
   });
 
-  describe('fetch() headers', () => {
+  describe('fetch() URL handling', () => {
     /**
      *
      */
@@ -136,6 +200,54 @@ describe('HttpRequester', () => {
       expect(last?.[0]).to.equal(`${url}?foo=bar&api=true`);
     });
 
+    /**
+     *
+     */
+    it('should not duplicate api=true when the caller has already added it', async () => {
+      const url = `${baseUrl}/things?foo=bar&api=true`;
+      fetchMock.get(url, { ok: true });
+
+      const http = new HttpRequester();
+      await http.fetch('/things?foo=bar&api=true', {}, false);
+
+      expect(fetchMock.called(url)).to.be.true;
+      const last = fetchMock.lastCall();
+      // Should appear exactly once.
+      const calls = (last?.[0] as string).match(/api=true/g);
+      expect(calls).to.have.length(1);
+    });
+
+    /**
+     *
+     */
+    it('should leave absolute URLs (other than api=true injection) unchanged', async () => {
+      const absolute = 'https://other.test/elsewhere';
+      fetchMock.get(`${absolute}?api=true`, { ok: true });
+
+      const http = new HttpRequester();
+      await http.fetch(absolute, {}, false);
+
+      const last = fetchMock.lastCall();
+      expect(last?.[0]).to.equal(`${absolute}?api=true`);
+    });
+
+    /**
+     *
+     */
+    it('should not duplicate api=true on an absolute URL that already has it', async () => {
+      const absolute = 'https://other.test/elsewhere?api=true';
+      fetchMock.get(absolute, { ok: true });
+
+      const http = new HttpRequester();
+      await http.fetch(absolute, {}, false);
+
+      const last = fetchMock.lastCall();
+      const occurrences = (last?.[0] as string).match(/api=true/g);
+      expect(occurrences).to.have.length(1);
+    });
+  });
+
+  describe('fetch() headers', () => {
     /**
      *
      */
@@ -214,7 +326,11 @@ describe('HttpRequester', () => {
       fetchMock.get(`${url}?api=true`, { ok: true });
 
       const auth = new StubAuthProvider();
-      auth.authed = { idToken: 'cached', refreshToken: 'r', expiresAt: Date.now() + 1000 };
+      auth.authed = {
+        idToken: 'cached',
+        refreshToken: 'r',
+        expiresAt: Math.floor(Date.now() / 1000) + 3600,
+      };
 
       const http = new HttpRequester(auth);
       await http.fetch('/no-auth', {}, false);
@@ -231,7 +347,11 @@ describe('HttpRequester', () => {
       fetchMock.get(`${url}?api=true`, { ok: true });
 
       const auth = new StubAuthProvider();
-      auth.authed = { idToken: 'cached-id', refreshToken: 'r', expiresAt: Date.now() + 1000 };
+      auth.authed = {
+        idToken: 'cached-id',
+        refreshToken: 'r',
+        expiresAt: Math.floor(Date.now() / 1000) + 3600,
+      };
 
       const http = new HttpRequester(auth);
       await http.fetch('/me');
@@ -268,6 +388,63 @@ describe('HttpRequester', () => {
       await http.fetch('/anon');
 
       expect(lastHeaders().get('Authorization')).to.be.null;
+    });
+
+    /**
+     *
+     */
+    it('should retry once after auth.refresh() on a 401 response', async () => {
+      const url = `${baseUrl}/protected?api=true`;
+      const auth = new StubAuthProvider();
+      auth.authed = {
+        idToken: 'expired-id',
+        refreshToken: 'r',
+        expiresAt: Math.floor(Date.now() / 1000) + 3600,
+      };
+
+      let callCount = 0;
+      fetchMock.get(url, () => {
+        callCount += 1;
+        if (callCount === 1) {
+          return { status: 401, body: { error: 'expired' } };
+        }
+        return { status: 200, body: { ok: true } };
+      });
+
+      const http = new HttpRequester(auth);
+      const result = await http.fetch<{ ok: boolean }>('/protected');
+
+      expect(callCount).to.equal(2);
+      expect(auth.refreshCalls).to.equal(1);
+      expect(result).to.deep.equal({ ok: true });
+    });
+
+    /**
+     *
+     */
+    it('should not retry indefinitely on persistent 401s', async () => {
+      const url = `${baseUrl}/protected?api=true`;
+      const auth = new StubAuthProvider();
+      auth.authed = {
+        idToken: 'bad',
+        refreshToken: 'r',
+        expiresAt: Math.floor(Date.now() / 1000) + 3600,
+      };
+
+      fetchMock.get(url, { status: 401, body: { error: 'still bad' } });
+
+      const http = new HttpRequester(auth);
+      let caught: Error | undefined;
+      try {
+        await http.fetch('/protected');
+      } catch (err) {
+        caught = err as Error;
+      }
+
+      expect(caught).to.be.instanceof(ApiError);
+      expect((caught as ApiError).status).to.equal(401);
+      // One initial call + one retry; no infinite loop.
+      expect(fetchMock.calls(url)).to.have.length(2);
     });
   });
 
@@ -389,7 +566,7 @@ describe('HttpRequester', () => {
     /**
      *
      */
-    it('should throw using the response body error field on a non-ok JSON response', async () => {
+    it('should throw ApiError with status, body, and url on a non-ok JSON response', async () => {
       const url = `${baseUrl}/fail-json`;
       fetchMock.get(`${url}?api=true`, { status: 400, body: { error: 'Bad input' } });
 
@@ -401,15 +578,19 @@ describe('HttpRequester', () => {
         caught = err as Error;
       }
 
-      expect(caught).to.be.an.instanceof(Error);
-      expect(caught?.message).to.include('400');
-      expect(caught?.message).to.include('Bad input');
+      expect(caught).to.be.instanceof(ApiError);
+      const api = caught as ApiError;
+      expect(api.status).to.equal(400);
+      expect(api.body).to.deep.equal({ error: 'Bad input' });
+      expect(api.url).to.equal(`${url}?api=true`);
+      expect(api.message).to.include('400');
+      expect(api.message).to.include('Bad input');
     });
 
     /**
      *
      */
-    it('should throw using the response body on a non-ok text response', async () => {
+    it('should throw ApiError carrying the raw text on a non-ok non-JSON response', async () => {
       const url = `${baseUrl}/fail-text`;
       fetchMock.get(`${url}?api=true`, { status: 500, body: 'kaboom' });
 
@@ -421,9 +602,12 @@ describe('HttpRequester', () => {
         caught = err as Error;
       }
 
-      expect(caught).to.be.an.instanceof(Error);
-      expect(caught?.message).to.include('500');
-      expect(caught?.message).to.include('kaboom');
+      expect(caught).to.be.instanceof(ApiError);
+      const api = caught as ApiError;
+      expect(api.status).to.equal(500);
+      expect(api.body).to.equal('kaboom');
+      expect(api.message).to.include('500');
+      expect(api.message).to.include('kaboom');
     });
   });
 });

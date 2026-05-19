@@ -1,9 +1,10 @@
+import { z } from 'zod';
 import { Requester } from '../http/Requester';
-import { SnippetLibrary } from '../types/SnippetLibrary';
-import { Workflow } from '../types/Workflow';
-import { WorkflowJob, WorkflowJobStatus } from '../types/WorkflowJob';
-import { WorkflowMessage } from '../types/WorkflowMessage';
+import { SnippetLibrary, SnippetLibrarySchema } from '../types/SnippetLibrary';
+import { Workflow, WorkflowSchema } from '../types/Workflow';
+import { WorkflowJob, WorkflowJobSchema } from '../types/WorkflowJob';
 import Endpoint from './Endpoint';
+import WorkflowJobsEndpoint from './workflows/JobsEndpoint';
 
 /**
  * Body accepted by {@link WorkflowsEndpoint.run}.
@@ -36,8 +37,17 @@ export interface WorkflowRunBody {
 
 /**
  * Communicate with the workflows endpoints.
+ *
+ * Per-job operations (read, update, status polling, log appending) have moved to
+ * `client.workflows.jobs.*` in v2 — see {@link WorkflowJobsEndpoint}.
  */
 export default class WorkflowsEndpoint extends Endpoint {
+  /**
+   * Job operations for workflows (`/workflows/jobs/*` and the workflow-scoped
+   * `/workflows/:workflowId/jobs` listing).
+   */
+  public readonly jobs: WorkflowJobsEndpoint;
+
   /**
    * Constructor.
    *
@@ -45,13 +55,14 @@ export default class WorkflowsEndpoint extends Endpoint {
    */
   constructor(req: Requester) {
     super(req, '/workflows');
+    this.jobs = new WorkflowJobsEndpoint(this);
   }
 
   /**
    * Returns all of the workflows for authenticated organization.
    */
   public getAll = async (): Promise<Workflow[]> => {
-    return await this.do.get('');
+    return await this.do.get('', z.array(WorkflowSchema));
   };
 
   /**
@@ -60,7 +71,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param id The ID of the workflow.
    */
   public getById = async (id: string): Promise<Workflow> => {
-    return await this.do.get(`/${id}`);
+    return await this.do.get(`/${id}`, WorkflowSchema);
   };
 
   /**
@@ -69,7 +80,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param workflow The workflow to create.
    */
   public create = async (workflow: Omit<Workflow, 'id' | 'createdDate'>): Promise<Workflow> => {
-    return await this.do.post('', workflow);
+    return await this.do.post('', workflow, WorkflowSchema);
   };
 
   /**
@@ -79,7 +90,7 @@ export default class WorkflowsEndpoint extends Endpoint {
    * @param workflow The workflow to update.
    */
   public update = async (workflowId: string, workflow: Partial<Workflow>): Promise<Workflow> => {
-    return await this.do.post(`/${workflowId}`, workflow);
+    return await this.do.post(`/${workflowId}`, workflow, WorkflowSchema);
   };
 
   /**
@@ -92,68 +103,22 @@ export default class WorkflowsEndpoint extends Endpoint {
   };
 
   /**
-   * Returns the jobs for a workflow.
-   *
-   * @param workflowId The ID of the workflow.
-   */
-  public getJobs = async (workflowId: string): Promise<WorkflowJob[]> => {
-    return await this.do.get(`/${workflowId}/jobs`);
-  };
-
-  /**
-   * Returns the details for a job.
-   *
-   * @param jobId The ID of the job.
-   */
-  public getJob = async (jobId: string): Promise<WorkflowJob> => {
-    return await this.do.get(`/jobs/${jobId}`);
-  };
-
-  /**
-   * Updates a job.
-   *
-   * @param jobId The ID of the job.
-   * @param body The job body.
-   */
-  public updateJob = async (jobId: string, body: Partial<WorkflowJob>): Promise<WorkflowJob> => {
-    return await this.do.post(`/jobs/${jobId}`, body);
-  };
-
-  /**
-   * Logs a message to a workflow job.
-   *
-   * @param jobId The ID of the job.
-   * @param message The message to log.
-   */
-  public addJobLog = async (jobId: string, message: WorkflowMessage): Promise<WorkflowJob> => {
-    return await this.do.post(`/jobs/${jobId}/logs`, message);
-  };
-
-  /**
    * Returns the snippets for the authenticated organization.
    */
   public getSnippets = async (): Promise<SnippetLibrary[]> => {
-    return await this.do.get('/libraries');
+    return await this.do.get('/libraries', z.array(SnippetLibrarySchema));
   };
 
   /**
    * Runs a workflow.
    *
    * Creates a new {@link WorkflowJob} and dispatches it to the workflow runner. The returned
-   * job will be in the `pending` status; poll {@link getJobStatus} to track progress.
+   * job will be in the `pending` status; poll `client.workflows.jobs.getStatus(jobId)`
+   * to track progress.
    *
    * @param body The run request.
    */
   public run = async (body: WorkflowRunBody): Promise<WorkflowJob> => {
-    return await this.do.post('/run', body);
-  };
-
-  /**
-   * Returns the current status of a workflow job.
-   *
-   * @param jobId The ID of the workflow job.
-   */
-  public getJobStatus = async (jobId: string): Promise<WorkflowJobStatus> => {
-    return await this.do.get(`/jobs/${jobId}/status`);
+    return await this.do.post('/run', body, WorkflowJobSchema);
   };
 }

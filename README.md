@@ -6,6 +6,7 @@ Client library that communicates with the addtowallet API.
 - [Developing](#developing)
 - [Building](#building)
 - [Publishing](#publishing)
+- [Runtime validation](#runtime-validation)
 - [Examples](#examples)
   - [Creating a new client with keys](#creating-a-new-client-with-keys)
   - [Creating a new client with oauth](#creating-a-new-client-with-oauth)
@@ -48,6 +49,7 @@ Client library that communicates with the addtowallet API.
   - [Detaching a workflow from a campaign](#detaching-a-workflow-from-a-campaign)
   - [Running a workflow](#running-a-workflow)
   - [Getting a workflow job status](#getting-a-workflow-job-status)
+  - [Listing and inspecting workflow jobs](#listing-and-inspecting-workflow-jobs)
   - [Managing webhooks](#managing-webhooks)
   - [Managing data stores](#managing-data-stores)
   - [Managing exporters](#managing-exporters)
@@ -98,6 +100,41 @@ Then run the `Release` workflow to publish the package to npm.
 ```bash
 gh workflow run Release
 ```
+
+## Runtime validation
+
+Starting with v2.0.0, every type in `src/types/` is defined as a
+[Zod](https://zod.dev/) schema with an inferred TypeScript type. Both the schema and the
+type are re-exported from the package root:
+
+```ts
+import { CampaignSchema, type Campaign } from '@basetime/a2w-api-ts';
+```
+
+At request time, the SDK runs each response through `schema.safeParse(...)`:
+
+- On **success** the parsed value is returned.
+- On **failure** the issue list is logged via the requester's logger as
+  `Response shape mismatch` and the **raw, unvalidated** payload is returned as `T`.
+
+This is intentionally non-throwing: a backend response with an unexpected field never
+crashes a caller, but the mismatch is surfaced loudly to whatever `Logger` was wired in
+when constructing the `Client` (`console.error` if you passed `console`). Schemas are
+defensive — `.passthrough()` is used everywhere — so most "new field on the server" cases
+silently produce a valid parse.
+
+If you need stricter validation (throw on shape mismatch), import the schema and call
+`.parse(...)` yourself:
+
+```ts
+import { CampaignSchema } from '@basetime/a2w-api-ts';
+
+const campaign = CampaignSchema.parse(await client.campaigns.getById('h8X2JxgrnEsu2U0dI8KN'));
+```
+
+Consumers that don't want the runtime validation overhead at all can simply type-import
+(`import type { Campaign }`), and treat the SDK's response shapes as plain TypeScript
+types — Zod is bundled into the SDK so there is no extra peer-dependency setup required.
 
 ## Examples
 
@@ -597,7 +634,7 @@ console.log(remaining);
 ### Running a workflow
 
 Creates a new workflow job and dispatches it to the runner. Returns the job in the
-`pending` status; poll {@link Client#workflows#getJobStatus} to track progress.
+`pending` status; poll `client.workflows.jobs.getStatus(jobId)` to track progress.
 
 ```ts
 const job = await client.workflows.run({
@@ -611,8 +648,17 @@ console.log(job.id);
 ### Getting a workflow job status
 
 ```ts
-const status = await client.workflows.getJobStatus('JOB01');
+const status = await client.workflows.jobs.getStatus('JOB01');
 console.log(status); // 'pending' | 'running' | 'success' | 'error'
+```
+
+### Listing and inspecting workflow jobs
+
+```ts
+const allJobs = await client.workflows.jobs.getAll('WF01');
+const job = await client.workflows.jobs.getById('JOB01');
+await client.workflows.jobs.update('JOB01', { status: 'success' });
+await client.workflows.jobs.addLog('JOB01', { type: 'info', message: 'Completed' });
 ```
 
 ### Managing webhooks

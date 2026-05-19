@@ -1,28 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setBaseUrl = exports.getBaseUrl = void 0;
+exports.DEFAULT_BASE_URL = void 0;
 /**
- * Base url when explicitly set.
- */
-let baseUrl = undefined;
-/**
- * Returns the base URL for all requests to the API.
+ * The default API base URL used by `HttpRequester` when no override is supplied.
  *
- * @returns The base URL for all requests to the API.
+ * Each `HttpRequester` instance keeps its own base URL on `this.baseUrl`; this is just the
+ * fallback. Override per-instance via `client.http.setBaseUrl(...)` or by passing
+ * `{ baseUrl }` to the `Client`/`HttpRequester` constructor.
  */
-const getBaseUrl = () => {
-    if (baseUrl) {
-        return baseUrl;
-    }
-    return 'https://app.addtowallet.io/api/v1';
-};
-exports.getBaseUrl = getBaseUrl;
-/**
- * Sets the base URL for all requests to the API.
- *
- * @param url The base URL for all requests to the API.
- */
-const setBaseUrl = (url) => {
-    baseUrl = url;
-};
-exports.setBaseUrl = setBaseUrl;
+exports.DEFAULT_BASE_URL = 'https://app.addtowallet.io/api/v1';

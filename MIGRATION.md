@@ -1,5 +1,62 @@
 # Migration Guide
 
+## v1.x to v2.0.0
+
+### Workflow job methods moved to `client.workflows.jobs`
+
+The five flat job methods on `WorkflowsEndpoint` (`getJobs`, `getJob`, `updateJob`,
+`addJobLog`, `getJobStatus`) have moved to a dedicated `WorkflowJobsEndpoint` exposed as
+`client.workflows.jobs`. Wire URLs, verbs, and bodies are byte-for-byte identical.
+
+| v1.x                                         | v2.0.0                                         |
+| -------------------------------------------- | ---------------------------------------------- |
+| `client.workflows.getJobs(workflowId)`       | `client.workflows.jobs.getAll(workflowId)`     |
+| `client.workflows.getJob(jobId)`             | `client.workflows.jobs.getById(jobId)`         |
+| `client.workflows.updateJob(jobId, body)`    | `client.workflows.jobs.update(jobId, body)`    |
+| `client.workflows.addJobLog(jobId, message)` | `client.workflows.jobs.addLog(jobId, message)` |
+| `client.workflows.getJobStatus(jobId)`       | `client.workflows.jobs.getStatus(jobId)`       |
+
+`client.workflows.run(...)` and the workflow-level CRUD (`getAll`, `getById`, `create`,
+`update`, `delete`, `getSnippets`) stay on the parent endpoint. The new
+`WorkflowJobsEndpoint` is re-exported from the package root.
+
+### Types are Zod-generated
+
+Every type in `src/types/` is now defined as a Zod schema with an inferred TypeScript
+type:
+
+```ts
+export const FooSchema = z
+  .object({
+    /* ... */
+  })
+  .passthrough();
+export type Foo = z.infer<typeof FooSchema>;
+```
+
+Both the schema and the type are re-exported from the package root. Type-only consumers
+need no changes — `import type { Campaign } from '@basetime/a2w-api-ts'` still works.
+
+At request time, the SDK runs every response through `schema.safeParse(...)`. On a
+**success** the parsed value is returned; on a **failure** the issue list is logged via
+the requester's logger (`req.getLogger().error('Response shape mismatch', { issues, url })`)
+and the **raw, unvalidated** payload is returned as `T`. This is a non-throwing mode by
+design — see [Runtime validation in the README](README.md#runtime-validation) — so a
+backend response with an unexpected field never crashes a caller, but it does produce a
+log entry that consumers wiring `console` as their logger will see.
+
+A few specific Zod-related notes:
+
+- All object schemas use `.passthrough()`. Unknown server-added fields are preserved on
+  the parsed value.
+- `Date` fields use `z.coerce.date()`, so ISO strings parse correctly.
+- Fields previously typed as `any` (e.g. `Campaign.importConfig`, `Job.Task.config`,
+  `CampaignWalletsResponse.bundled` / `bundles`) are now `unknown`.
+- Unions like `JobStatus`, `JobMode`, `MetaValue`, and `BarcodeType` are `z.enum`s.
+
+If you want strict validation (throw on shape mismatch), call `Schema.parse(value)`
+yourself — the schemas are exported for exactly this case.
+
 ## v0.4.x to v1.0.0
 
 v1.0.0 reshuffles the SDK's internals: the HTTP transport is extracted out of

@@ -1,53 +1,34 @@
 import { Logger } from '../Logger';
-import NoopLogger from '../NoopLogger';
-import { getBaseUrl } from '../constants';
 import { Authed } from '../types/Authed';
-import { AuthProvider } from './AuthProvider';
+import BaseAuthProvider, { parseAuthed } from './BaseAuthProvider';
 
 const e = encodeURIComponent;
 
 /**
  * Authenticates with the a2w API using an oauth code.
+ *
+ * The initial grant exchanges the supplied `code` at `/auth/oauth/token`. The shared
+ * {@link BaseAuthProvider} machinery handles caching, in-flight dedup, clock-skew
+ * margin, and refresh-token exchange via `/auth/apiRefresh` — so an expired token is
+ * refreshed without re-spending the original (one-shot) code.
  */
-export default class OAuthProvider implements AuthProvider {
-  /**
-   * The successful last authentication.
-   */
-  private authed?: Authed;
-
-  /**
-   * The logger.
-   */
-  private logger: Logger;
-
+export default class OAuthProvider extends BaseAuthProvider {
   /**
    * Constructor.
    *
    * @param app The ID of the app requesting authentication.
    * @param code The code that was received from the oauth.
    * @param logger The logger to use.
+   * @param baseUrl The API base URL to send the grant request to.
    */
   constructor(
     private app: string,
     private code = '',
     logger?: Logger,
+    baseUrl?: string,
   ) {
-    this.logger = logger || new NoopLogger();
+    super(logger, baseUrl);
   }
-
-  /**
-   * @inheritdoc
-   */
-  public setLogger = (logger: Logger) => {
-    this.logger = logger;
-  };
-
-  /**
-   * @inheritdoc
-   */
-  public getAuthed = (): Authed | undefined => {
-    return this.authed;
-  };
 
   /**
    * Returns a URL to get an oauth code.
@@ -58,61 +39,35 @@ export default class OAuthProvider implements AuthProvider {
    */
   public getCodeUrl = (redirectUrl: string, scopes: string[], state: string): string => {
     this.logger.debug('OAuth.getCodeUrl', { redirectUrl, scopes, state });
-    return `${getBaseUrl()}/auth/oauth/code?app=${e(this.app)}&redirectUrl=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
+    return `${this.baseUrl}/auth/oauth/code?app=${e(this.app)}&redirectUrl=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
   };
 
   /**
    * @inheritdoc
    */
-  public authenticate = async (): Promise<string> => {
-    if (this.authed && this.authed.expiresAt > Date.now() / 1000) {
-      return this.authed.idToken;
-    }
-
-    const opts: RequestInit = {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        app: this.app,
-        code: this.code,
-      }),
-    };
-
-    const baseUrl = getBaseUrl();
-    this.logger.debug(`Sending request to ${baseUrl}/auth/oauth/token`);
-    this.authed = await fetch(`${baseUrl}/auth/oauth/token`, opts)
-      .then((resp) => {
-        if (resp.ok) {
-          return resp.json();
-        }
-
-        throw new Error(
-          `Authentication returned non-ok response: ${resp.status} ${resp.statusText}`,
-        );
-      })
-      .then((json: Authed) => {
-        if (typeof json !== 'object') {
-          throw new Error('Invalid object from /oauth/token endpoint.');
-        }
-        if (typeof json.idToken !== 'string') {
-          throw new Error('Invalid idToken from /oauth/token endpoint.');
-        }
-        if (typeof json.refreshToken !== 'string') {
-          throw new Error('Invalid refreshToken from /oauth/token endpoint.');
-        }
-        if (typeof json.expiresAt !== 'number') {
-          throw new Error('Invalid expiresAt from /oauth/token endpoint.');
-        }
-
-        return json;
-      })
-      .catch((err: any) => {
-        throw new Error(`Failed to authenticate: ${err.toString()}`);
+  protected fetchAuthed = async (): Promise<Authed> => {
+    const url = `${this.baseUrl}/auth/oauth/token`;
+    this.logger.debug(`Sending request to ${url}`);
+    let resp: Response;
+    try {
+      resp = await fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ app: this.app, code: this.code }),
       });
-
-    return this.authed.idToken;
+    } catch (err) {
+      const wrapped = new Error(`Failed to authenticate: ${(err as Error).message ?? err}`);
+      (wrapped as { cause?: unknown }).cause = err;
+      throw wrapped;
+    }
+    if (!resp.ok) {
+      throw new Error(
+        `Authentication returned non-ok response: ${resp.status} ${resp.statusText}`,
+      );
+    }
+    return parseAuthed(await resp.json(), '/auth/oauth/token');
   };
 }

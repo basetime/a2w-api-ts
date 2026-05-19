@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl } from '../../constants';
+import { DEFAULT_BASE_URL } from '../../constants';
 import { Client, KeysProvider, ScannerApp, ScannerDeviceInfo } from '../../index';
 import { ScannerAppInput } from '../../types/ScannerApp';
 
-const baseUrl = getBaseUrl();
+const baseUrl = DEFAULT_BASE_URL;
 const endpoint = '/scanners';
 
 /**

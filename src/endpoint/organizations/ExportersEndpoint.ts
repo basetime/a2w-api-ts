@@ -1,6 +1,6 @@
-import { Requester } from '../../http/Requester';
-import { Exporter, ExporterInput } from '../../types/Exporter';
-import { ExporterLog } from '../../types/ExporterLog';
+import { z } from 'zod';
+import { Exporter, ExporterInput, ExporterSchema } from '../../types/Exporter';
+import { ExporterLog, ExporterLogSchema } from '../../types/ExporterLog';
 import Endpoint from '../Endpoint';
 
 /**
@@ -13,17 +13,18 @@ export default class OrganizationExportersEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `OrganizationsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused.
    */
-  constructor(req: Requester) {
-    super(req, '/organization');
+  constructor(parent: Endpoint) {
+    super(parent);
   }
 
   /**
    * Returns all exporters for the authenticated organization.
    */
   public getAll = async (): Promise<Exporter[]> => {
-    return await this.do.get('/exporters');
+    return await this.do.get('/exporters', z.array(ExporterSchema));
   };
 
   /**
@@ -32,7 +33,7 @@ export default class OrganizationExportersEndpoint extends Endpoint {
    * @param id The ID of the exporter.
    */
   public getById = async (id: string): Promise<Exporter> => {
-    return await this.do.get(`/exporters/${id}`);
+    return await this.do.get(`/exporters/${id}`, ExporterSchema);
   };
 
   /**
@@ -45,7 +46,7 @@ export default class OrganizationExportersEndpoint extends Endpoint {
    * @param body The exporter to create.
    */
   public create = async (body: ExporterInput): Promise<Exporter[]> => {
-    return await this.do.put('/exporters', body);
+    return await this.do.put('/exporters', body, z.array(ExporterSchema));
   };
 
   /**
@@ -55,7 +56,7 @@ export default class OrganizationExportersEndpoint extends Endpoint {
    * @param body The new exporter values.
    */
   public update = async (id: string, body: ExporterInput): Promise<Exporter> => {
-    return await this.do.post(`/exporters/${id}`, body);
+    return await this.do.post(`/exporters/${id}`, body, ExporterSchema);
   };
 
   /**
@@ -64,7 +65,7 @@ export default class OrganizationExportersEndpoint extends Endpoint {
    * @param id The ID of the exporter to delete.
    */
   public delete = async (id: string): Promise<string> => {
-    return await this.do.del(`/exporters/${id}`);
+    return await this.do.del(`/exporters/${id}`, z.string());
   };
 
   /**
@@ -73,7 +74,7 @@ export default class OrganizationExportersEndpoint extends Endpoint {
    * @param id The ID of the exporter to run.
    */
   public run = async (id: string): Promise<string> => {
-    return await this.do.post(`/exporters/${id}/run`, {});
+    return await this.do.post(`/exporters/${id}/run`, {}, z.string());
   };
 
   /**
@@ -82,7 +83,7 @@ export default class OrganizationExportersEndpoint extends Endpoint {
    * @param id The ID of the exporter.
    */
   public getLogs = async (id: string): Promise<ExporterLog[]> => {
-    return await this.do.get(`/exporters/${id}/logs`);
+    return await this.do.get(`/exporters/${id}/logs`, z.array(ExporterLogSchema));
   };
 
   /**
@@ -92,6 +93,6 @@ export default class OrganizationExportersEndpoint extends Endpoint {
    * @param logId The ID of the log entry.
    */
   public getLog = async (id: string, logId: string): Promise<ExporterLog> => {
-    return await this.do.get(`/exporters/${id}/logs/${logId}`);
+    return await this.do.get(`/exporters/${id}/logs/${logId}`, ExporterLogSchema);
   };
 }

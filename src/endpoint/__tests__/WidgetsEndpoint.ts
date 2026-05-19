@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl } from '../../constants';
+import { DEFAULT_BASE_URL } from '../../constants';
 import { Client } from '../../index';
 
-const apiBaseUrl = getBaseUrl();
+const apiBaseUrl = DEFAULT_BASE_URL;
 const siteBaseUrl = apiBaseUrl.replace(/\/api\/v1\/?$/, '');
 
 describe('WidgetsEndpoint', () => {

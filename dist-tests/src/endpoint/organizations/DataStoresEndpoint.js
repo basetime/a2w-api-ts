@@ -3,6 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const zod_1 = require("zod");
+const DataStore_1 = require("../../types/DataStore");
 const Endpoint_1 = __importDefault(require("../Endpoint"));
 /**
  * Communicate with the `/organization/dataStores*` sub-endpoints.
@@ -14,15 +16,16 @@ class OrganizationDataStoresEndpoint extends Endpoint_1.default {
     /**
      * Constructor.
      *
-     * @param req The object to use to make requests.
+     * @param parent The parent `OrganizationsEndpoint` whose `req`, `do`, and `qb` are
+     *   reused.
      */
-    constructor(req) {
-        super(req, '/organization');
+    constructor(parent) {
+        super(parent);
         /**
          * Returns all data stores for the authenticated organization.
          */
         this.getAll = async () => {
-            return await this.do.get('/dataStores');
+            return await this.do.get('/dataStores', zod_1.z.array(DataStore_1.DataStoreSchema));
         };
         /**
          * Returns a single data store by ID.
@@ -30,7 +33,7 @@ class OrganizationDataStoresEndpoint extends Endpoint_1.default {
          * @param id The ID of the data store.
          */
         this.getById = async (id) => {
-            return await this.do.get(`/dataStores/${id}`);
+            return await this.do.get(`/dataStores/${id}`, DataStore_1.DataStoreSchema);
         };
         /**
          * Creates a new data store.
@@ -41,7 +44,7 @@ class OrganizationDataStoresEndpoint extends Endpoint_1.default {
          * @param body The data store to create.
          */
         this.create = async (body) => {
-            return await this.do.put('/dataStores', body);
+            return await this.do.put('/dataStores', body, DataStore_1.DataStoreSchema);
         };
         /**
          * Updates an existing data store.
@@ -50,7 +53,7 @@ class OrganizationDataStoresEndpoint extends Endpoint_1.default {
          * @param body The new data store values.
          */
         this.update = async (id, body) => {
-            return await this.do.post(`/dataStores/${id}`, body);
+            return await this.do.post(`/dataStores/${id}`, body, DataStore_1.DataStoreSchema);
         };
         /**
          * Deletes a data store.
@@ -60,7 +63,7 @@ class OrganizationDataStoresEndpoint extends Endpoint_1.default {
          * @param id The ID of the data store to delete.
          */
         this.delete = async (id) => {
-            return await this.do.del(`/dataStores/${id}`);
+            return await this.do.del(`/dataStores/${id}`, zod_1.z.array(DataStore_1.DataStoreSchema));
         };
     }
 }

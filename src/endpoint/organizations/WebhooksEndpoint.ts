@@ -1,6 +1,6 @@
-import { Requester } from '../../http/Requester';
-import { Webhook, WebhookInput } from '../../types/Webhook';
-import { WebhookLog } from '../../types/WebhookLog';
+import { z } from 'zod';
+import { Webhook, WebhookInput, WebhookSchema } from '../../types/Webhook';
+import { WebhookLog, WebhookLogSchema } from '../../types/WebhookLog';
 import Endpoint from '../Endpoint';
 
 /**
@@ -13,17 +13,18 @@ export default class OrganizationWebhooksEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `OrganizationsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused.
    */
-  constructor(req: Requester) {
-    super(req, '/organization');
+  constructor(parent: Endpoint) {
+    super(parent);
   }
 
   /**
    * Returns all webhooks for the authenticated organization.
    */
   public getAll = async (): Promise<Webhook[]> => {
-    return await this.do.get('/webhooks');
+    return await this.do.get('/webhooks', z.array(WebhookSchema));
   };
 
   /**
@@ -32,7 +33,7 @@ export default class OrganizationWebhooksEndpoint extends Endpoint {
    * @param body The webhook to create.
    */
   public create = async (body: WebhookInput): Promise<Webhook> => {
-    return await this.do.post('/webhooks', body);
+    return await this.do.post('/webhooks', body, WebhookSchema);
   };
 
   /**
@@ -42,7 +43,7 @@ export default class OrganizationWebhooksEndpoint extends Endpoint {
    * @param body The new webhook values.
    */
   public update = async (id: string, body: WebhookInput): Promise<Webhook> => {
-    return await this.do.post(`/webhooks/${id}`, body);
+    return await this.do.post(`/webhooks/${id}`, body, WebhookSchema);
   };
 
   /**
@@ -51,13 +52,13 @@ export default class OrganizationWebhooksEndpoint extends Endpoint {
    * @param id The ID of the webhook to delete.
    */
   public delete = async (id: string): Promise<string> => {
-    return await this.do.del(`/webhooks/${id}`);
+    return await this.do.del(`/webhooks/${id}`, z.string());
   };
 
   /**
    * Returns the delivery logs for all webhooks owned by the authenticated organization.
    */
   public getLogs = async (): Promise<WebhookLog[]> => {
-    return await this.do.get('/webhookLogs');
+    return await this.do.get('/webhookLogs', z.array(WebhookLogSchema));
   };
 }

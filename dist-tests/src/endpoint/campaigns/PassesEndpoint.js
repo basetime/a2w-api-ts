@@ -3,6 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const zod_1 = require("zod");
+const Pass_1 = require("../../types/Pass");
+const ScannerLog_1 = require("../../types/ScannerLog");
 const Endpoint_1 = __importDefault(require("../Endpoint"));
 /**
  * Communicate with the `/campaigns/:campaignId/passes/*` sub-endpoints.
@@ -14,10 +17,11 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
     /**
      * Constructor.
      *
-     * @param req The object to use to make requests.
+     * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+     *   reused.
      */
-    constructor(req) {
-        super(req, '/campaigns');
+    constructor(parent) {
+        super(parent);
         /**
          * Returns the passes for a campaign.
          *
@@ -25,7 +29,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @returns The passes.
          */
         this.getAll = async (campaignId) => {
-            return await this.do.get(`/${campaignId}/passes`);
+            return await this.do.get(`/${campaignId}/passes`, zod_1.z.array(Pass_1.PassSchema));
         };
         /**
          * Returns the details for a pass.
@@ -39,7 +43,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
                 .addParam('campaign', campaignId)
                 .addParam('pass', passId)
                 .addQuery('scanner', JSON.stringify(scanner));
-            return await this.do.get(url);
+            return await this.do.get(url, Pass_1.PassSchema);
         };
         /**
          * Queries the passes for a campaign.
@@ -51,7 +55,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
         this.query = async (campaignId, queries = {}) => {
             const url = this.qb.create('/{campaign}/passes/query').addParam('campaign', campaignId);
             Object.entries(queries).forEach(([key, value]) => url.addQuery('query[]', `${key}:${value}`));
-            return await this.do.get(url);
+            return await this.do.get(url, zod_1.z.array(Pass_1.PassSchema));
         };
         /**
          * Updates the details of a pass.
@@ -69,7 +73,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
                 templateVersion: body.templateVersion,
                 passTypeIdentifier: body.passTypeIdentifier,
             };
-            return await this.do.post(`/${campaignId}/passes/details/${passId}`, cleaned);
+            return await this.do.post(`/${campaignId}/passes/details/${passId}`, cleaned, Pass_1.PassSchema);
         };
         /**
          * Merges a pass object store into the existing object store.
@@ -79,9 +83,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @param body The new pass values with objectStore key.
          */
         this.mergeObjectStore = async (campaignId, passId, body) => {
-            return await this.do.put(`/${campaignId}/passes/details/${passId}`, {
-                objectStore: body.objectStore,
-            });
+            return await this.do.put(`/${campaignId}/passes/details/${passId}`, { objectStore: body.objectStore }, Pass_1.PassSchema);
         };
         /**
          * Deletes keys from a pass object store.
@@ -91,7 +93,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @param objectStoreKeys The keys to delete from the object store.
          */
         this.deleteObjectStoreKeys = async (campaignId, passId, objectStoreKeys) => {
-            return await this.do.del(`/${campaignId}/passes/details/${passId}`, true, { objectStoreKeys });
+            return await this.do.del(`/${campaignId}/passes/details/${passId}`, Pass_1.PassSchema, true, { objectStoreKeys });
         };
         /**
          * Updates multiple passes.
@@ -110,7 +112,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
                     passTypeIdentifier: pass.passTypeIdentifier,
                 };
             });
-            return await this.do.post(`/${campaignId}/passes/details/passes`, { passes: cleaned });
+            return await this.do.post(`/${campaignId}/passes/details/passes`, { passes: cleaned }, zod_1.z.array(Pass_1.PassSchema));
         };
         /**
          * Appends a log to a pass.
@@ -120,7 +122,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @param log The message to append to the log.
          */
         this.appendLog = async (campaignId, passId, log) => {
-            return await this.do.post(`/${campaignId}/passes/${passId}/logs`, { log });
+            return await this.do.post(`/${campaignId}/passes/${passId}/logs`, { log }, Pass_1.PassSchema);
         };
         /**
          * Creates a pass bundle and returns the URL to the claims page.
@@ -138,11 +140,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @param utm The UTM values to pass along to the api.
          */
         this.createBundle = async (campaignId, metaValues = {}, objectStore = {}, utm = {}) => {
-            return await this.do.post(`/${campaignId}/passes/bundle`, {
-                metaValues,
-                objectStore,
-                utm,
-            });
+            return await this.do.post(`/${campaignId}/passes/bundle`, { metaValues, objectStore, utm }, zod_1.z.string());
         };
         /**
          * Returns the passes for a job.
@@ -152,7 +150,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @returns The passes.
          */
         this.getByJob = async (campaignId, jobId) => {
-            return await this.do.get(`/${campaignId}/passes/${jobId}`);
+            return await this.do.get(`/${campaignId}/passes/${jobId}`, zod_1.z.array(Pass_1.PassSchema));
         };
         /**
          * Sets the redeemed status of a pass to true.
@@ -162,7 +160,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @returns True if the pass was redeemed, false if it was already redeemed.
          */
         this.redeem = async (campaignId, passId) => {
-            return await this.do.post(`/${campaignId}/passes/${passId}/redeemed`, {});
+            return await this.do.post(`/${campaignId}/passes/${passId}/redeemed`, {}, zod_1.z.boolean());
         };
         /**
          * Returns the redeemed status of a pass.
@@ -172,7 +170,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @returns The redeemed status.
          */
         this.getRedeemedStatus = async (campaignId, passId) => {
-            return await this.do.get(`/${campaignId}/passes/${passId}/redeemed`);
+            return await this.do.get(`/${campaignId}/passes/${passId}/redeemed`, zod_1.z.boolean());
         };
         /**
          * Returns the scanner logs recorded against a pass.
@@ -183,7 +181,7 @@ class CampaignPassesEndpoint extends Endpoint_1.default {
          * @param passId The ID of the pass.
          */
         this.getScannerLogs = async (campaignId, passId) => {
-            return await this.do.get(`/${campaignId}/passes/${passId}/scannerLogs`);
+            return await this.do.get(`/${campaignId}/passes/${passId}/scannerLogs`, zod_1.z.array(ScannerLog_1.ScannerLogSchema));
         };
     }
 }

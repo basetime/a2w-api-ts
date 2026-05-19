@@ -1,114 +1,140 @@
+import { z } from 'zod';
+
+/**
+ * Schema for the status of a job.
+ */
+export const JobStatusSchema = z.enum(['preparing', 'running', 'success', 'failed']);
+
 /**
  * Job status.
  */
-export type JobStatus = 'preparing' | 'running' | 'success' | 'failed';
+export type JobStatus = z.infer<typeof JobStatusSchema>;
+
+/**
+ * Schema for the mode of a job.
+ */
+export const JobModeSchema = z.enum(['import', 'export']);
 
 /**
  * Job mode.
  */
-export type JobMode = 'import' | 'export';
+export type JobMode = z.infer<typeof JobModeSchema>;
 
 /**
- * The details of a running job.
+ * Schema for a task in the job.
  */
-export interface Job {
-  /**
-   * The ID of the job.
-   */
-  id: string;
+export const TaskSchema = z
+  .object({
+    /**
+     * The ID of the task.
+     */
+    id: z.string(),
 
-  /**
-   * The job status.
-   */
-  status: JobStatus;
+    /**
+     * Are we importing or exporting?
+     */
+    mode: JobModeSchema,
 
-  /**
-   * Error message if the job failed.
-   */
-  error?: string;
+    /**
+     * The ID of the installed integration that processes the task.
+     */
+    integration: z.string(),
 
-  /**
-   * The tasks in the job.
-   */
-  tasks: Task[];
+    /**
+     * The task configuration.
+     */
+    config: z.unknown(),
 
-  /**
-   * The number of passes in the job.
-   */
-  passesCount: number;
+    /**
+     * The cloud file that's the input for the task.
+     */
+    inputFile: z.string(),
 
-  /**
-   * Log messages for the job.
-   */
-  logs: string[];
+    /**
+     * The cloud file that's the output for the task.
+     */
+    outputFile: z.string(),
 
-  /**
-   * The date the job finished.
-   */
-  finishedDate: Date | null;
+    /**
+     * The status of the task.
+     */
+    status: JobStatusSchema,
 
-  /**
-   * The date the job was created.
-   */
-  createdDate: Date;
-}
+    /**
+     * The error message if the task failed.
+     */
+    error: z.string().optional(),
+
+    /**
+     * The number of rows affected by the task.
+     */
+    rowsAffected: z.number(),
+
+    /**
+     * The date the task was created.
+     */
+    createdDate: z.coerce.date(),
+
+    /**
+     * The date the task finished.
+     */
+    finishedDate: z.coerce.date().nullable(),
+  })
+  .passthrough();
 
 /**
  * A task in the job.
  */
-export interface Task {
-  /**
-   * The ID of the task.
-   */
-  id: string;
+export type Task = z.infer<typeof TaskSchema>;
 
-  /**
-   * Are we importing or exporting?
-   */
-  mode: 'import' | 'export';
+/**
+ * Schema for the details of a running job.
+ */
+export const JobSchema = z
+  .object({
+    /**
+     * The ID of the job.
+     */
+    id: z.string(),
 
-  /**
-   * The ID of the installed integration that processes the task.
-   */
-  integration: string;
+    /**
+     * The job status.
+     */
+    status: JobStatusSchema,
 
-  /**
-   * The task configuration.
-   */
-  config: any;
+    /**
+     * Error message if the job failed.
+     */
+    error: z.string().optional(),
 
-  /**
-   * The cloud file that's the input for the task.
-   */
-  inputFile: string;
+    /**
+     * The tasks in the job.
+     */
+    tasks: z.array(TaskSchema),
 
-  /**
-   * The cloud file that's the output for the task.
-   */
-  outputFile: string;
+    /**
+     * The number of passes in the job.
+     */
+    passesCount: z.number(),
 
-  /**
-   * The status of the task.
-   */
-  status: JobStatus;
+    /**
+     * Log messages for the job.
+     */
+    logs: z.array(z.string()),
 
-  /**
-   * The error message if the task failed.
-   */
-  error?: string;
+    /**
+     * The date the job finished.
+     */
+    finishedDate: z.coerce.date().nullable(),
 
-  /**
-   * The number of rows affected by the task.
-   */
-  rowsAffected: number;
+    /**
+     * The date the job was created.
+     */
+    createdDate: z.coerce.date(),
+  })
+  .passthrough();
 
-  /**
-   * The date the task was created.
-   */
-  createdDate: Date;
-
-  /**
-   * The date the task finished.
-   */
-  finishedDate: Date | null;
-}
+/**
+ * The details of a running job.
+ */
+export type Job = z.infer<typeof JobSchema>;

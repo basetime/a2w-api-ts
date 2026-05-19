@@ -2,7 +2,16 @@
 
 ## Unreleased
 
-- Refactors migration documentation for v1.0.0, clarifying changes to the Client and Requester interfaces, updating endpoint structures, and enhancing examples for subclassing and URL handling. Highlights the transition to new method signatures and the reorganization of endpoint classes for improved clarity and maintainability.. (`c3edd3f`)
+- **Breaking:** Move `baseUrl` off the module global onto `HttpRequester` instance state. `setBaseUrl` / `getBaseUrl` mutate per-instance fields, providers learn the base URL from `setAuth(...)`, and `src/constants.ts` now exports only `DEFAULT_BASE_URL`. `Client` accepts an `{ baseUrl }` option forwarded to `HttpRequester`.
+- **Breaking:** Introduce a typed `ApiError` (status, statusText, body, url, cause) and have `HttpRequester.fetch` throw it directly on non-2xx responses instead of double-wrapping. Network errors propagate as-is.
+- **Breaking:** Add `BaseAuthProvider` with in-flight dedup, 30s clock-skew margin, and `/auth/apiRefresh`-based refresh; `HttpRequester` retries once on 401 after `auth.refresh()`. `KeysProvider`, `OAuthProvider`, and `StoredProvider` are now thin subclasses.
+- **Breaking:** Move workflow job operations to a dedicated `client.workflows.jobs` sub-endpoint — `getAll`, `getById`, `update`, `addLog`, `getStatus`. The five flat methods on `WorkflowsEndpoint` are removed.
+- **Breaking:** Sub-endpoint constructors now accept their parent `Endpoint` (`new CampaignPassesEndpoint(this)`) and reuse its `do` / `qb`. Hand-instantiating a sub-endpoint with the bare requester no longer compiles.
+- **Breaking:** Add a `siteRoot` option to `Endpoint`; refactor `BarcodesEndpoint` and `WidgetsEndpoint` to extend `Endpoint` and drop their hand-rolled site-base-URL helpers. `HttpRequester` now exposes `getSiteBaseUrl()`.
+- Replace the manual `?api=true` concat with a `URL`/`URLSearchParams`-based builder that dedupes the marker and leaves absolute URLs alone (apart from injecting `api=true` once).
+- **Breaking:** Remove `passkit-generator` from `dependencies`. `Template.apple` is now `Record<string, unknown>`; consumers needing strong typing can cast to `PassProps`.
+- **Breaking:** `HttpRequester.auth` is now a read-only getter backed by a private `_auth` field. Use `setAuth(...)` to mutate.
+- **Breaking:** Migrate every file in `src/types/` to Zod schemas with inferred TS types (`FooSchema` + `Foo`). Endpoint methods opt in to `safeParse`-and-log validation by passing the schema to `do.get/post/put/del`; mismatches log via `req.getLogger()` but never crash callers. `zod` is now a runtime dependency.
 
 ## 1.0.0 - 2026-05-16
 

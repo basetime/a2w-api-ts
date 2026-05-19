@@ -3,6 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const zod_1 = require("zod");
+const Image_1 = require("../types/Image");
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
  * Communicate with the images endpoints.
@@ -21,7 +23,7 @@ class ImagesEndpoint extends Endpoint_1.default {
          * @param id The ID of the image.
          */
         this.getById = async (id) => {
-            return await this.do.get(`/${id}`);
+            return await this.do.get(`/${id}`, Image_1.ImageSchema.nullable());
         };
         /**
          * Returns the images with the given IDs.
@@ -30,7 +32,7 @@ class ImagesEndpoint extends Endpoint_1.default {
          */
         this.getByIds = async (ids) => {
             const url = this.qb.create('/ids').addQuery('ids', ids.join(','));
-            return await this.do.get(url);
+            return await this.do.get(url, zod_1.z.array(Image_1.ImageSchema));
         };
     }
 }

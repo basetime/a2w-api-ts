@@ -31,9 +31,11 @@ class Client {
      *
      * @param auth The authentication provider.
      * @param logger The logger to use.
+     * @param options Additional options forwarded to `HttpRequester` (currently just
+     *   `baseUrl`, which overrides the default `https://app.addtowallet.io/api/v1`).
      */
-    constructor(auth, logger) {
-        this.http = new HttpRequester_1.default(auth, logger);
+    constructor(auth, logger, options = {}) {
+        this.http = new HttpRequester_1.default(auth, logger, options);
         this.campaigns = new CampaignsEndpoint_1.default(this.http);
         this.claims = new ClaimsEndpoint_1.default(this.http);
         this.templates = new TemplatesEndpoint_1.default(this.http);

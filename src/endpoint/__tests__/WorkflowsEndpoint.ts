@@ -1,9 +1,9 @@
 import { expect } from 'chai';
 import fetchMock from 'fetch-mock';
-import { getBaseUrl } from '../../constants';
+import { DEFAULT_BASE_URL } from '../../constants';
 import { Client, KeysProvider, Workflow, WorkflowJob, WorkflowMessage } from '../../index';
 
-const baseUrl = getBaseUrl();
+const baseUrl = DEFAULT_BASE_URL;
 const endpoint = '/workflows';
 
 describe('WorkflowsEndpoint', () => {
@@ -129,37 +129,37 @@ describe('WorkflowsEndpoint', () => {
   /**
    *
    */
-  it('getJobs() should GET /workflows/:id/jobs', async () => {
+  it('jobs.getAll() should GET /workflows/:id/jobs', async () => {
     const id = 'WF01';
     const url = `${baseUrl}${endpoint}/${id}/jobs?api=true`;
     fetchMock.get(url, [{ id: 'JOB01' }]);
 
-    const result = await client.workflows.getJobs(id);
+    const result = await client.workflows.jobs.getAll(id);
     expectCommon(url, result, 'array');
   });
 
   /**
    *
    */
-  it('getJob() should GET /workflows/jobs/:jobId', async () => {
+  it('jobs.getById() should GET /workflows/jobs/:jobId', async () => {
     const id = 'JOB01';
     const url = `${baseUrl}${endpoint}/jobs/${id}?api=true`;
     fetchMock.get(url, { id });
 
-    const result = await client.workflows.getJob(id);
+    const result = await client.workflows.jobs.getById(id);
     expectCommon(url, result, 'object');
   });
 
   /**
    *
    */
-  it('updateJob() should POST /workflows/jobs/:jobId with the partial job body', async () => {
+  it('jobs.update() should POST /workflows/jobs/:jobId with the partial job body', async () => {
     const id = 'JOB01';
     const url = `${baseUrl}${endpoint}/jobs/${id}?api=true`;
     fetchMock.post(url, { id });
 
     const body: Partial<WorkflowJob> = { status: 'success' };
-    const result = await client.workflows.updateJob(id, body);
+    const result = await client.workflows.jobs.update(id, body);
     expectCommon(url, result, 'object');
 
     const init = fetchMock.lastCall(url)?.[1] as RequestInit;
@@ -170,13 +170,13 @@ describe('WorkflowsEndpoint', () => {
   /**
    *
    */
-  it('addJobLog() should POST /workflows/jobs/:jobId/logs with the message body', async () => {
+  it('jobs.addLog() should POST /workflows/jobs/:jobId/logs with the message body', async () => {
     const id = 'JOB01';
     const url = `${baseUrl}${endpoint}/jobs/${id}/logs?api=true`;
     fetchMock.post(url, { id });
 
     const message: WorkflowMessage = { type: 'info', message: 'hi' };
-    const result = await client.workflows.addJobLog(id, message);
+    const result = await client.workflows.jobs.addLog(id, message);
     expectCommon(url, result, 'object');
 
     const init = fetchMock.lastCall(url)?.[1] as RequestInit;
@@ -228,12 +228,12 @@ describe('WorkflowsEndpoint', () => {
   /**
    *
    */
-  it('getJobStatus() should GET /workflows/jobs/:jobId/status', async () => {
+  it('jobs.getStatus() should GET /workflows/jobs/:jobId/status', async () => {
     const id = 'JOB01';
     const url = `${baseUrl}${endpoint}/jobs/${id}/status?api=true`;
     fetchMock.get(url, JSON.stringify('pending'));
 
-    const result = await client.workflows.getJobStatus(id);
+    const result = await client.workflows.jobs.getStatus(id);
     expect(fetchMock.called(authUrl)).to.be.true;
     expect(fetchMock.called(url)).to.be.true;
     expect(result).to.equal('pending');

@@ -1,8 +1,15 @@
+import { z } from 'zod';
+
+/**
+ * Schema for the events a webhook can subscribe to.
+ *
+ * Backend events are open-ended, so the schema accepts any string while the common
+ * ones autocomplete via the TypeScript union below.
+ */
+export const WebhookEventSchema = z.string();
+
 /**
  * The events a webhook can subscribe to.
- *
- * Backend events are open-ended, so unknown strings are also accepted at the type level
- * while still autocompleting the common ones.
  */
 export type WebhookEvent =
   | 'enrolled'
@@ -16,52 +23,64 @@ export type WebhookEvent =
   | (string & {});
 
 /**
- * Body accepted by create/update on the webhooks sub-endpoint.
+ * Schema for the body accepted by create/update on the webhooks sub-endpoint.
  */
-export interface WebhookInput {
-  /**
-   * Human-readable name shown in the dashboard.
-   */
-  displayName: string;
+export const WebhookInputSchema = z
+  .object({
+    /**
+     * Human-readable name shown in the dashboard.
+     */
+    displayName: z.string(),
 
-  /**
-   * The URL to POST to when the event fires.
-   */
-  url: string;
+    /**
+     * The URL to POST to when the event fires.
+     */
+    url: z.string(),
 
-  /**
-   * The event that triggers the webhook.
-   */
-  event: WebhookEvent;
+    /**
+     * The event that triggers the webhook.
+     */
+    event: WebhookEventSchema,
 
-  /**
-   * Optional shared secret. When set, the backend includes it in the request so the
-   * receiver can verify the payload.
-   */
-  password?: string;
-}
+    /**
+     * Optional shared secret. When set, the backend includes it in the request so the
+     * receiver can verify the payload.
+     */
+    password: z.string().optional(),
+  })
+  .passthrough();
 
 /**
- * A webhook configured on an organization.
+ * Body accepted by create/update on the webhooks sub-endpoint.
  */
-export interface Webhook extends WebhookInput {
+export type WebhookInput = z.infer<typeof WebhookInputSchema> & { event: WebhookEvent };
+
+/**
+ * Schema for a webhook configured on an organization.
+ */
+export const WebhookSchema = WebhookInputSchema.extend({
   /**
    * The ID of the webhook.
    */
-  id: string;
+  id: z.string(),
 
   /**
    * The ID of the organization that owns the webhook.
    */
-  organization: string;
+  organization: z.string(),
 
   /**
    * Whether the webhook has been deleted.
    */
-  isDeleted: boolean;
+  isDeleted: z.boolean(),
 
   /**
    * The date the webhook was created.
    */
-  createdDate: Date;
-}
+  createdDate: z.coerce.date(),
+}).passthrough();
+
+/**
+ * A webhook configured on an organization.
+ */
+export type Webhook = z.infer<typeof WebhookSchema> & { event: WebhookEvent };

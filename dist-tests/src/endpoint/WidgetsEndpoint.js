@@ -1,64 +1,49 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = require("../constants");
-/**
- * Strips the `/api/v1` suffix from the configured API base URL so this endpoint can target
- * routes mounted at the site root.
- */
-const getSiteBaseUrl = () => (0, constants_1.getBaseUrl)().replace(/\/api\/v1\/?$/, '');
+const zod_1 = require("zod");
+const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
  * Communicate with the `/widgets` endpoint.
  *
  * Accessed via `client.widgets`. The widgets routes live outside `/api/v1`, so this
- * endpoint bypasses the API prefix and targets the site root.
- *
- * The two JWT signing methods are convenient for server-side callers that need to mint
- * tokens for the campaign enrollment flow without re-implementing the signing logic.
+ * endpoint is constructed with `{ siteRoot: true }` — the inherited `this.do` builds
+ * absolute URLs against the requester's current site base URL.
  */
-class WidgetsEndpoint {
+class WidgetsEndpoint extends Endpoint_1.default {
     /**
      * Constructor.
      *
      * @param req The object to use to make requests.
      */
     constructor(req) {
-        this.req = req;
+        super(req, '/widgets', { siteRoot: true });
         /**
-         * Signs an arbitrary payload with an explicit secret and returns the JWT.
+         * Signs an arbitrary payload as a JWT using a caller-supplied secret.
+         *
+         * Returns the signed JWT as a string. Sent unauthenticated because the secret is what
+         * the backend uses to sign — the caller's API key is not involved.
          *
          * @param payload The payload to sign.
-         * @param secret The secret to sign with.
+         * @param secret The HMAC secret used to sign the JWT.
          */
         this.signJwt = async (payload, secret) => {
-            return await this.req.fetch(`${getSiteBaseUrl()}/widgets/jwt`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ payload, secret }),
-            }, false);
+            return await this.do.post('/jwt', { payload, secret }, zod_1.z.string(), false);
         };
         /**
-         * Signs a payload using the campaign's stored `openEnrollmentJwtSecret`.
+         * Signs a campaign-scoped payload as a JWT.
          *
-         * The campaign must have an `openEnrollmentJwtSecret` configured; otherwise the
-         * backend returns a 400.
+         * The backend signs with the campaign's `openEnrollmentJwtSecret`, so no client-side
+         * secret is required.
          *
-         * Pairs well with `client.campaigns.enrollments.create(...)`, which requires the
-         * caller to inject a `jwtEncode` function. For example:
-         *
-         * ```ts
-         * client.campaigns.enrollments.jwtEncode = (data) =>
-         *   client.widgets.signCampaignJwt(campaignId, data);
-         * ```
-         *
-         * @param campaignId The ID of the campaign whose secret should be used.
+         * @param campaignId The ID of the campaign whose JWT secret should be used.
          * @param payload The payload to sign.
          */
         this.signCampaignJwt = async (campaignId, payload) => {
-            return await this.req.fetch(`${getSiteBaseUrl()}/widgets/jwt/${encodeURIComponent(campaignId)}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ payload }),
-            }, false);
+            const url = this.qb.create('/jwt/{campaign}').addParam('campaign', campaignId);
+            return await this.do.post(url, { payload }, zod_1.z.string(), false);
         };
     }
 }

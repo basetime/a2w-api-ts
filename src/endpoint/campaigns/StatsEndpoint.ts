@@ -1,5 +1,4 @@
-import { Requester } from '../../http/Requester';
-import { CampaignStats } from '../../types/CampaignStats';
+import { CampaignStats, CampaignStatsSchema } from '../../types/CampaignStats';
 import Endpoint from '../Endpoint';
 
 /**
@@ -11,10 +10,11 @@ export default class CampaignStatsEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused.
    */
-  constructor(req: Requester) {
-    super(req, '/campaigns');
+  constructor(parent: Endpoint) {
+    super(parent);
   }
 
   /**
@@ -24,6 +24,6 @@ export default class CampaignStatsEndpoint extends Endpoint {
    * @returns The statistics.
    */
   public get = async (campaignId: string): Promise<CampaignStats> => {
-    return await this.do.get(`/${campaignId}/stats`);
+    return await this.do.get(`/${campaignId}/stats`, CampaignStatsSchema);
   };
 }

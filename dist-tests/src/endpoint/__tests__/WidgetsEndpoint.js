@@ -7,7 +7,7 @@ const chai_1 = require("chai");
 const fetch_mock_1 = __importDefault(require("fetch-mock"));
 const constants_1 = require("../../constants");
 const index_1 = require("../../index");
-const apiBaseUrl = (0, constants_1.getBaseUrl)();
+const apiBaseUrl = constants_1.DEFAULT_BASE_URL;
 const siteBaseUrl = apiBaseUrl.replace(/\/api\/v1\/?$/, '');
 describe('WidgetsEndpoint', () => {
     let client;

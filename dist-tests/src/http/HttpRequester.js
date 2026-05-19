@@ -6,9 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const version_1 = require("../version");
 const NoopLogger_1 = __importDefault(require("../NoopLogger"));
 const constants_1 = require("../constants");
+const ApiError_1 = require("./ApiError");
 /**
- * Represents a class that can make authenticated HTTP requests
- * to the Addtowallet API.
+ * Makes authenticated HTTP requests to the Addtowallet API.
+ *
+ * All state — base URL, auth provider, logger, user agent — lives on the instance, so
+ * multiple `HttpRequester` (and therefore `Client`) instances may coexist in the same
+ * process targeting different environments.
  */
 class HttpRequester {
     /**
@@ -16,8 +20,9 @@ class HttpRequester {
      *
      * @param auth The authentication provider.
      * @param logger The logger to use.
+     * @param options Additional options (currently just `baseUrl`).
      */
-    constructor(auth, logger) {
+    constructor(auth, logger, options = {}) {
         /**
          * The user agent string.
          */
@@ -26,14 +31,31 @@ class HttpRequester {
          * @inheritdoc
          */
         this.setBaseUrl = (url) => {
-            (0, constants_1.setBaseUrl)(url);
+            this.baseUrl = url;
+            this.siteBaseUrl = deriveSiteBaseUrl(url);
+            if (this._auth) {
+                this._auth.setBaseUrl(url);
+            }
+        };
+        /**
+         * @inheritdoc
+         */
+        this.getBaseUrl = () => {
+            return this.baseUrl;
+        };
+        /**
+         * @inheritdoc
+         */
+        this.getSiteBaseUrl = () => {
+            return this.siteBaseUrl;
         };
         /**
          * @inheritdoc
          */
         this.setAuth = (auth) => {
-            this.auth = auth;
-            this.auth.setLogger(this.logger);
+            this._auth = auth;
+            auth.setLogger(this.logger);
+            auth.setBaseUrl(this.baseUrl);
         };
         /**
          * @inheritdoc
@@ -44,39 +66,39 @@ class HttpRequester {
         /**
          * @inheritdoc
          */
+        this.getLogger = () => {
+            return this.logger;
+        };
+        /**
+         * @inheritdoc
+         */
         this.doGet = async (url, authenticate = true) => {
-            return await this.fetch(url, {
-                method: 'GET',
-            }, authenticate);
+            return await this.fetch(url, { method: 'GET' }, authenticate);
         };
         /**
          * @inheritdoc
          */
         this.doPost = async (url, body, authenticate = true) => {
-            const options = {
+            return await this.fetch(url, {
                 method: 'POST',
                 body: JSON.stringify(body),
-            };
-            return await this.fetch(url, options, authenticate);
+            }, authenticate);
         };
         /**
          * @inheritdoc
          */
         this.doPut = async (url, body, authenticate = true) => {
-            const options = {
+            return await this.fetch(url, {
                 method: 'PUT',
                 body: JSON.stringify(body),
-            };
-            return await this.fetch(url, options, authenticate);
+            }, authenticate);
         };
         /**
          * @inheritdoc
          */
         this.doDelete = async (url, authenticate = true, body = undefined) => {
-            const options = {
-                method: 'DELETE',
-            };
-            if (body) {
+            const options = { method: 'DELETE' };
+            if (body !== undefined) {
                 options.body = JSON.stringify(body);
             }
             return await this.fetch(url, options, authenticate);
@@ -85,14 +107,96 @@ class HttpRequester {
          * @inheritdoc
          *
          * When `url` is a fully-qualified URL (starts with `http://` or `https://`) it is used
-         * as-is without prepending the configured API base URL. This lets endpoint helpers
-         * target routes that live outside `/api/v1` (e.g. `/barcodes`, `/widgets`) while still
-         * benefiting from the shared header, auth, and error-handling logic.
+         * as-is without prepending the configured API base URL and without injecting the
+         * `api=true` marker. This lets endpoint helpers target routes that live outside
+         * `/api/v1` (e.g. `/barcodes`, `/widgets`) while still benefiting from the shared
+         * header, auth, and error-handling logic.
+         *
+         * On a 401 response and when an auth provider is configured, the request is retried
+         * once after `auth.refresh()` succeeds; further 401s are surfaced as `ApiError`s.
          */
         this.fetch = async (url, options = {}, authenticate = true) => {
+            return this.fetchInternal(url, options, authenticate, false);
+        };
+        /**
+         * Internal implementation of {@link fetch} that tracks whether the current call is
+         * already a 401 retry, so we never recurse more than once.
+         *
+         * @param url The url to send the request to.
+         * @param options The fetch options.
+         * @param authenticate Whether to authenticate the request.
+         * @param isRetry Whether this is the 401-recovery retry pass.
+         */
+        this.fetchInternal = async (url, options, authenticate, isRetry) => {
+            const resolvedUrl = this.resolveUrl(url);
+            const headers = await this.buildHeaders(options, authenticate);
+            const opts = { ...options, headers };
+            this.logger.debug(`${options?.method || 'GET'} ${resolvedUrl}, ${authenticate ? 'authenticate' : 'no authenticate'}, body: ${options.body ? JSON.stringify(options.body) : 'none'}`);
+            const resp = await fetch(resolvedUrl, opts);
+            if (resp.ok) {
+                if (headers.get('Accept') === 'application/json') {
+                    return (await resp.json());
+                }
+                return (await resp.text());
+            }
+            if (resp.status === 401 && authenticate && this._auth && !isRetry) {
+                this.logger.debug(`401 from ${resolvedUrl}, attempting token refresh`);
+                try {
+                    await this._auth.refresh();
+                }
+                catch (err) {
+                    this.logger.error(`Token refresh failed: ${err.message ?? err}`);
+                }
+                return this.fetchInternal(url, options, authenticate, true);
+            }
+            const rawBody = await resp.text();
+            let parsedBody = rawBody;
+            let parseError;
+            try {
+                parsedBody = JSON.parse(rawBody);
+            }
+            catch (err) {
+                parseError = err;
+            }
+            throw new ApiError_1.ApiError(resp.status, resp.statusText, parsedBody, resolvedUrl, {
+                cause: parseError,
+            });
+        };
+        /**
+         * Resolves a caller-supplied URL into the final absolute URL that will be sent.
+         *
+         * - Absolute URLs (`http://`/`https://`) are returned unchanged.
+         * - Relative URLs are joined with {@link baseUrl}.
+         * - The `api=true` marker is appended to the resolved URL's query string only when
+         *   it isn't already present.
+         *
+         * @param url The raw URL passed to {@link fetch}.
+         */
+        this.resolveUrl = (url) => {
             const isAbsolute = /^https?:\/\//i.test(url);
-            const sep = url.includes('?') ? '&' : '?';
-            url = `${isAbsolute ? '' : (0, constants_1.getBaseUrl)()}${url}${sep}api=true`;
+            if (isAbsolute) {
+                const parsed = new URL(url);
+                if (!parsed.searchParams.has('api')) {
+                    parsed.searchParams.set('api', 'true');
+                }
+                return parsed.toString();
+            }
+            const base = this.baseUrl.replace(/\/$/, '');
+            const path = url.startsWith('/') ? url : `/${url}`;
+            const parsed = new URL(`${base}${path}`);
+            if (!parsed.searchParams.has('api')) {
+                parsed.searchParams.set('api', 'true');
+            }
+            return parsed.toString();
+        };
+        /**
+         * Builds the headers for a single request: User-Agent, default Accept/Content-Type,
+         * and (when applicable) Authorization.
+         *
+         * @param options The caller's fetch options.
+         * @param authenticate Whether to attach the bearer token.
+         */
+        this.buildHeaders = async (options, authenticate) => {
             const headers = options.headers ? new Headers(options.headers) : new Headers();
             if (this.userAgent) {
                 headers.set('User-Agent', this.userAgent);
@@ -109,56 +213,43 @@ class HttpRequester {
             if (!headers.has('Content-Type') && isStringBody) {
                 headers.set('Content-Type', 'application/json');
             }
-            // Adds the bearer token to the headers, and ensures the json headers are
-            // set. The caller *might* want to override the json headers (like when
-            // uploading a multipart file), so we don't overwrite them if they are set.
-            if (authenticate && this.auth) {
-                const authed = this.auth.getAuthed();
+            if (authenticate && this._auth) {
+                const authed = this._auth.getAuthed();
                 if (authed) {
                     headers.set('Authorization', `Bearer ${authed.idToken}`);
                 }
                 else {
-                    const bearerToken = await this.auth.authenticate();
+                    const bearerToken = await this._auth.authenticate();
                     headers.set('Authorization', `Bearer ${bearerToken}`);
                 }
             }
-            this.logger.debug(`${options?.method || 'GET'} ${url}, ${authenticate ? 'authenticate' : 'no authenticate'}, body: ${options.body ? JSON.stringify(options.body) : 'none'}`);
-            const opts = {
-                ...options,
-                headers,
-            };
-            return await fetch(url, opts)
-                .then(async (resp) => {
-                if (resp.ok) {
-                    if (headers.get('Accept') === 'application/json') {
-                        return resp.json();
-                    }
-                    return resp.text();
-                }
-                const body = await resp.text();
-                let json = body;
-                try {
-                    json = JSON.parse(body);
-                }
-                catch (err) {
-                    // Do nothing
-                }
-                if (typeof json === 'string') {
-                    throw new Error(`Response failed: ${resp.status} ${body}`);
-                }
-                if (json.error) {
-                    throw new Error(`${resp.status} ${json.error}`);
-                }
-                throw new Error(`Response failed: ${resp.status} ${resp.statusText}`);
-            })
-                .catch((err) => {
-                throw new Error(`Response failed: ${err.toString()}`);
-            });
+            return headers;
         };
         this.logger = logger || new NoopLogger_1.default();
+        this.baseUrl = options.baseUrl ?? constants_1.DEFAULT_BASE_URL;
+        this.siteBaseUrl = deriveSiteBaseUrl(this.baseUrl);
         if (auth) {
             this.setAuth(auth);
         }
     }
+    /**
+     * The authentication provider currently in use.
+     *
+     * Read-only from outside the class; assignment is a TypeScript error. Use
+     * {@link setAuth} to change it.
+     */
+    get auth() {
+        return this._auth;
+    }
 }
 exports.default = HttpRequester;
+/**
+ * Derives the site base URL from the API base URL by stripping a trailing `/api/v1`
+ * segment (with or without a trailing slash). Returns the input unchanged when no such
+ * segment is present.
+ *
+ * @param baseUrl The API base URL.
+ */
+const deriveSiteBaseUrl = (baseUrl) => {
+    return baseUrl.replace(/\/api\/v1\/?$/, '');
+};

@@ -1,5 +1,6 @@
+import { z } from 'zod';
 import { Requester } from '../http/Requester';
-import { Image } from '../types/Image';
+import { Image, ImageSchema } from '../types/Image';
 import Endpoint from './Endpoint';
 
 /**
@@ -21,7 +22,7 @@ export default class ImagesEndpoint extends Endpoint {
    * @param id The ID of the image.
    */
   public getById = async (id: string): Promise<Image | null> => {
-    return await this.do.get(`/${id}`);
+    return await this.do.get(`/${id}`, ImageSchema.nullable());
   };
 
   /**
@@ -31,6 +32,6 @@ export default class ImagesEndpoint extends Endpoint {
    */
   public getByIds = async (ids: string[]): Promise<Image[]> => {
     const url = this.qb.create('/ids').addQuery('ids', ids.join(','));
-    return await this.do.get(url);
+    return await this.do.get(url, z.array(ImageSchema));
   };
 }

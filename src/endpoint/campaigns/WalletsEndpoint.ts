@@ -1,6 +1,6 @@
-import { Requester } from '../../http/Requester';
-import { Enrollment } from '../../types/Enrollment';
-import { WalletUpdate } from '../../types/WalletUpdate';
+import { z } from 'zod';
+import { Enrollment, EnrollmentSchema } from '../../types/Enrollment';
+import { WalletUpdate, WalletUpdateSchema } from '../../types/WalletUpdate';
 import Endpoint from '../Endpoint';
 
 /**
@@ -19,52 +19,69 @@ export interface CampaignWalletsPagination {
 }
 
 /**
- * Response shape returned by {@link CampaignWalletsEndpoint.getAll}.
+ * Schema for the response returned by {@link CampaignWalletsEndpoint.getAll}.
  *
  * Mirrors the backend's wallet listing response: a map of bundle IDs to request logs, the
  * corresponding bundles, and pagination metadata.
  */
-export interface CampaignWalletsResponse {
-  /**
-   * Request logs grouped by bundle ID.
-   */
-  bundled: Record<string, any[]>;
+export const CampaignWalletsResponseSchema = z
+  .object({
+    /**
+     * Request logs grouped by bundle ID.
+     */
+    bundled: z.record(z.string(), z.array(z.unknown())),
 
-  /**
-   * The bundle entities referenced by {@link bundled}.
-   */
-  bundles: any[];
+    /**
+     * The bundle entities referenced by {@link bundled}.
+     */
+    bundles: z.array(z.unknown()),
 
-  /**
-   * The current page number.
-   */
-  page: number;
+    /**
+     * The current page number.
+     */
+    page: z.number(),
 
-  /**
-   * The total number of items.
-   */
-  totalItems: number;
+    /**
+     * The total number of items.
+     */
+    totalItems: z.number(),
 
-  /**
-   * The total number of pages.
-   */
-  totalPages: number;
-}
+    /**
+     * The total number of pages.
+     */
+    totalPages: z.number(),
+  })
+  .passthrough();
+
+/**
+ * Response shape returned by {@link CampaignWalletsEndpoint.getAll}.
+ */
+export type CampaignWalletsResponse = z.infer<typeof CampaignWalletsResponseSchema>;
+
+/**
+ * Schema for the response returned by {@link CampaignWalletsEndpoint.getEnrollment}.
+ */
+export const CampaignWalletEnrollmentResponseSchema = z
+  .object({
+    /**
+     * The campaign the enrollment belongs to.
+     */
+    campaign: z.unknown(),
+
+    /**
+     * The enrollment details.
+     */
+    enrollment: EnrollmentSchema.nullable(),
+  })
+  .passthrough();
 
 /**
  * Response shape returned by {@link CampaignWalletsEndpoint.getEnrollment}.
  */
-export interface CampaignWalletEnrollmentResponse {
-  /**
-   * The campaign the enrollment belongs to.
-   */
-  campaign: any;
-
-  /**
-   * The enrollment details.
-   */
+export type CampaignWalletEnrollmentResponse = {
+  campaign: unknown;
   enrollment: Enrollment | null;
-}
+};
 
 /**
  * Communicate with the `/campaigns/:campaignId/wallets/*` sub-endpoints.
@@ -76,10 +93,11 @@ export default class CampaignWalletsEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused.
    */
-  constructor(req: Requester) {
-    super(req, '/campaigns');
+  constructor(parent: Endpoint) {
+    super(parent);
   }
 
   /**
@@ -100,7 +118,7 @@ export default class CampaignWalletsEndpoint extends Endpoint {
       url.addQuery('perPage', pagination.perPage);
     }
 
-    return await this.do.get(url);
+    return await this.do.get(url, CampaignWalletsResponseSchema);
   };
 
   /**
@@ -113,7 +131,10 @@ export default class CampaignWalletsEndpoint extends Endpoint {
     campaignId: string,
     enrollmentId: string,
   ): Promise<CampaignWalletEnrollmentResponse> => {
-    return await this.do.get(`/${campaignId}/wallets/enrollments/${enrollmentId}`);
+    return await this.do.get(
+      `/${campaignId}/wallets/enrollments/${enrollmentId}`,
+      CampaignWalletEnrollmentResponseSchema,
+    );
   };
 
   /**
@@ -126,7 +147,10 @@ export default class CampaignWalletsEndpoint extends Endpoint {
     campaignId: string,
     passId: string,
   ): Promise<WalletUpdate[]> => {
-    return await this.do.get(`/${campaignId}/wallets/pushes/${passId}/logs`);
+    return await this.do.get(
+      `/${campaignId}/wallets/pushes/${passId}/logs`,
+      z.array(WalletUpdateSchema),
+    );
   };
 
   /**
@@ -141,7 +165,11 @@ export default class CampaignWalletsEndpoint extends Endpoint {
     campaignId: string,
     templateIds: string[],
   ): Promise<number> => {
-    return await this.do.post(`/${campaignId}/wallets/pushes`, { templates: templateIds });
+    return await this.do.post(
+      `/${campaignId}/wallets/pushes`,
+      { templates: templateIds },
+      z.number(),
+    );
   };
 
   /**
@@ -153,6 +181,6 @@ export default class CampaignWalletsEndpoint extends Endpoint {
    * @param campaignId The ID of the campaign.
    */
   public dismissPushes = async (campaignId: string): Promise<string> => {
-    return await this.do.del(`/${campaignId}/wallets/pushes`);
+    return await this.do.del(`/${campaignId}/wallets/pushes`, z.string());
   };
 }

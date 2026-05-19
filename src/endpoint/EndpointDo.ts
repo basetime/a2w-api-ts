@@ -1,4 +1,5 @@
-import { UrlBuilder } from '../http/QueryBuilder';
+import type { ZodType } from 'zod';
+import { PrefixResolver, UrlBuilder } from '../http/QueryBuilder';
 import { Requester } from '../http/Requester';
 
 /**
@@ -12,6 +13,12 @@ import { Requester } from '../http/Requester';
  * When a {@link UrlBuilder} is passed instead of a string the wrapper assumes it already
  * carries the endpoint prefix (this is what `Endpoint`'s `this.qb.create(...)` returns)
  * and uses its `toString()` output as-is to avoid double-prefixing.
+ *
+ * When a Zod schema is supplied, the response is run through `schema.safeParse(...)`;
+ * on a success the parsed value is returned, on a failure the issue list is logged via
+ * `req.getLogger()` and the original payload is returned as `T`. This mirrors the
+ * "validate but don't crash" mode documented in the README — consumers that need
+ * strict validation can call `Schema.parse(response)` themselves.
  */
 export default class EndpointDo {
   /**
@@ -20,29 +27,70 @@ export default class EndpointDo {
    * @param req The object to use to make requests.
    * @param endpointPath The path prefix prepended to every string URL passed to a verb
    *   method, e.g. `/campaigns`.
+   * @param resolvePrefix Optional resolver returning a prefix prepended at request
+   *   time (used by site-root endpoints to inject the requester's current site base
+   *   URL lazily, so a later `setBaseUrl(...)` is picked up).
    */
-  constructor(private req: Requester, private endpointPath: string) { }
+  constructor(
+    private req: Requester,
+    private endpointPath: string,
+    private resolvePrefix?: PrefixResolver,
+  ) { }
 
   /**
-   * Resolves a `string | UrlBuilder` into a plain relative URL string.
+   * Resolves a `string | UrlBuilder` into a plain URL string suitable for the requester.
    *
-   * String paths are prefixed with `endpointPath`; builders are returned via
-   * `toString()` unchanged (they're expected to already carry the prefix).
+   * String paths are prefixed with `endpointPath` (and the optional resolved prefix);
+   * builders are returned via `toString()` unchanged because they already carry the
+   * prefix via the resolver passed to {@link UrlBuilder}.
    *
    * @param url The url or builder to resolve.
    */
-  private resolve = (url: string | UrlBuilder): string => (
-    typeof url === 'string' ? `${this.endpointPath}${url}` : url.toString()
-  );
+  private resolve = (url: string | UrlBuilder): string => {
+    if (typeof url !== 'string') {
+      return url.toString();
+    }
+    const prefix = this.resolvePrefix ? this.resolvePrefix() : '';
+    return `${prefix}${this.endpointPath}${url}`;
+  };
+
+  /**
+   * Validates a raw response against an optional Zod schema, logging mismatches.
+   *
+   * @param raw The raw response payload.
+   * @param schema The schema to validate against, when one was supplied.
+   * @param url The URL the response came from (for log context).
+   */
+  private validate = <T>(raw: unknown, schema: ZodType | undefined, url: string): T => {
+    if (!schema) {
+      return raw as T;
+    }
+    const result = schema.safeParse(raw);
+    if (result.success) {
+      return result.data as T;
+    }
+    this.req.getLogger().error('Response shape mismatch', {
+      url,
+      issues: result.error.issues,
+    });
+    return raw as T;
+  };
 
   /**
    * Makes a GET request to a path relative to the endpoint root.
    *
    * @param url Path string (prepended with the endpoint root) or a pre-built UrlBuilder.
+   * @param schema Optional Zod schema to validate the response against.
    * @param authenticate Whether to authenticate the request.
    */
-  public get = async <T>(url: string | UrlBuilder, authenticate = true): Promise<T> => {
-    return await this.req.doGet<T>(this.resolve(url), authenticate);
+  public get = async <T>(
+    url: string | UrlBuilder,
+    schema?: ZodType,
+    authenticate = true,
+  ): Promise<T> => {
+    const resolved = this.resolve(url);
+    const raw = await this.req.doGet<unknown>(resolved, authenticate);
+    return this.validate<T>(raw, schema, resolved);
   };
 
   /**
@@ -50,10 +98,18 @@ export default class EndpointDo {
    *
    * @param url Path string (prepended with the endpoint root) or a pre-built UrlBuilder.
    * @param body The body to send. Serialised to JSON by the underlying requester.
+   * @param schema Optional Zod schema to validate the response against.
    * @param authenticate Whether to authenticate the request.
    */
-  public post = async <T>(url: string | UrlBuilder, body: any, authenticate = true): Promise<T> => {
-    return await this.req.doPost<T>(this.resolve(url), body, authenticate);
+  public post = async <T>(
+    url: string | UrlBuilder,
+    body: any,
+    schema?: ZodType,
+    authenticate = true,
+  ): Promise<T> => {
+    const resolved = this.resolve(url);
+    const raw = await this.req.doPost<unknown>(resolved, body, authenticate);
+    return this.validate<T>(raw, schema, resolved);
   };
 
   /**
@@ -61,10 +117,18 @@ export default class EndpointDo {
    *
    * @param url Path string (prepended with the endpoint root) or a pre-built UrlBuilder.
    * @param body The body to send. Serialised to JSON by the underlying requester.
+   * @param schema Optional Zod schema to validate the response against.
    * @param authenticate Whether to authenticate the request.
    */
-  public put = async <T>(url: string | UrlBuilder, body: any, authenticate = true): Promise<T> => {
-    return await this.req.doPut<T>(this.resolve(url), body, authenticate);
+  public put = async <T>(
+    url: string | UrlBuilder,
+    body: any,
+    schema?: ZodType,
+    authenticate = true,
+  ): Promise<T> => {
+    const resolved = this.resolve(url);
+    const raw = await this.req.doPut<unknown>(resolved, body, authenticate);
+    return this.validate<T>(raw, schema, resolved);
   };
 
   /**
@@ -74,11 +138,19 @@ export default class EndpointDo {
    * out without one.
    *
    * @param url Path string (prepended with the endpoint root) or a pre-built UrlBuilder.
+   * @param schema Optional Zod schema to validate the response against.
    * @param authenticate Whether to authenticate the request.
    * @param body The body to send.
    */
-  public del = async <T>(url: string | UrlBuilder, authenticate = true, body: any = undefined): Promise<T> => {
-    return await this.req.doDelete<T>(this.resolve(url), authenticate, body);
+  public del = async <T>(
+    url: string | UrlBuilder,
+    schema?: ZodType,
+    authenticate = true,
+    body: any = undefined,
+  ): Promise<T> => {
+    const resolved = this.resolve(url);
+    const raw = await this.req.doDelete<unknown>(resolved, authenticate, body);
+    return this.validate<T>(raw, schema, resolved);
   };
 
   /**
@@ -86,7 +158,8 @@ export default class EndpointDo {
    *
    * Escape hatch for cases that don't fit the JSON-in / JSON-out shape of the verb
    * helpers — for example, a GET that needs a custom `Accept` header and returns a binary
-   * payload as text.
+   * payload as text. Schema validation is intentionally not applied here because the
+   * response can be any media type.
    *
    * @param url Path string (prepended with the endpoint root) or a pre-built UrlBuilder.
    * @param options The fetch options. Defaults to an empty object (GET, default headers).

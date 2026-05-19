@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const CampaignStats_1 = require("../../types/CampaignStats");
 const Endpoint_1 = __importDefault(require("../Endpoint"));
 /**
  * Communicate with the `/campaigns/:campaignId/stats` sub-endpoint.
@@ -13,10 +14,11 @@ class CampaignStatsEndpoint extends Endpoint_1.default {
     /**
      * Constructor.
      *
-     * @param req The object to use to make requests.
+     * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+     *   reused.
      */
-    constructor(req) {
-        super(req, '/campaigns');
+    constructor(parent) {
+        super(parent);
         /**
          * Returns statistics for a campaign.
          *
@@ -24,7 +26,7 @@ class CampaignStatsEndpoint extends Endpoint_1.default {
          * @returns The statistics.
          */
         this.get = async (campaignId) => {
-            return await this.do.get(`/${campaignId}/stats`);
+            return await this.do.get(`/${campaignId}/stats`, CampaignStats_1.CampaignStatsSchema);
         };
     }
 }

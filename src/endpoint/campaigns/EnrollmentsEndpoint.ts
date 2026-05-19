@@ -1,5 +1,10 @@
-import { Requester } from '../../http/Requester';
-import { Enrollment, EnrollmentResponse } from '../../types/Enrollment';
+import { z } from 'zod';
+import {
+  Enrollment,
+  EnrollmentResponse,
+  EnrollmentResponseSchema,
+  EnrollmentSchema,
+} from '../../types/Enrollment';
 import { MetaValues } from '../../types/MetaValues';
 import Endpoint from '../Endpoint';
 import EndpointDo from '../EndpointDo';
@@ -28,11 +33,13 @@ export default class CampaignEnrollmentsEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused. The extra `/e` enrollment endpoint is constructed against the parent's
+   *   requester.
    */
-  constructor(req: Requester) {
-    super(req, '/campaigns');
-    this.enrollment = new EndpointDo(req, '/e');
+  constructor(parent: Endpoint) {
+    super(parent);
+    this.enrollment = new EndpointDo(this.req, '/e');
   }
 
   /**
@@ -42,7 +49,7 @@ export default class CampaignEnrollmentsEndpoint extends Endpoint {
    * @returns The enrollments.
    */
   public getAll = async (campaignId: string): Promise<Enrollment[]> => {
-    return await this.do.get(`/${campaignId}/enrollments`);
+    return await this.do.get(`/${campaignId}/enrollments`, z.array(EnrollmentSchema));
   };
 
   /**
@@ -67,12 +74,9 @@ export default class CampaignEnrollmentsEndpoint extends Endpoint {
     }
 
     const body = {
-      d: await this.jwtEncode({
-        metaValues,
-        formValues,
-      }),
+      d: await this.jwtEncode({ metaValues, formValues }),
     };
 
-    return await this.enrollment.post(`/campaign/${campaignId}`, body);
+    return await this.enrollment.post(`/campaign/${campaignId}`, body, EnrollmentResponseSchema);
   };
 }

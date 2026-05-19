@@ -1,136 +1,103 @@
+import { z } from 'zod';
+
+/**
+ * Schema for the stats for the campaign.
+ */
+export const CampaignStatsSchema = z
+  .object({
+    /**
+     * The total Mac devices.
+     */
+    countMacType: z.number(),
+
+    /**
+     * The total Windows devices.
+     */
+    countWindowsType: z.number(),
+
+    /**
+     * The total Linux devices.
+     */
+    countLinuxType: z.number(),
+
+    /**
+     * The total mobile devices.
+     */
+    countMobileType: z.number(),
+
+    /**
+     * The total desktop devices.
+     */
+    countDesktopType: z.number(),
+
+    /**
+     * The total wearable devices.
+     */
+    countWearableType: z.number(),
+
+    /**
+     * The total tablet devices.
+     */
+    countTabletType: z.number(),
+
+    /**
+     * The total Android devices.
+     */
+    countAndroidType: z.number(),
+
+    /**
+     * The total iOS devices.
+     */
+    countIOSType: z.number(),
+
+    /**
+     * The total Windows Phone devices.
+     */
+    countWinPhoneType: z.number(),
+  })
+  .passthrough();
+
 /**
  * The stats for the campaign.
  */
-export interface CampaignStats {
-  /**
-   * The total Mac devices.
-   */
-  countMacType: number;
-
-  /**
-   * The total Windows devices.
-   */
-  countWindowsType: number;
-
-  /**
-   * The total Linux devices.
-   */
-  countLinuxType: number;
-
-  /**
-   * The total mobile devices.
-   */
-  countMobileType: number;
-
-  /**
-   * The total desktop devices.
-   */
-  countDesktopType: number;
-
-  /**
-   * The total wearable devices.
-   */
-  countWearableType: number;
-
-  /**
-   * The total tablet devices.
-   */
-  countTabletType: number;
-
-  /**
-   * The total Android devices.
-   */
-  countAndroidType: number;
-
-  /**
-   * The total iOS devices.
-   */
-  countIOSType: number;
-
-  /**
-   * The total Windows Phone devices.
-   */
-  countWinPhoneType: number;
-}
+export type CampaignStats = z.infer<typeof CampaignStatsSchema>;
 
 /**
- * The detailed stats for the campaign.
+ * Schema for the detailed stats for the campaign.
  */
-export interface DetailedStats {
+export const DetailedStatsSchema = CampaignStatsSchema.extend({
   /**
    * Hits per type of browser.
    */
-  browsers: Record<string, number>;
+  browsers: z.record(z.string(), z.number()),
 
   /**
    * Hits per country.
    */
-  countries: Record<string, number>;
+  countries: z.record(z.string(), z.number()),
 
   /**
    * Hits per state.
    */
-  states: Record<string, number>;
-
-  /**
-   * The total Mac devices.
-   */
-  countMacType: number;
-
-  /**
-   * The total Windows devices.
-   */
-  countWindowsType: number;
-
-  /**
-   * The total Linux devices.
-   */
-  countLinuxType: number;
-
-  /**
-   * The total mobile devices.
-   */
-  countMobileType: number;
-
-  /**
-   * The total desktop devices.
-   */
-  countDesktopType: number;
-
-  /**
-   * The total wearable devices.
-   */
-  countWearableType: number;
-
-  /**
-   * The total tablet devices.
-   */
-  countTabletType: number;
-
-  /**
-   * The total Android devices.
-   */
-  countAndroidType: number;
-
-  /**
-   * The total iOS devices.
-   */
-  countIOSType: number;
-
-  /**
-   * The total Windows Phone devices.
-   */
-  countWinPhoneType: number;
+  states: z.record(z.string(), z.number()),
 
   /**
    * The total number of hits.
    */
-  countTotal: number;
-}
+  countTotal: z.number(),
+}).passthrough();
+
+/**
+ * The detailed stats for the campaign.
+ */
+export type DetailedStats = z.infer<typeof DetailedStatsSchema>;
+
+/**
+ * Schema for the daily stats for the campaign.
+ */
+export const DailyStatsSchema = z.record(z.string(), DetailedStatsSchema);
 
 /**
  * The daily stats for the campaign.
  */
-export interface DailyStats {
-  [key: string]: DetailedStats;
-}
+export type DailyStats = z.infer<typeof DailyStatsSchema>;

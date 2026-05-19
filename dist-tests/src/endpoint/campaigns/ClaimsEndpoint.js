@@ -3,6 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const zod_1 = require("zod");
+const Claim_1 = require("../../types/Claim");
 const Endpoint_1 = __importDefault(require("../Endpoint"));
 /**
  * Communicate with the `/campaigns/:campaignId/claims` sub-endpoint.
@@ -14,10 +16,11 @@ class CampaignClaimsEndpoint extends Endpoint_1.default {
     /**
      * Constructor.
      *
-     * @param req The object to use to make requests.
+     * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+     *   reused.
      */
-    constructor(req) {
-        super(req, '/campaigns');
+    constructor(parent) {
+        super(parent);
         /**
          * Returns the claims for a campaign.
          *
@@ -25,7 +28,7 @@ class CampaignClaimsEndpoint extends Endpoint_1.default {
          * @returns The claims.
          */
         this.getAll = async (campaignId) => {
-            return await this.do.get(`/${campaignId}/claims`);
+            return await this.do.get(`/${campaignId}/claims`, zod_1.z.array(Claim_1.ClaimSchema));
         };
     }
 }

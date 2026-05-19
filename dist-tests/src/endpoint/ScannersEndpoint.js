@@ -3,6 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const zod_1 = require("zod");
+const ApiKey_1 = require("../types/ApiKey");
+const ScannerApp_1 = require("../types/ScannerApp");
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
  * Communicate with the scanners endpoints.
@@ -22,7 +25,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @returns The scanner app.
          */
         this.getByRegistrationCode = async (registrationCode) => {
-            return await this.do.get(`/registrationCode/${registrationCode}`, false);
+            return await this.do.get(`/registrationCode/${registrationCode}`, ScannerApp_1.ScannerAppSchema.nullable(), false);
         };
         /**
          * Registers a new scanner device.
@@ -32,7 +35,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param deviceInfo The device info.
          */
         this.registerDevice = async (scannerApp, pushToken, deviceInfo) => {
-            return await this.do.post(`/register/${scannerApp.id}`, { deviceInfo, pushToken }, false);
+            return await this.do.post(`/register/${scannerApp.id}`, { deviceInfo, pushToken }, ApiKey_1.ApiKeySchema.nullable(), false);
         };
         /**
          * Deregisters a scanner device.
@@ -46,7 +49,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * Returns all the scanner apps for the authenticated organization.
          */
         this.getAll = async () => {
-            return await this.do.get('/organizations/apps');
+            return await this.do.get('/organizations/apps', zod_1.z.array(ScannerApp_1.ScannerAppSchema));
         };
         /**
          * Returns the scanner app with the given ID.
@@ -54,7 +57,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param id The ID of the scanner app.
          */
         this.getById = async (id) => {
-            return await this.do.get(`/organizations/${id}`);
+            return await this.do.get(`/organizations/${id}`, ScannerApp_1.ScannerAppSchema.nullable());
         };
         /**
          * Creates a new scanner app.
@@ -62,7 +65,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param app The scanner app to create.
          */
         this.createApp = async (app) => {
-            return await this.do.post('/organizations/apps', app);
+            return await this.do.post('/organizations/apps', app, ScannerApp_1.ScannerAppSchema.nullable());
         };
         /**
          * Updates a scanner app.
@@ -71,7 +74,7 @@ class ScannersEndpoint extends Endpoint_1.default {
          * @param app The scanner app to update.
          */
         this.updateApp = async (id, app) => {
-            return await this.do.post(`/organizations/${id}`, app);
+            return await this.do.post(`/organizations/${id}`, app, ScannerApp_1.ScannerAppSchema.nullable());
         };
         /**
          * Deletes a scanner app.

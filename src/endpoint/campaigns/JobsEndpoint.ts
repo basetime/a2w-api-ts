@@ -1,5 +1,5 @@
-import { Requester } from '../../http/Requester';
-import { Job } from '../../types/Job';
+import { z } from 'zod';
+import { Job, JobSchema } from '../../types/Job';
 import Endpoint from '../Endpoint';
 
 /**
@@ -11,10 +11,11 @@ export default class CampaignJobsEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused.
    */
-  constructor(req: Requester) {
-    super(req, '/campaigns');
+  constructor(parent: Endpoint) {
+    super(parent);
   }
 
   /**
@@ -24,6 +25,6 @@ export default class CampaignJobsEndpoint extends Endpoint {
    * @returns The jobs.
    */
   public getAll = async (campaignId: string): Promise<Job[]> => {
-    return await this.do.get(`/${campaignId}/jobs`);
+    return await this.do.get(`/${campaignId}/jobs`, z.array(JobSchema));
   };
 }

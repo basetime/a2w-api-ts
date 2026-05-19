@@ -1,27 +1,24 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = require("../constants");
-/**
- * Strips the `/api/v1` suffix from the configured API base URL so this endpoint can target
- * routes mounted at the site root (e.g. `/barcodes`, `/widgets`).
- *
- * If the base URL does not end with `/api/v1` it is returned unchanged.
- */
-const getSiteBaseUrl = () => (0, constants_1.getBaseUrl)().replace(/\/api\/v1\/?$/, '');
+const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
  * Communicate with the `/barcodes` endpoint.
  *
  * Accessed via `client.barcodes`. The barcode route lives outside `/api/v1`, so this
- * endpoint bypasses the API prefix and targets the site root.
+ * endpoint is constructed with `{ siteRoot: true }` — the inherited `this.do` builds
+ * absolute URLs against the requester's current site base URL.
  */
-class BarcodesEndpoint {
+class BarcodesEndpoint extends Endpoint_1.default {
     /**
      * Constructor.
      *
      * @param req The object to use to make requests.
      */
     constructor(req) {
-        this.req = req;
+        super(req, '/barcodes', { siteRoot: true });
         /**
          * Renders a barcode and returns the PNG body as a string.
          *
@@ -32,23 +29,22 @@ class BarcodesEndpoint {
          * @param input The barcode render input.
          */
         this.render = async (input) => {
-            const params = new URLSearchParams();
-            params.set('type', input.type);
-            params.set('data', input.data);
+            const url = this.qb.create('')
+                .addQuery('type', input.type)
+                .addQuery('data', input.data);
             if (input.width !== undefined) {
-                params.set('width', String(input.width));
+                url.addQuery('width', input.width);
             }
             if (input.height !== undefined) {
-                params.set('height', String(input.height));
+                url.addQuery('height', input.height);
             }
             if (input.color !== undefined) {
-                params.set('color', input.color);
+                url.addQuery('color', input.color);
             }
             if (input.background !== undefined) {
-                params.set('background', input.background);
+                url.addQuery('background', input.background);
             }
-            const url = `${getSiteBaseUrl()}/barcodes?${params.toString()}`;
-            return await this.req.fetch(url, {
+            return await this.do.fetch(url, {
                 method: 'GET',
                 headers: { Accept: 'image/png' },
             }, false);

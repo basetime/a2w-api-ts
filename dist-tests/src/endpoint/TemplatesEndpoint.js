@@ -3,6 +3,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const zod_1 = require("zod");
+const Template_1 = require("../types/Template");
+const TemplateThumbnail_1 = require("../types/TemplateThumbnail");
 const Endpoint_1 = __importDefault(require("./Endpoint"));
 /**
  * Communicate with the templates endpoints.
@@ -21,7 +24,7 @@ class TemplatesEndpoint extends Endpoint_1.default {
          * @param id The ID of the template.
          */
         this.getById = async (id) => {
-            return await this.do.get(`/simple/${id}`);
+            return await this.do.get(`/simple/${id}`, TemplateThumbnail_1.TemplateThumbnailSchema);
         };
         /**
          * Returns all of the templates for authenticated organization.
@@ -29,7 +32,7 @@ class TemplatesEndpoint extends Endpoint_1.default {
          * @returns The templates.
          */
         this.getAll = async () => {
-            return await this.do.get('/organization');
+            return await this.do.get('/organization', zod_1.z.array(Template_1.TemplateSchema));
         };
         /**
          * Returns all of the templates for a specific tag.
@@ -38,7 +41,7 @@ class TemplatesEndpoint extends Endpoint_1.default {
          * @returns The templates.
          */
         this.getByTag = async (tag) => {
-            return await this.do.get(`/tagged/${tag}`);
+            return await this.do.get(`/tagged/${tag}`, zod_1.z.array(TemplateThumbnail_1.TemplateThumbnailSchema));
         };
         /**
          * Deletes a template.
@@ -46,7 +49,7 @@ class TemplatesEndpoint extends Endpoint_1.default {
          * @param id The ID of the template to delete.
          */
         this.delete = async (id) => {
-            return await this.do.del(`/${id}`);
+            return await this.do.del(`/${id}`, zod_1.z.string());
         };
         /**
          * Clones a template and returns the new template.
@@ -54,7 +57,7 @@ class TemplatesEndpoint extends Endpoint_1.default {
          * @param id The ID of the template to clone.
          */
         this.clone = async (id) => {
-            return await this.do.post(`/${id}/clone`, {});
+            return await this.do.post(`/${id}/clone`, {}, Template_1.TemplateSchema);
         };
         /**
          * Exports a template as a JSON bundle suitable for re-importing into another

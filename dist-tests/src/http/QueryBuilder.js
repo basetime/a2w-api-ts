@@ -17,9 +17,13 @@ class UrlBuilder {
      * @param template The raw path template, e.g. `/campaigns/{id}/passes`. Anything between
      *   `{` and `}` is treated as a placeholder name that must be supplied via {@link addParam}
      *   before {@link toString} is called.
+     * @param resolvePrefix Optional resolver returning a prefix prepended at
+     *   {@link toString} time. Used by site-root endpoints to inject the requester's
+     *   current site base URL lazily.
      */
-    constructor(template) {
+    constructor(template, resolvePrefix) {
         this.template = template;
+        this.resolvePrefix = resolvePrefix;
         /**
          * Values for `{name}` placeholders in the path template, set via {@link addParam}.
          */
@@ -58,8 +62,9 @@ class UrlBuilder {
         /**
          * Renders the final URL.
          *
-         * Replaces every `{name}` placeholder with its URL-encoded value, then appends the
-         * collected query parameters as a `?k=v&...` suffix when any are present.
+         * Replaces every `{name}` placeholder with its URL-encoded value, prepends the lazy
+         * prefix when one was supplied, and appends the collected query parameters as a
+         * `?k=v&...` suffix when any are present.
          *
          * @throws Error If the template references a placeholder that was never supplied via
          *   {@link addParam}.
@@ -72,13 +77,15 @@ class UrlBuilder {
                 }
                 return encodeURIComponent(value);
             });
+            const prefix = this.resolvePrefix ? this.resolvePrefix() : '';
+            const full = `${prefix}${path}`;
             if (this.queries.length === 0) {
-                return path;
+                return full;
             }
             const qs = this.queries
                 .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
                 .join('&');
-            return `${path}?${qs}`;
+            return `${full}?${qs}`;
         };
     }
 }
@@ -89,20 +96,25 @@ exports.UrlBuilder = UrlBuilder;
  *
  * Inside the SDK this is constructed by {@link Endpoint} with an empty `baseUrl` so that
  * {@link UrlBuilder.toString} returns a relative path; the parent `HttpRequester` then
- * prepends the configured API origin. Callers using `QueryBuilder` directly may pass a
- * real base URL to get a fully-qualified URL back.
+ * prepends the configured API origin. Site-root endpoints pass a lazy resolver instead
+ * so the site base URL is injected at request time and a later `setBaseUrl(...)` is
+ * picked up.
  */
 class QueryBuilder {
     /**
      * Constructor.
      *
-     * @param baseUrl The base URL prepended to every produced URL. Pass `''` to produce a
-     *   relative path (the default mode used by the SDK's `Endpoint` base class).
+     * @param baseUrl The static base URL prepended to every produced URL. Pass `''` to
+     *   produce a relative path (the default mode used by the SDK's `Endpoint` base class).
      * @param endpointPath The endpoint path appended after the base URL, e.g. `/campaigns`.
+     * @param resolvePrefix Optional resolver returning a prefix prepended at
+     *   `UrlBuilder.toString()` time. When supplied, the resolver overrides the static
+     *   `baseUrl` for prefixing purposes.
      */
-    constructor(baseUrl, endpointPath) {
+    constructor(baseUrl, endpointPath, resolvePrefix) {
         this.baseUrl = baseUrl;
         this.endpointPath = endpointPath;
+        this.resolvePrefix = resolvePrefix;
         /**
          * Creates a new {@link UrlBuilder} for a path under the endpoint.
          *
@@ -113,7 +125,7 @@ class QueryBuilder {
          *   to an empty string, which targets the endpoint root itself.
          */
         this.create = (path = '') => {
-            return new UrlBuilder(`${this.baseUrl}${this.endpointPath}${path}`);
+            return new UrlBuilder(`${this.baseUrl}${this.endpointPath}${path}`, this.resolvePrefix);
         };
     }
 }

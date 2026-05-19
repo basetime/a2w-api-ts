@@ -1,5 +1,9 @@
-import { Requester } from '../../http/Requester';
-import { CampaignWorkflow, CampaignWorkflowInput } from '../../types/CampaignWorkflow';
+import { z } from 'zod';
+import {
+  CampaignWorkflow,
+  CampaignWorkflowInput,
+  CampaignWorkflowSchema,
+} from '../../types/CampaignWorkflow';
 import Endpoint from '../Endpoint';
 
 /**
@@ -12,10 +16,11 @@ export default class CampaignWorkflowsEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused.
    */
-  constructor(req: Requester) {
-    super(req, '/campaigns');
+  constructor(parent: Endpoint) {
+    super(parent);
   }
 
   /**
@@ -24,7 +29,7 @@ export default class CampaignWorkflowsEndpoint extends Endpoint {
    * @param campaignId The ID of the campaign.
    */
   public getAll = async (campaignId: string): Promise<CampaignWorkflow[]> => {
-    return await this.do.get(`/${campaignId}/workflows`);
+    return await this.do.get(`/${campaignId}/workflows`, z.array(CampaignWorkflowSchema));
   };
 
   /**
@@ -37,7 +42,7 @@ export default class CampaignWorkflowsEndpoint extends Endpoint {
     campaignId: string,
     body: CampaignWorkflowInput,
   ): Promise<CampaignWorkflow> => {
-    return await this.do.post(`/${campaignId}/workflows`, body);
+    return await this.do.post(`/${campaignId}/workflows`, body, CampaignWorkflowSchema);
   };
 
   /**
@@ -52,7 +57,7 @@ export default class CampaignWorkflowsEndpoint extends Endpoint {
     workflowId: string,
     body: Pick<CampaignWorkflowInput, 'runsWhen' | 'schedule'>,
   ): Promise<string> => {
-    return await this.do.post(`/${campaignId}/workflows/${workflowId}`, body);
+    return await this.do.post(`/${campaignId}/workflows/${workflowId}`, body, z.string());
   };
 
   /**
@@ -67,6 +72,9 @@ export default class CampaignWorkflowsEndpoint extends Endpoint {
     campaignId: string,
     workflowId: string,
   ): Promise<CampaignWorkflow[]> => {
-    return await this.do.del(`/${campaignId}/workflows/${workflowId}`);
+    return await this.do.del(
+      `/${campaignId}/workflows/${workflowId}`,
+      z.array(CampaignWorkflowSchema),
+    );
   };
 }

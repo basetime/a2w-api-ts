@@ -1,39 +1,60 @@
+import { z } from 'zod';
+
 /**
- * Represents an attribute collection.
+ * Schema for the possible types of attributes.
  */
-export interface Attributes {
-  /**
-   * The items of the attribute.
-   */
-  items: AttributeItem[];
-}
+export const AttributeTypeSchema = z.enum(['text', 'boolean', 'number']);
 
 /**
  * The possible types of attributes.
  */
-export type AttributeType = 'text' | 'boolean' | 'number';
+export type AttributeType = z.infer<typeof AttributeTypeSchema>;
+
+/**
+ * Schema for a single attribute.
+ */
+export const AttributeItemSchema = z
+  .object({
+    /**
+     * A unique key for the attribute.
+     */
+    key: z.string(),
+
+    /**
+     * Description of the attribute.
+     */
+    description: z.string(),
+
+    /**
+     * The value of the attribute.
+     */
+    value: z.union([z.string(), z.boolean()]),
+
+    /**
+     * The type of the value.
+     */
+    type: AttributeTypeSchema,
+  })
+  .passthrough();
 
 /**
  * A single attribute.
  */
-export interface AttributeItem {
-  /**
-   * A unique key for the attribute.
-   */
-  key: string;
+export type AttributeItem = z.infer<typeof AttributeItemSchema>;
 
-  /**
-   * Description of the attribute.
-   */
-  description: string;
+/**
+ * Schema for an attribute collection.
+ */
+export const AttributesSchema = z
+  .object({
+    /**
+     * The items of the attribute.
+     */
+    items: z.array(AttributeItemSchema),
+  })
+  .passthrough();
 
-  /**
-   * The value of the attribute.
-   */
-  value: string | boolean;
-
-  /**
-   * The type of the value.
-   */
-  type: AttributeType;
-}
+/**
+ * Represents an attribute collection.
+ */
+export type Attributes = z.infer<typeof AttributesSchema>;

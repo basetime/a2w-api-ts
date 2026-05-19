@@ -1,4 +1,12 @@
 /**
+ * Resolves the runtime prefix prepended to every URL produced by a
+ * {@link QueryBuilder}. Used to swap between "relative path" mode (returns `''`) and
+ * "site root" mode (returns the requester's current site base URL) at request time so
+ * a later `setBaseUrl(...)` is picked up.
+ */
+export type PrefixResolver = () => string;
+
+/**
  * A chainable URL builder returned by {@link QueryBuilder.create}.
  *
  * Holds a path template that may contain `{name}` placeholders, plus a bag of placeholder
@@ -25,8 +33,14 @@ export class UrlBuilder {
    * @param template The raw path template, e.g. `/campaigns/{id}/passes`. Anything between
    *   `{` and `}` is treated as a placeholder name that must be supplied via {@link addParam}
    *   before {@link toString} is called.
+   * @param resolvePrefix Optional resolver returning a prefix prepended at
+   *   {@link toString} time. Used by site-root endpoints to inject the requester's
+   *   current site base URL lazily.
    */
-  constructor(private template: string) { }
+  constructor(
+    private template: string,
+    private resolvePrefix?: PrefixResolver,
+  ) { }
 
   /**
    * Records a value for a `{name}` placeholder in the path template.
@@ -59,8 +73,9 @@ export class UrlBuilder {
   /**
    * Renders the final URL.
    *
-   * Replaces every `{name}` placeholder with its URL-encoded value, then appends the
-   * collected query parameters as a `?k=v&...` suffix when any are present.
+   * Replaces every `{name}` placeholder with its URL-encoded value, prepends the lazy
+   * prefix when one was supplied, and appends the collected query parameters as a
+   * `?k=v&...` suffix when any are present.
    *
    * @throws Error If the template references a placeholder that was never supplied via
    *   {@link addParam}.
@@ -74,14 +89,17 @@ export class UrlBuilder {
       return encodeURIComponent(value);
     });
 
+    const prefix = this.resolvePrefix ? this.resolvePrefix() : '';
+    const full = `${prefix}${path}`;
+
     if (this.queries.length === 0) {
-      return path;
+      return full;
     }
 
     const qs = this.queries
       .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&');
-    return `${path}?${qs}`;
+    return `${full}?${qs}`;
   };
 }
 
@@ -91,18 +109,26 @@ export class UrlBuilder {
  *
  * Inside the SDK this is constructed by {@link Endpoint} with an empty `baseUrl` so that
  * {@link UrlBuilder.toString} returns a relative path; the parent `HttpRequester` then
- * prepends the configured API origin. Callers using `QueryBuilder` directly may pass a
- * real base URL to get a fully-qualified URL back.
+ * prepends the configured API origin. Site-root endpoints pass a lazy resolver instead
+ * so the site base URL is injected at request time and a later `setBaseUrl(...)` is
+ * picked up.
  */
 export class QueryBuilder {
   /**
    * Constructor.
    *
-   * @param baseUrl The base URL prepended to every produced URL. Pass `''` to produce a
-   *   relative path (the default mode used by the SDK's `Endpoint` base class).
+   * @param baseUrl The static base URL prepended to every produced URL. Pass `''` to
+   *   produce a relative path (the default mode used by the SDK's `Endpoint` base class).
    * @param endpointPath The endpoint path appended after the base URL, e.g. `/campaigns`.
+   * @param resolvePrefix Optional resolver returning a prefix prepended at
+   *   `UrlBuilder.toString()` time. When supplied, the resolver overrides the static
+   *   `baseUrl` for prefixing purposes.
    */
-  constructor(private baseUrl: string, private endpointPath: string) { }
+  constructor(
+    private baseUrl: string,
+    private endpointPath: string,
+    private resolvePrefix?: PrefixResolver,
+  ) { }
 
   /**
    * Creates a new {@link UrlBuilder} for a path under the endpoint.
@@ -114,6 +140,9 @@ export class QueryBuilder {
    *   to an empty string, which targets the endpoint root itself.
    */
   public create = (path: string = ''): UrlBuilder => {
-    return new UrlBuilder(`${this.baseUrl}${this.endpointPath}${path}`);
+    return new UrlBuilder(
+      `${this.baseUrl}${this.endpointPath}${path}`,
+      this.resolvePrefix,
+    );
   };
 }

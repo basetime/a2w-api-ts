@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Requester } from '../http/Requester';
-import { Template } from '../types/Template';
-import { TemplateThumbnail } from '../types/TemplateThumbnail';
+import { Template, TemplateSchema } from '../types/Template';
+import { TemplateThumbnail, TemplateThumbnailSchema } from '../types/TemplateThumbnail';
 import Endpoint from './Endpoint';
 
 /**
@@ -42,7 +43,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @param id The ID of the template.
    */
   public getById = async (id: string): Promise<TemplateThumbnail> => {
-    return await this.do.get(`/simple/${id}`);
+    return await this.do.get(`/simple/${id}`, TemplateThumbnailSchema);
   };
 
   /**
@@ -51,7 +52,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @returns The templates.
    */
   public getAll = async (): Promise<Template[]> => {
-    return await this.do.get('/organization');
+    return await this.do.get('/organization', z.array(TemplateSchema));
   };
 
   /**
@@ -61,7 +62,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @returns The templates.
    */
   public getByTag = async (tag: string): Promise<TemplateThumbnail[]> => {
-    return await this.do.get(`/tagged/${tag}`);
+    return await this.do.get(`/tagged/${tag}`, z.array(TemplateThumbnailSchema));
   };
 
   /**
@@ -70,7 +71,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @param id The ID of the template to delete.
    */
   public delete = async (id: string): Promise<string> => {
-    return await this.do.del(`/${id}`);
+    return await this.do.del(`/${id}`, z.string());
   };
 
   /**
@@ -79,7 +80,7 @@ export default class TemplatesEndpoint extends Endpoint {
    * @param id The ID of the template to clone.
    */
   public clone = async (id: string): Promise<Template> => {
-    return await this.do.post(`/${id}/clone`, {});
+    return await this.do.post(`/${id}/clone`, {}, TemplateSchema);
   };
 
   /**

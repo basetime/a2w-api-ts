@@ -1,3 +1,4 @@
+import { Logger } from '../Logger';
 import { AuthProvider } from '../provider/AuthProvider';
 
 /**
@@ -12,12 +13,26 @@ export interface Requester {
   /**
    * Sets the base URL for all requests to the API.
    *
-   * Useful for pointing the client at a non-production environment such as a staging server or
-   * a local mock. When unset, requests target the default Addtowallet API origin.
+   * Mutates this requester's instance state only — different `HttpRequester` instances
+   * keep independent base URLs. The site base URL (returned by {@link getSiteBaseUrl})
+   * is recomputed by stripping a trailing `/api/v1` segment.
    *
    * @param url The base URL for all requests to the API.
    */
   setBaseUrl(url: string): void;
+
+  /**
+   * Returns the API base URL currently in use.
+   */
+  getBaseUrl(): string;
+
+  /**
+   * Returns the site base URL (the API base URL with a trailing `/api/v1` stripped).
+   *
+   * Used by endpoints that target routes mounted at the site root rather than under
+   * `/api/v1` (e.g. `/barcodes`, `/widgets`).
+   */
+  getSiteBaseUrl(): string;
 
   /**
    * Sets the auth provider to use.
@@ -25,7 +40,8 @@ export interface Requester {
    * When set, authenticated requests automatically attach a bearer token obtained from the
    * provider's cached `getAuthed()` value or, if absent, a fresh `authenticate()` call. The
    * provider is also wired up with the requester's logger so its authentication attempts log
-   * through the same sink.
+   * through the same sink, and with the requester's current base URL so its auth requests
+   * target the same origin.
    *
    * @param auth The auth provider to use.
    */
@@ -43,12 +59,20 @@ export interface Requester {
   setUserAgent(userAgent: string): void;
 
   /**
+   * Returns the logger used by this requester.
+   *
+   * Exposed so downstream collaborators (e.g. {@link EndpointDo}'s schema validator) can
+   * log through the same sink as the requester itself.
+   */
+  getLogger(): Logger;
+
+  /**
    * Sends a request using the fetcher and returns the response.
    *
-   * Adds the bearer token to the headers and catches errors. JSON `Accept` and `Content-Type`
-   * headers are applied unless the caller has already set them (e.g. for multipart uploads).
-   * Non-2xx responses are surfaced as thrown `Error`s that include the status code and, when
-   * present, the `error` field from the response body.
+   * Adds the bearer token to the headers and surfaces non-2xx responses as
+   * `ApiError` instances (with `status`, `body`, and `url` fields). JSON `Accept` and
+   * `Content-Type` headers are applied unless the caller has already set them
+   * (e.g. for multipart uploads).
    *
    * @param url The url to send the request to.
    * @param options The fetch options.

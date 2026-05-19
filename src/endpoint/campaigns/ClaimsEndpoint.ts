@@ -1,5 +1,5 @@
-import { Requester } from '../../http/Requester';
-import { Claim } from '../../types/Claim';
+import { z } from 'zod';
+import { Claim, ClaimSchema } from '../../types/Claim';
 import Endpoint from '../Endpoint';
 
 /**
@@ -12,10 +12,11 @@ export default class CampaignClaimsEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused.
    */
-  constructor(req: Requester) {
-    super(req, '/campaigns');
+  constructor(parent: Endpoint) {
+    super(parent);
   }
 
   /**
@@ -25,6 +26,6 @@ export default class CampaignClaimsEndpoint extends Endpoint {
    * @returns The claims.
    */
   public getAll = async (campaignId: string): Promise<Claim[]> => {
-    return await this.do.get(`/${campaignId}/claims`);
+    return await this.do.get(`/${campaignId}/claims`, z.array(ClaimSchema));
   };
 }

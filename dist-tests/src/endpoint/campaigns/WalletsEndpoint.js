@@ -3,7 +3,56 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CampaignWalletEnrollmentResponseSchema = exports.CampaignWalletsResponseSchema = void 0;
+const zod_1 = require("zod");
+const Enrollment_1 = require("../../types/Enrollment");
+const WalletUpdate_1 = require("../../types/WalletUpdate");
 const Endpoint_1 = __importDefault(require("../Endpoint"));
+/**
+ * Schema for the response returned by {@link CampaignWalletsEndpoint.getAll}.
+ *
+ * Mirrors the backend's wallet listing response: a map of bundle IDs to request logs, the
+ * corresponding bundles, and pagination metadata.
+ */
+exports.CampaignWalletsResponseSchema = zod_1.z
+    .object({
+    /**
+     * Request logs grouped by bundle ID.
+     */
+    bundled: zod_1.z.record(zod_1.z.string(), zod_1.z.array(zod_1.z.unknown())),
+    /**
+     * The bundle entities referenced by {@link bundled}.
+     */
+    bundles: zod_1.z.array(zod_1.z.unknown()),
+    /**
+     * The current page number.
+     */
+    page: zod_1.z.number(),
+    /**
+     * The total number of items.
+     */
+    totalItems: zod_1.z.number(),
+    /**
+     * The total number of pages.
+     */
+    totalPages: zod_1.z.number(),
+})
+    .passthrough();
+/**
+ * Schema for the response returned by {@link CampaignWalletsEndpoint.getEnrollment}.
+ */
+exports.CampaignWalletEnrollmentResponseSchema = zod_1.z
+    .object({
+    /**
+     * The campaign the enrollment belongs to.
+     */
+    campaign: zod_1.z.unknown(),
+    /**
+     * The enrollment details.
+     */
+    enrollment: Enrollment_1.EnrollmentSchema.nullable(),
+})
+    .passthrough();
 /**
  * Communicate with the `/campaigns/:campaignId/wallets/*` sub-endpoints.
  *
@@ -14,10 +63,11 @@ class CampaignWalletsEndpoint extends Endpoint_1.default {
     /**
      * Constructor.
      *
-     * @param req The object to use to make requests.
+     * @param parent The parent `CampaignsEndpoint` whose `req`, `do`, and `qb` are
+     *   reused.
      */
-    constructor(req) {
-        super(req, '/campaigns');
+    constructor(parent) {
+        super(parent);
         /**
          * Returns the wallets for a campaign, grouped by bundle.
          *
@@ -32,7 +82,7 @@ class CampaignWalletsEndpoint extends Endpoint_1.default {
             if (pagination.perPage !== undefined) {
                 url.addQuery('perPage', pagination.perPage);
             }
-            return await this.do.get(url);
+            return await this.do.get(url, exports.CampaignWalletsResponseSchema);
         };
         /**
          * Returns the details of a single wallet enrollment.
@@ -41,7 +91,7 @@ class CampaignWalletsEndpoint extends Endpoint_1.default {
          * @param enrollmentId The ID of the enrollment.
          */
         this.getEnrollment = async (campaignId, enrollmentId) => {
-            return await this.do.get(`/${campaignId}/wallets/enrollments/${enrollmentId}`);
+            return await this.do.get(`/${campaignId}/wallets/enrollments/${enrollmentId}`, exports.CampaignWalletEnrollmentResponseSchema);
         };
         /**
          * Returns the push log history for a specific pass.
@@ -50,7 +100,7 @@ class CampaignWalletsEndpoint extends Endpoint_1.default {
          * @param passId The ID of the pass.
          */
         this.getPushLogs = async (campaignId, passId) => {
-            return await this.do.get(`/${campaignId}/wallets/pushes/${passId}/logs`);
+            return await this.do.get(`/${campaignId}/wallets/pushes/${passId}/logs`, zod_1.z.array(WalletUpdate_1.WalletUpdateSchema));
         };
         /**
          * Pushes template updates to every wallet that has the campaign's passes installed.
@@ -61,7 +111,7 @@ class CampaignWalletsEndpoint extends Endpoint_1.default {
          * @param templateIds The IDs of the templates whose changes should be pushed.
          */
         this.pushTemplates = async (campaignId, templateIds) => {
-            return await this.do.post(`/${campaignId}/wallets/pushes`, { templates: templateIds });
+            return await this.do.post(`/${campaignId}/wallets/pushes`, { templates: templateIds }, zod_1.z.number());
         };
         /**
          * Dismisses the "pending pushes" notice for a campaign without actually pushing.
@@ -72,7 +122,7 @@ class CampaignWalletsEndpoint extends Endpoint_1.default {
          * @param campaignId The ID of the campaign.
          */
         this.dismissPushes = async (campaignId) => {
-            return await this.do.del(`/${campaignId}/wallets/pushes`);
+            return await this.do.del(`/${campaignId}/wallets/pushes`, zod_1.z.string());
         };
     }
 }

@@ -1,5 +1,5 @@
-import { Requester } from '../../http/Requester';
-import { DataStore, DataStoreInput } from '../../types/DataStore';
+import { z } from 'zod';
+import { DataStore, DataStoreInput, DataStoreSchema } from '../../types/DataStore';
 import Endpoint from '../Endpoint';
 
 /**
@@ -12,17 +12,18 @@ export default class OrganizationDataStoresEndpoint extends Endpoint {
   /**
    * Constructor.
    *
-   * @param req The object to use to make requests.
+   * @param parent The parent `OrganizationsEndpoint` whose `req`, `do`, and `qb` are
+   *   reused.
    */
-  constructor(req: Requester) {
-    super(req, '/organization');
+  constructor(parent: Endpoint) {
+    super(parent);
   }
 
   /**
    * Returns all data stores for the authenticated organization.
    */
   public getAll = async (): Promise<DataStore[]> => {
-    return await this.do.get('/dataStores');
+    return await this.do.get('/dataStores', z.array(DataStoreSchema));
   };
 
   /**
@@ -31,7 +32,7 @@ export default class OrganizationDataStoresEndpoint extends Endpoint {
    * @param id The ID of the data store.
    */
   public getById = async (id: string): Promise<DataStore> => {
-    return await this.do.get(`/dataStores/${id}`);
+    return await this.do.get(`/dataStores/${id}`, DataStoreSchema);
   };
 
   /**
@@ -43,7 +44,7 @@ export default class OrganizationDataStoresEndpoint extends Endpoint {
    * @param body The data store to create.
    */
   public create = async (body: DataStoreInput): Promise<DataStore> => {
-    return await this.do.put('/dataStores', body);
+    return await this.do.put('/dataStores', body, DataStoreSchema);
   };
 
   /**
@@ -53,7 +54,7 @@ export default class OrganizationDataStoresEndpoint extends Endpoint {
    * @param body The new data store values.
    */
   public update = async (id: string, body: DataStoreInput): Promise<DataStore> => {
-    return await this.do.post(`/dataStores/${id}`, body);
+    return await this.do.post(`/dataStores/${id}`, body, DataStoreSchema);
   };
 
   /**
@@ -64,6 +65,6 @@ export default class OrganizationDataStoresEndpoint extends Endpoint {
    * @param id The ID of the data store to delete.
    */
   public delete = async (id: string): Promise<DataStore[]> => {
-    return await this.do.del(`/dataStores/${id}`);
+    return await this.do.del(`/dataStores/${id}`, z.array(DataStoreSchema));
   };
 }

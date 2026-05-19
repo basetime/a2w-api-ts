@@ -1,53 +1,41 @@
 import { Logger } from '../Logger';
-import NoopLogger from '../NoopLogger';
 import { Authed } from '../types/Authed';
-import { AuthProvider } from './AuthProvider';
+import BaseAuthProvider from './BaseAuthProvider';
 
 /**
- * Authenticates the with the a2w API using stored id and refresh tokens.
+ * Authenticates with the a2w API using stored id and refresh tokens.
+ *
+ * Wraps a pre-existing `Authed` value (e.g. one persisted across server restarts).
+ * When the cached id token has expired, the shared {@link BaseAuthProvider} machinery
+ * will refresh it at `/auth/apiRefresh` using the stored refresh token rather than
+ * failing.
  */
-export default class StoredProvider implements AuthProvider {
-  /**
-   * The logger.
-   */
-  private logger: Logger;
-
+export default class StoredProvider extends BaseAuthProvider {
   /**
    * Constructor.
    *
    * @param authed The auth credentials.
    * @param logger The logger to use.
+   * @param baseUrl The API base URL to send refresh requests to.
    */
-  constructor(
-    private readonly authed: Authed,
-    logger?: Logger,
-  ) {
-    this.logger = logger || new NoopLogger();
+  constructor(authed: Authed, logger?: Logger, baseUrl?: string) {
+    super(logger, baseUrl);
+    this.authed = authed;
   }
 
   /**
    * @inheritdoc
+   *
+   * `StoredProvider` has no grant flow to run — the only way to obtain a fresh token
+   * is via the refresh endpoint. When the cached refresh token is rejected, this
+   * surfaces as an error.
    */
-  public setLogger = (logger: Logger) => {
-    this.logger = logger;
-  };
-
-  /**
-   * @inheritdoc
-   */
-  public getAuthed = (): Authed | undefined => {
-    return this.authed;
-  };
-
-  /**
-   * @inheritdoc
-   */
-  public authenticate = async (): Promise<string> => {
-    if (this.authed && this.authed.expiresAt > Date.now() / 1000) {
-      return this.authed.idToken;
+  protected fetchAuthed = async (): Promise<Authed> => {
+    const refreshToken = this.authed?.refreshToken;
+    if (!refreshToken) {
+      this.logger.error('StoredProvider: No refresh token available');
+      throw new Error('StoredProvider: No refresh token available');
     }
-
-    this.logger.error('StoredProvider: No valid authed found');
-    throw new Error('StoredProvider: No valid authed found');
+    return this.exchangeRefreshToken(refreshToken);
   };
 }

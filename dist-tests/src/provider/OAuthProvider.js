@@ -1,37 +1,61 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const NoopLogger_1 = __importDefault(require("../NoopLogger"));
-const constants_1 = require("../constants");
+const BaseAuthProvider_1 = __importStar(require("./BaseAuthProvider"));
 const e = encodeURIComponent;
 /**
  * Authenticates with the a2w API using an oauth code.
+ *
+ * The initial grant exchanges the supplied `code` at `/auth/oauth/token`. The shared
+ * {@link BaseAuthProvider} machinery handles caching, in-flight dedup, clock-skew
+ * margin, and refresh-token exchange via `/auth/apiRefresh` — so an expired token is
+ * refreshed without re-spending the original (one-shot) code.
  */
-class OAuthProvider {
+class OAuthProvider extends BaseAuthProvider_1.default {
     /**
      * Constructor.
      *
      * @param app The ID of the app requesting authentication.
      * @param code The code that was received from the oauth.
      * @param logger The logger to use.
+     * @param baseUrl The API base URL to send the grant request to.
      */
-    constructor(app, code = '', logger) {
+    constructor(app, code = '', logger, baseUrl) {
+        super(logger, baseUrl);
         this.app = app;
         this.code = code;
-        /**
-         * @inheritdoc
-         */
-        this.setLogger = (logger) => {
-            this.logger = logger;
-        };
-        /**
-         * @inheritdoc
-         */
-        this.getAuthed = () => {
-            return this.authed;
-        };
         /**
          * Returns a URL to get an oauth code.
          *
@@ -41,56 +65,35 @@ class OAuthProvider {
          */
         this.getCodeUrl = (redirectUrl, scopes, state) => {
             this.logger.debug('OAuth.getCodeUrl', { redirectUrl, scopes, state });
-            return `${(0, constants_1.getBaseUrl)()}/auth/oauth/code?app=${e(this.app)}&redirectUrl=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
+            return `${this.baseUrl}/auth/oauth/code?app=${e(this.app)}&redirectUrl=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
         };
         /**
          * @inheritdoc
          */
-        this.authenticate = async () => {
-            if (this.authed && this.authed.expiresAt > Date.now() / 1000) {
-                return this.authed.idToken;
+        this.fetchAuthed = async () => {
+            const url = `${this.baseUrl}/auth/oauth/token`;
+            this.logger.debug(`Sending request to ${url}`);
+            let resp;
+            try {
+                resp = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ app: this.app, code: this.code }),
+                });
             }
-            const opts = {
-                method: 'POST',
-                headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    app: this.app,
-                    code: this.code,
-                }),
-            };
-            const baseUrl = (0, constants_1.getBaseUrl)();
-            this.logger.debug(`Sending request to ${baseUrl}/auth/oauth/token`);
-            this.authed = await fetch(`${baseUrl}/auth/oauth/token`, opts)
-                .then((resp) => {
-                if (resp.ok) {
-                    return resp.json();
-                }
+            catch (err) {
+                const wrapped = new Error(`Failed to authenticate: ${err.message ?? err}`);
+                wrapped.cause = err;
+                throw wrapped;
+            }
+            if (!resp.ok) {
                 throw new Error(`Authentication returned non-ok response: ${resp.status} ${resp.statusText}`);
-            })
-                .then((json) => {
-                if (typeof json !== 'object') {
-                    throw new Error('Invalid object from /oauth/token endpoint.');
-                }
-                if (typeof json.idToken !== 'string') {
-                    throw new Error('Invalid idToken from /oauth/token endpoint.');
-                }
-                if (typeof json.refreshToken !== 'string') {
-                    throw new Error('Invalid refreshToken from /oauth/token endpoint.');
-                }
-                if (typeof json.expiresAt !== 'number') {
-                    throw new Error('Invalid expiresAt from /oauth/token endpoint.');
-                }
-                return json;
-            })
-                .catch((err) => {
-                throw new Error(`Failed to authenticate: ${err.toString()}`);
-            });
-            return this.authed.idToken;
+            }
+            return (0, BaseAuthProvider_1.parseAuthed)(await resp.json(), '/auth/oauth/token');
         };
-        this.logger = logger || new NoopLogger_1.default();
     }
 }
 exports.default = OAuthProvider;

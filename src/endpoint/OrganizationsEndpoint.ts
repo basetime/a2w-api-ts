@@ -1,8 +1,9 @@
+import { z } from 'zod';
 import { Requester } from '../http/Requester';
-import { ApiKey } from '../types/ApiKey';
-import { Organization } from '../types/Organization';
+import { ApiKey, ApiKeySchema } from '../types/ApiKey';
+import { Organization, OrganizationSchema } from '../types/Organization';
 import { ScannerDeviceInfo } from '../types/ScannerDeviceInfo';
-import { ScannerInvite } from '../types/ScannerInvite';
+import { ScannerInvite, ScannerInviteSchema } from '../types/ScannerInvite';
 import OrganizationDataStoresEndpoint from './organizations/DataStoresEndpoint';
 import OrganizationExportersEndpoint from './organizations/ExportersEndpoint';
 import OrganizationWebhooksEndpoint from './organizations/WebhooksEndpoint';
@@ -45,9 +46,9 @@ export default class OrganizationsEndpoint extends Endpoint {
    */
   constructor(req: Requester) {
     super(req, '/organization');
-    this.webhooks = new OrganizationWebhooksEndpoint(req);
-    this.dataStores = new OrganizationDataStoresEndpoint(req);
-    this.exporters = new OrganizationExportersEndpoint(req);
+    this.webhooks = new OrganizationWebhooksEndpoint(this);
+    this.dataStores = new OrganizationDataStoresEndpoint(this);
+    this.exporters = new OrganizationExportersEndpoint(this);
   }
 
   /**
@@ -56,7 +57,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @returns The organization.
    */
   public getMine = async (): Promise<Organization> => {
-    return await this.do.get('');
+    return await this.do.get('', OrganizationSchema);
   };
 
   /**
@@ -65,7 +66,11 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param code The invite code.
    */
   public getScannerInvite = async (code: string): Promise<ScannerInvite | null> => {
-    return await this.do.get(`/scanners/invites/${code}`, false);
+    return await this.do.get(
+      `/scanners/invites/${code}`,
+      ScannerInviteSchema.nullable(),
+      false,
+    );
   };
 
   /**
@@ -74,7 +79,11 @@ export default class OrganizationsEndpoint extends Endpoint {
    * @param code The invite code.
    */
   public startScannerExchange = async (code: string): Promise<ScannerInvite | null> => {
-    return await this.do.get(`/scanners/invites/${code}/start`, false);
+    return await this.do.get(
+      `/scanners/invites/${code}/start`,
+      ScannerInviteSchema.nullable(),
+      false,
+    );
   };
 
   /**
@@ -96,6 +105,7 @@ export default class OrganizationsEndpoint extends Endpoint {
         pushToken,
         scannerDeviceInfo,
       },
+      ApiKeySchema,
       false,
     );
   };
@@ -104,20 +114,22 @@ export default class OrganizationsEndpoint extends Endpoint {
    * Returns the API keys for the authenticated organization.
    */
   public getApiKeys = async (): Promise<ApiKey[]> => {
-    return await this.do.get('/apiKeys');
+    return await this.do.get('/apiKeys', z.array(ApiKeySchema));
   };
 
   /**
    * Returns an API key by ID.
    *
    * @param id The ID of the API key.
+   * @param scanner Optional scanner context — typed as `unknown` because the backend
+   *   accepts any JSON-serializable value; defaults to the empty string.
    */
-  public getApiKey = async (id: string, scanner: any = ''): Promise<ApiKey | null> => {
+  public getApiKey = async (id: string, scanner: unknown = ''): Promise<ApiKey | null> => {
     const url = this.qb.create('/apiKeys/{id}')
       .addParam('id', id)
       .addQuery('scanner', JSON.stringify(scanner));
 
-    return await this.do.get(url);
+    return await this.do.get(url, ApiKeySchema.nullable());
   };
 
   /**

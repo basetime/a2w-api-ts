@@ -1,6 +1,7 @@
+import { z } from 'zod';
 import { Requester } from '../http/Requester';
-import { ApiKey } from '../types/ApiKey';
-import { ScannerApp, ScannerAppInput } from '../types/ScannerApp';
+import { ApiKey, ApiKeySchema } from '../types/ApiKey';
+import { ScannerApp, ScannerAppInput, ScannerAppSchema } from '../types/ScannerApp';
 import { ScannerDeviceInfo } from '../types/ScannerDeviceInfo';
 import Endpoint from './Endpoint';
 
@@ -24,7 +25,11 @@ export default class ScannersEndpoint extends Endpoint {
    * @returns The scanner app.
    */
   public getByRegistrationCode = async (registrationCode: string): Promise<ScannerApp | null> => {
-    return await this.do.get(`/registrationCode/${registrationCode}`, false);
+    return await this.do.get(
+      `/registrationCode/${registrationCode}`,
+      ScannerAppSchema.nullable(),
+      false,
+    );
   };
 
   /**
@@ -42,6 +47,7 @@ export default class ScannersEndpoint extends Endpoint {
     return await this.do.post(
       `/register/${scannerApp.id}`,
       { deviceInfo, pushToken },
+      ApiKeySchema.nullable(),
       false,
     );
   };
@@ -59,7 +65,7 @@ export default class ScannersEndpoint extends Endpoint {
    * Returns all the scanner apps for the authenticated organization.
    */
   public getAll = async (): Promise<ScannerApp[]> => {
-    return await this.do.get('/organizations/apps');
+    return await this.do.get('/organizations/apps', z.array(ScannerAppSchema));
   };
 
   /**
@@ -68,7 +74,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @param id The ID of the scanner app.
    */
   public getById = async (id: string): Promise<ScannerApp | null> => {
-    return await this.do.get(`/organizations/${id}`);
+    return await this.do.get(`/organizations/${id}`, ScannerAppSchema.nullable());
   };
 
   /**
@@ -77,7 +83,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @param app The scanner app to create.
    */
   public createApp = async (app: ScannerAppInput): Promise<ScannerApp | null> => {
-    return await this.do.post('/organizations/apps', app);
+    return await this.do.post('/organizations/apps', app, ScannerAppSchema.nullable());
   };
 
   /**
@@ -87,7 +93,7 @@ export default class ScannersEndpoint extends Endpoint {
    * @param app The scanner app to update.
    */
   public updateApp = async (id: string, app: ScannerAppInput): Promise<ScannerApp | null> => {
-    return await this.do.post(`/organizations/${id}`, app);
+    return await this.do.post(`/organizations/${id}`, app, ScannerAppSchema.nullable());
   };
 
   /**

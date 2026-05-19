@@ -1,185 +1,215 @@
-import type { PassProps } from 'passkit-generator';
-import { GoogleTemplate } from '../types/GoogleTemplate';
-import { Organization } from '../types/Organization';
-import { User } from './User';
+import { z } from 'zod';
+import { GoogleTemplateSchema } from './GoogleTemplate';
+import { OrganizationSchema } from './Organization';
+import { UserSchema } from './User';
 
 /**
- * Represents a template from which passes can be created.
+ * Schema for the possible types of template attributes.
  */
-export interface Template {
-  /**
-   * The ID of the template.
-   */
-  id: string;
-
-  /**
-   * The name of the template.
-   */
-  name: string;
-
-  /**
-   * The version of the template.
-   */
-  version: number;
-
-  /**
-   * The ID of the version in the database.
-   */
-  versionID: string;
-
-  /**
-   * The files that are part of the template.
-   */
-  files: Record<string, string>;
-
-  /**
-   * The URLs of the files that are part of the template.
-   */
-  templateUrls: Record<string, string>;
-
-  /**
-   * The attributes of the template.
-   */
-  attributes: TemplateAttributes;
-
-  /**
-   * Values related to the Apple version of the template.
-   */
-  apple: PassProps;
-
-  /**
-   * Values related to the Google version of the template.
-   */
-  google: GoogleTemplate;
-
-  /**
-   * Value that should be used instead of Apple's relevantDate.
-   *
-   * The relevantDate field is a Date object, but sometimes users need to put
-   * {{placeholders}} in the value. This field allows them to do that.
-   */
-  relevantDateOverride?: string;
-
-  /**
-   * Value that should be used instead of Apple's expirationDate.
-   *
-   * The expirationDate field is a Date object, but sometimes users need to put
-   * {{placeholders}} in the value. This field allows them to do that.
-   */
-  expirationDateOverride?: string;
-
-  /**
-   * The organization the template belongs to.
-   */
-  organization: Organization;
-
-  /**
-   * The ID of the folder the template belongs to.
-   */
-  folder: string;
-
-  /**
-   * Unique value that identifies the editing session the template was created in.
-   */
-  sessionId: string;
-
-  /**
-   * The URL of the screenshot for the template.
-   */
-  screenshotUrl?: string;
-
-  /**
-   * The URL of the Apple screenshot for the template.
-   */
-  screenshotAppleUrl?: string;
-
-  /**
-   * The URL of the Android screenshot for the template.
-   */
-  screenshotAndroidUrl?: string;
-
-  /**
-   * The URL of the PDF for the template.
-   */
-  pdfUrl?: string;
-
-  /**
-   * The URL of the Apple PDF for the template.
-   */
-  pdfAppleUrl?: string;
-
-  /**
-   * The URL of the Android PDF for the template.
-   */
-  pdfAndroidUrl?: string;
-
-  /**
-   * The date the template was updated.
-   */
-  updatedDate: Date;
-
-  /**
-   * Is the public allowed to view the template?
-   *
-   * This value comes from the meta, and gets set on the object during transform.
-   */
-  isPublicShare: boolean;
-
-  /**
-   * The current status (e.g. "Ready", "Working", "Review", "Done") of the template.
-   *
-   * This value comes from the meta, and gets set on the object during transform.
-   */
-  status: string;
-
-  /**
-   * The user the template is assigned to.
-   *
-   * This value comes from the meta, and gets set on the object during transform.
-   */
-  assignee?: User | null;
-
-  /**
-   * The user that created the template.
-   *
-   * This value comes from the meta, and gets set on the object during transform.
-   */
-  createdBy?: User | null;
-
-  /**
-   * List of labels applied to the template.
-   *
-   * This value comes from the meta, and gets set on the object during transform.
-   */
-  labels?: string[] | null;
-}
+export const TemplateAttributeTypeSchema = z.enum(['color', 'image', 'text', 'boolean']);
 
 /**
  * The possible types of attributes.
  */
-export type TemplateAttributeType = 'color' | 'image' | 'text' | 'boolean';
+export type TemplateAttributeType = z.infer<typeof TemplateAttributeTypeSchema>;
+
+/**
+ * Schema for a single attribute of a template.
+ */
+export const TemplateAttributeSchema = z
+  .object({
+    /**
+     * A unique key for the attribute.
+     */
+    key: z.string(),
+
+    /**
+     * The value of the attribute.
+     */
+    value: z.string(),
+
+    /**
+     * The type of the value.
+     */
+    type: TemplateAttributeTypeSchema,
+  })
+  .passthrough();
 
 /**
  * A single attribute of a template.
  */
-export interface TemplateAttribute {
-  /**
-   * A unique key for the attribute.
-   */
-  key: string;
+export type TemplateAttribute = z.infer<typeof TemplateAttributeSchema>;
 
-  /**
-   * The value of the attribute.
-   */
-  value: string;
-
-  /**
-   * The type of the value.
-   */
-  type: TemplateAttributeType;
-}
+/**
+ * Schema for a list of attributes of a template.
+ */
+export const TemplateAttributesSchema = z.array(TemplateAttributeSchema);
 
 /**
  * A list of attributes of a template.
  */
-export type TemplateAttributes = TemplateAttribute[];
+export type TemplateAttributes = z.infer<typeof TemplateAttributesSchema>;
+
+/**
+ * Schema for a template from which passes can be created.
+ *
+ * The `apple` field carries the Apple `PassProps` shape used by the
+ * [`passkit-generator`](https://www.npmjs.com/package/passkit-generator) package, but
+ * the SDK no longer takes a runtime dependency on that package. If you want strong
+ * typing on `template.apple`, cast it: `template.apple as PassProps`.
+ */
+export const TemplateSchema = z
+  .object({
+    /**
+     * The ID of the template.
+     */
+    id: z.string(),
+
+    /**
+     * The name of the template.
+     */
+    name: z.string(),
+
+    /**
+     * The version of the template.
+     */
+    version: z.number(),
+
+    /**
+     * The ID of the version in the database.
+     */
+    versionID: z.string(),
+
+    /**
+     * The files that are part of the template.
+     */
+    files: z.record(z.string(), z.string()),
+
+    /**
+     * The URLs of the files that are part of the template.
+     */
+    templateUrls: z.record(z.string(), z.string()),
+
+    /**
+     * The attributes of the template.
+     */
+    attributes: TemplateAttributesSchema,
+
+    /**
+     * Values related to the Apple version of the template. Shape matches
+     * `passkit-generator`'s `PassProps`; consumers needing strong typing should cast.
+     */
+    apple: z.record(z.string(), z.unknown()),
+
+    /**
+     * Values related to the Google version of the template.
+     */
+    google: GoogleTemplateSchema,
+
+    /**
+     * Value that should be used instead of Apple's relevantDate.
+     *
+     * The relevantDate field is a Date object, but sometimes users need to put
+     * {{placeholders}} in the value. This field allows them to do that.
+     */
+    relevantDateOverride: z.string().optional(),
+
+    /**
+     * Value that should be used instead of Apple's expirationDate.
+     *
+     * The expirationDate field is a Date object, but sometimes users need to put
+     * {{placeholders}} in the value. This field allows them to do that.
+     */
+    expirationDateOverride: z.string().optional(),
+
+    /**
+     * The organization the template belongs to.
+     */
+    organization: OrganizationSchema,
+
+    /**
+     * The ID of the folder the template belongs to.
+     */
+    folder: z.string(),
+
+    /**
+     * Unique value that identifies the editing session the template was created in.
+     */
+    sessionId: z.string(),
+
+    /**
+     * The URL of the screenshot for the template.
+     */
+    screenshotUrl: z.string().optional(),
+
+    /**
+     * The URL of the Apple screenshot for the template.
+     */
+    screenshotAppleUrl: z.string().optional(),
+
+    /**
+     * The URL of the Android screenshot for the template.
+     */
+    screenshotAndroidUrl: z.string().optional(),
+
+    /**
+     * The URL of the PDF for the template.
+     */
+    pdfUrl: z.string().optional(),
+
+    /**
+     * The URL of the Apple PDF for the template.
+     */
+    pdfAppleUrl: z.string().optional(),
+
+    /**
+     * The URL of the Android PDF for the template.
+     */
+    pdfAndroidUrl: z.string().optional(),
+
+    /**
+     * The date the template was updated.
+     */
+    updatedDate: z.coerce.date(),
+
+    /**
+     * Is the public allowed to view the template?
+     *
+     * This value comes from the meta, and gets set on the object during transform.
+     */
+    isPublicShare: z.boolean(),
+
+    /**
+     * The current status (e.g. "Ready", "Working", "Review", "Done") of the template.
+     *
+     * This value comes from the meta, and gets set on the object during transform.
+     */
+    status: z.string(),
+
+    /**
+     * The user the template is assigned to.
+     *
+     * This value comes from the meta, and gets set on the object during transform.
+     */
+    assignee: UserSchema.nullable().optional(),
+
+    /**
+     * The user that created the template.
+     *
+     * This value comes from the meta, and gets set on the object during transform.
+     */
+    createdBy: UserSchema.nullable().optional(),
+
+    /**
+     * List of labels applied to the template.
+     *
+     * This value comes from the meta, and gets set on the object during transform.
+     */
+    labels: z.array(z.string()).nullable().optional(),
+  })
+  .passthrough();
+
+/**
+ * Represents a template from which passes can be created.
+ */
+export type Template = z.infer<typeof TemplateSchema>;

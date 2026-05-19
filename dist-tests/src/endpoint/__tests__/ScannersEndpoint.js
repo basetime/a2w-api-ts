@@ -7,7 +7,7 @@ const chai_1 = require("chai");
 const fetch_mock_1 = __importDefault(require("fetch-mock"));
 const constants_1 = require("../../constants");
 const index_1 = require("../../index");
-const baseUrl = (0, constants_1.getBaseUrl)();
+const baseUrl = constants_1.DEFAULT_BASE_URL;
 const endpoint = '/scanners';
 /**
  * Builds a minimal valid ScannerApp used as a fixture for tests that don't
