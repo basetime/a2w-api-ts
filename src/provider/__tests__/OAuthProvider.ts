@@ -14,7 +14,7 @@ describe('OAuthProvider', () => {
     const oauth = new OAuthProvider(app, '@', console);
     const url = oauth.getCodeUrl('redirect', ['scope1', 'scope2'], 'state');
     expect(url).to.be.equal(
-      `${baseUrl}/auth/oauth/code?app=${app}&redirectUrl=redirect&scope=scope1%20scope2&state=state`,
+      `${baseUrl}/auth/oauth/code?client_id=${app}&redirect_uri=redirect&scope=scope1%20scope2&state=state`,
     );
   });
 
@@ -25,9 +25,9 @@ describe('OAuthProvider', () => {
     const idToken = 'xxxxxxxx';
     const refreshToken = 'yyyyyyyy';
     fetchMock.post(`${baseUrl}/auth/oauth/token`, {
-      idToken,
-      refreshToken,
-      expiresAt: Date.now() + 1000,
+      access_token: idToken,
+      refresh_token: refreshToken,
+      expires_at: Math.floor(Date.now() / 1000) + 1000,
     });
 
     const appId = 'app';
@@ -41,7 +41,7 @@ describe('OAuthProvider', () => {
     const lastCall = fetchMock.lastCall();
     expect(lastCall).to.not.be.undefined;
     const body = JSON.parse((lastCall?.[1] as any).body);
-    expect(body.app).to.be.equal(appId);
+    expect(body.client_id).to.be.equal(appId);
     expect(body.code).to.be.equal(code);
 
     fetchMock.reset();

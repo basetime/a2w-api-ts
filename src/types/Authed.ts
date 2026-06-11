@@ -1,8 +1,18 @@
 import { z } from 'zod';
 
 /**
- * Schema for an auth response from `/auth/apiGrant`, `/auth/oauth/token`, and
- * `/auth/apiRefresh`.
+ * Schema for an OAuth token response from `/auth/oauth/token`.
+ */
+export const OAuthTokenSchema = z
+  .object({
+    access_token: z.string(),
+    refresh_token: z.string(),
+    expires_at: z.number(),
+  })
+  .passthrough();
+
+/**
+ * Schema for an auth response from `/auth/apiGrant` and `/auth/apiRefresh`.
  */
 export const AuthedSchema = z
   .object({

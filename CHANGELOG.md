@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refactor OAuthProvider to improve authentication handling. (`8e93260`)
+
 ## 2.0.1 - 2026-05-19
 
 - **Breaking:** Move `baseUrl` off the module global onto `HttpRequester` instance state. `setBaseUrl` / `getBaseUrl` mutate per-instance fields, providers learn the base URL from `setAuth(...)`, and `src/constants.ts` now exports only `DEFAULT_BASE_URL`. `Client` accepts an `{ baseUrl }` option forwarded to `HttpRequester`.

@@ -16,7 +16,7 @@ describe('OAuthProvider', () => {
         const app = 'app';
         const oauth = new index_1.OAuthProvider(app, '@', console);
         const url = oauth.getCodeUrl('redirect', ['scope1', 'scope2'], 'state');
-        (0, chai_1.expect)(url).to.be.equal(`${baseUrl}/auth/oauth/code?app=${app}&redirectUrl=redirect&scope=scope1%20scope2&state=state`);
+        (0, chai_1.expect)(url).to.be.equal(`${baseUrl}/auth/oauth/code?client_id=${app}&redirect_uri=redirect&scope=scope1%20scope2&state=state`);
     });
     /**
      *
@@ -25,9 +25,9 @@ describe('OAuthProvider', () => {
         const idToken = 'xxxxxxxx';
         const refreshToken = 'yyyyyyyy';
         fetch_mock_1.default.post(`${baseUrl}/auth/oauth/token`, {
-            idToken,
-            refreshToken,
-            expiresAt: Date.now() + 1000,
+            access_token: idToken,
+            refresh_token: refreshToken,
+            expires_at: Math.floor(Date.now() / 1000) + 1000,
         });
         const appId = 'app';
         const code = 'code';
@@ -38,7 +38,7 @@ describe('OAuthProvider', () => {
         const lastCall = fetch_mock_1.default.lastCall();
         (0, chai_1.expect)(lastCall).to.not.be.undefined;
         const body = JSON.parse((lastCall?.[1]).body);
-        (0, chai_1.expect)(body.app).to.be.equal(appId);
+        (0, chai_1.expect)(body.client_id).to.be.equal(appId);
         (0, chai_1.expect)(body.code).to.be.equal(code);
         fetch_mock_1.default.reset();
     });

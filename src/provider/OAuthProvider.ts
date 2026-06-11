@@ -1,6 +1,6 @@
 import { Logger } from '../Logger';
-import { Authed } from '../types/Authed';
-import BaseAuthProvider, { parseAuthed } from './BaseAuthProvider';
+import { Authed, OAuthTokenSchema } from '../types/Authed';
+import BaseAuthProvider from './BaseAuthProvider';
 
 const e = encodeURIComponent;
 
@@ -16,7 +16,7 @@ export default class OAuthProvider extends BaseAuthProvider {
   /**
    * Constructor.
    *
-   * @param app The ID of the app requesting authentication.
+   * @param app The OAuth app's client ID.
    * @param code The code that was received from the oauth.
    * @param logger The logger to use.
    * @param baseUrl The API base URL to send the grant request to.
@@ -39,7 +39,7 @@ export default class OAuthProvider extends BaseAuthProvider {
    */
   public getCodeUrl = (redirectUrl: string, scopes: string[], state: string): string => {
     this.logger.debug('OAuth.getCodeUrl', { redirectUrl, scopes, state });
-    return `${this.baseUrl}/auth/oauth/code?app=${e(this.app)}&redirectUrl=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
+    return `${this.baseUrl}/auth/oauth/code?client_id=${e(this.app)}&redirect_uri=${e(redirectUrl)}&scope=${e(scopes.join(' '))}&state=${e(state)}`;
   };
 
   /**
@@ -48,6 +48,7 @@ export default class OAuthProvider extends BaseAuthProvider {
   protected fetchAuthed = async (): Promise<Authed> => {
     const url = `${this.baseUrl}/auth/oauth/token`;
     this.logger.debug(`Sending request to ${url}`);
+
     let resp: Response;
     try {
       resp = await fetch(url, {
@@ -56,18 +57,32 @@ export default class OAuthProvider extends BaseAuthProvider {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ app: this.app, code: this.code }),
+        body: JSON.stringify({ client_id: this.app, code: this.code }),
       });
     } catch (err) {
       const wrapped = new Error(`Failed to authenticate: ${(err as Error).message ?? err}`);
       (wrapped as { cause?: unknown }).cause = err;
       throw wrapped;
     }
+
     if (!resp.ok) {
       throw new Error(
         `Authentication returned non-ok response: ${resp.status} ${resp.statusText}`,
       );
     }
-    return parseAuthed(await resp.json(), '/auth/oauth/token');
+
+    const parsed = OAuthTokenSchema.safeParse(await resp.json());
+    if (!parsed.success) {
+      throw new Error(
+        `Invalid response from /auth/oauth/token endpoint: ${parsed.error.message}`,
+      );
+    }
+
+    const { access_token, refresh_token, expires_at } = parsed.data;
+    return {
+      idToken: access_token,
+      refreshToken: refresh_token,
+      expiresAt: expires_at,
+    };
   };
 }

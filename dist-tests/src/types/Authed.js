@@ -1,10 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthedSchema = void 0;
+exports.AuthedSchema = exports.OAuthTokenSchema = void 0;
 const zod_1 = require("zod");
 /**
- * Schema for an auth response from `/auth/apiGrant`, `/auth/oauth/token`, and
- * `/auth/apiRefresh`.
+ * Schema for an OAuth token response from `/auth/oauth/token`.
+ */
+exports.OAuthTokenSchema = zod_1.z
+    .object({
+    access_token: zod_1.z.string(),
+    refresh_token: zod_1.z.string(),
+    expires_at: zod_1.z.number(),
+})
+    .passthrough();
+/**
+ * Schema for an auth response from `/auth/apiGrant` and `/auth/apiRefresh`.
  */
 exports.AuthedSchema = zod_1.z
     .object({
