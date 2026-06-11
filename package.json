@@ -47,7 +47,11 @@
     "test:build": "rm -rf dist-tests && pnpm exec tsc -p tsconfig.test.json",
     "test:watch": "pnpm test:build && mocha --watch",
     "watch": "nodemon --exec 'pnpm run build' --watch src --ext ts",
-    "example": "NODE_ENV=development NODE_TLS_REJECT_UNAUTHORIZED=0 node example.mjs"
+    "example": "NODE_ENV=development NODE_TLS_REJECT_UNAUTHORIZED=0 node example.mjs",
+    "docs:build": "pnpm docs:build:nav && vitepress build docs",
+    "docs:build:nav": "node scripts/build-docs-nav.mjs && node scripts/assert-docs-slugs.mjs",
+    "docs:preview": "pnpm docs:build && vitepress preview docs",
+    "docs:serve": "pnpm docs:build:nav && concurrently --kill-others --prefixColors=auto -n nav,vp \"node scripts/watch-docs-nav.mjs\" \"vitepress dev docs\""
   },
   "dependencies": {
     "zod": "^4.4.3"
@@ -60,6 +64,7 @@
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.14.1",
     "chai": "^4.5.0",
+    "concurrently": "^8.2.2",
     "esbuild": "^0.21.5",
     "eslint": "^9.6.0",
     "eslint-config-google": "^0.14.0",
@@ -71,6 +76,7 @@
     "prettier": "^3.3.2",
     "rollup": "^4.19.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.5.2"
+    "typescript": "^5.5.2",
+    "vitepress": "^1.6.4"
   }
 }

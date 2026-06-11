@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Enhance package.json and pnpm-lock.yaml for documentation and dependencies. (`26ef8af`)
 - Refactor OAuthProvider to improve authentication handling. (`8e93260`)
 
 ## 2.0.1 - 2026-05-19
