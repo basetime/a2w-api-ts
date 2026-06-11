@@ -1,18 +1,17 @@
 # Campaigns
 
-## Fetching all campaigns
+## `getAll(): Promise<Campaign[]>`
 
-Fetches the campaigns for the authenticated organization.
+Returns all campaigns for the authenticated organization.
 
 ```ts
 const campaigns = await client.campaigns.getAll();
 console.log(campaigns);
 ```
 
-## Updating a campaign
+## `update(id, body): Promise<Campaign>`
 
-Mirrors the backend Joi schema permissively. `templates` accepts a list of template IDs
-to associate with the campaign.
+Updates a campaign. Mirrors the backend Joi schema permissively. `templates` accepts a list of template IDs to associate with the campaign.
 
 ```ts
 const updated = await client.campaigns.update('h8X2JxgrnEsu2U0dI8KN', {
@@ -22,10 +21,9 @@ const updated = await client.campaigns.update('h8X2JxgrnEsu2U0dI8KN', {
 console.log(updated);
 ```
 
-## Creating a simple campaign
+## `createSimple(id, body): Promise<Campaign>`
 
-Creates a campaign from an existing template plus placeholder values. Pass `'__new'` as
-the ID to create a brand-new campaign, or an existing campaign ID to update one in place.
+Creates or updates a "simple" campaign from a template and placeholder values. Pass `'__new'` as the ID to create a brand-new campaign, or an existing campaign ID to update one in place.
 
 ```ts
 const created = await client.campaigns.createSimple('__new', {
@@ -39,16 +37,18 @@ const created = await client.campaigns.createSimple('__new', {
 console.log(created);
 ```
 
-## Cloning a campaign
+## `clone(id): Promise<string>`
 
-Returns the ID of the newly created campaign.
+Clones a campaign and returns the ID of the new campaign.
 
 ```ts
 const newCampaignId = await client.campaigns.clone('h8X2JxgrnEsu2U0dI8KN');
 console.log(newCampaignId);
 ```
 
-## Deleting a campaign
+## `delete(id): Promise<string>`
+
+Deletes a campaign.
 
 ```ts
 await client.campaigns.delete('h8X2JxgrnEsu2U0dI8KN');

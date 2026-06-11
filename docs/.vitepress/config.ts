@@ -14,7 +14,7 @@ const withSiteBase = (path: string) => {
 };
 
 export default defineConfig({
-  title: 'AddToWallet Typescript Client',
+  title: 'Addtowallet Typescript Client',
   description: 'Client library that communicates with the addtowallet API.',
   base: siteBase,
   appearance: 'force-dark',
@@ -75,7 +75,7 @@ export default defineConfig({
       {
         icon: 'github',
         link: 'https://github.com/basetime/a2w-api-ts',
-        ariaLabel: 'AddToWallet Typescript Client on GitHub',
+        ariaLabel: 'Addtowallet Typescript Client on GitHub',
       },
     ],
     sidebar,

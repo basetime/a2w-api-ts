@@ -1,6 +1,8 @@
 # Passes
 
-## Fetching a pass
+## `getById(campaignId, passId): Promise<Pass>`
+
+Returns the details for a pass.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -9,7 +11,9 @@ const pass = await client.campaigns.passes.getById(campaignId, passId);
 console.log(pass);
 ```
 
-## Querying for Passes
+## `query(campaignId, queries?): Promise<Pass[]>`
+
+Queries the passes for a campaign.
 
 Fetching all of the passes in the campaign.
 
@@ -39,10 +43,9 @@ const passes = await client.campaigns.passes.query(campaignId, {
 console.log(passes);
 ```
 
-## Updating a pass
+## `update(campaignId, passId, body): Promise<Pass>`
 
-Updates the object store. This will also have a2w send the updated pass
-to the wallets that contain it. Only the following values can be updated:
+Updates the details of a pass. This method also updates the wallets that contain the pass. Only the following values can be updated:
 
 - `templateId`
 - `templateVersion`
@@ -64,9 +67,9 @@ const updatedPass = await client.campaigns.passes.update(campaignId, passId, {
 console.log(updatedPass);
 ```
 
-## Patching Pass Object Store
+## `mergeObjectStore(campaignId, passId, body): Promise<Pass>`
 
-Merges the given object store values with the existing object store values.
+Merges a pass object store into the existing object store.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -81,9 +84,9 @@ const updatedPass = await client.campaigns.passes.mergeObjectStore(campaignId, p
 console.log(updatedPass);
 ```
 
-## Deleting Object Store Values
+## `deleteObjectStoreKeys(campaignId, passId, objectStoreKeys): Promise<Pass>`
 
-Deletes values from an object store by specifying the keys.
+Deletes keys from a pass object store.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -96,9 +99,9 @@ const updatedPass = await client.campaigns.passes.deleteObjectStoreKeys(campaign
 console.log(updatedPass);
 ```
 
-## Updating pass logs
+## `appendLog(campaignId, passId, log): Promise<Pass>`
 
-Appends a new log to a pass.
+Appends a log to a pass.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -108,7 +111,9 @@ const ok = await client.campaigns.passes.appendLog(campaignId, passId, 'This is 
 console.log(ok);
 ```
 
-## Redeem a pass
+## `redeem(campaignId, passId): Promise<boolean>`
+
+Sets the redeemed status of a pass to true. Returns `true` if the pass was redeemed, `false` if it was already redeemed.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -117,7 +122,9 @@ const redeemed = await client.campaigns.passes.redeem(campaignId, passId);
 console.log(redeemed);
 ```
 
-## Get the redeemed status of a pass
+## `getRedeemedStatus(campaignId, passId): Promise<boolean>`
+
+Returns the redeemed status of a pass.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -126,7 +133,9 @@ const redeemed = await client.campaigns.passes.getRedeemedStatus(campaignId, pas
 console.log(redeemed);
 ```
 
-## Creating a pass bundle
+## `createBundle(campaignId, metaValues?, objectStore?, utm?): Promise<string>`
+
+Creates a pass bundle and returns the URL to the claims page.
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -148,9 +157,9 @@ const url = await client.campaigns.passes.createBundle(campaignId, meta, form);
 console.log(url);
 ```
 
-## Getting scanner logs for a pass
+## `getScannerLogs(campaignId, passId): Promise<ScannerLog[]>`
 
-Returns every scan recorded by a registered scanner against the pass.
+Returns the scanner logs recorded against a pass. Each entry records one scan made by a registered scanner device.
 
 ```ts
 const logs = await client.campaigns.passes.getScannerLogs(

@@ -1,9 +1,8 @@
 # Barcodes
 
-## Rendering a barcode
+## `render(input): Promise<string>`
 
-The barcode endpoint lives at the site root (outside `/api/v1`). The PNG body is returned
-as a string.
+Renders a barcode and returns the PNG body as a string. The barcode endpoint lives at the site root (outside `/api/v1`).
 
 ```ts
 const png = await client.barcodes.render({

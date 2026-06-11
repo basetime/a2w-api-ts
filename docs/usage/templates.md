@@ -1,48 +1,53 @@
 # Templates
 
-## Fetching all templates
+## `getAll(): Promise<Template[]>`
 
-Fetches the templates for the authenticated organization.
+Returns all templates for the authenticated organization.
 
 ```ts
 const templates = await client.templates.getAll();
 console.log(templates);
 ```
 
-## Fetching a template by ID
+## `getById(id): Promise<TemplateThumbnail>`
+
+Returns a template by ID.
 
 ```ts
 const template = await client.templates.getById('id');
 console.log(template);
 ```
 
-## Fetching templates by tag
+## `getByTag(tag): Promise<TemplateThumbnail[]>`
+
+Returns all templates for a specific tag.
 
 ```ts
 const templates = await client.templates.getByTag('tag');
 console.log(templates);
 ```
 
-## Cloning a template
+## `clone(id): Promise<Template>`
+
+Clones a template and returns the new template.
 
 ```ts
 const cloned = await client.templates.clone('TPL01');
 console.log(cloned);
 ```
 
-## Exporting a template
+## `export(id): Promise<Record<string, unknown>>`
 
-Returns the JSON bundle that can be re-imported into another organization.
+Exports a template as a JSON bundle suitable for re-importing into another organization.
 
 ```ts
 const bundle = await client.templates.export('TPL01');
 console.log(bundle);
 ```
 
-## Importing a template
+## `import(file): Promise<Template>`
 
-Pass a `Blob`/`File` or a `{ name, content }` shape and the SDK constructs the multipart
-upload for you.
+Imports a template from a JSON bundle previously produced by `export`. Pass a `Blob`/`File` or a `{ name, content }` shape and the SDK constructs the multipart upload for you.
 
 ```ts
 const imported = await client.templates.import({
@@ -52,7 +57,9 @@ const imported = await client.templates.import({
 console.log(imported);
 ```
 
-## Deleting a template
+## `delete(id): Promise<string>`
+
+Deletes a template.
 
 ```ts
 await client.templates.delete('TPL01');

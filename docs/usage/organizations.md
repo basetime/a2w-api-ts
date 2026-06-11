@@ -1,40 +1,81 @@
 # Organizations
 
-## Fetching the authenticated organization
+## `getMine(): Promise<Organization>`
+
+Fetches the details of the authenticated organization.
 
 ```ts
 const organization = await client.organizations.getMine();
 console.log(organization);
 ```
 
-## Managing webhooks
+## `webhooks.getAll(): Promise<Webhook[]>`
+
+Returns all webhooks for the authenticated organization.
 
 ```ts
 const webhooks = await client.organizations.webhooks.getAll();
+console.log(webhooks);
+```
 
+## `webhooks.create(body): Promise<Webhook>`
+
+Creates a new webhook.
+
+```ts
 const created = await client.organizations.webhooks.create({
   displayName: 'Redemption Notifier',
   url: 'https://example.com/hooks/redemption',
   event: 'redeemed',
   password: 'shared-secret',
 });
+console.log(created);
+```
 
-await client.organizations.webhooks.update(created.id, {
-  ...created,
+## `webhooks.update(id, body): Promise<Webhook>`
+
+Updates an existing webhook.
+
+```ts
+await client.organizations.webhooks.update('webhook-id', {
   displayName: 'Renamed',
+  url: 'https://example.com/hooks/redemption',
+  event: 'redeemed',
+  password: 'shared-secret',
 });
+```
 
-await client.organizations.webhooks.delete(created.id);
+## `webhooks.delete(id): Promise<string>`
 
+Deletes a webhook.
+
+```ts
+await client.organizations.webhooks.delete('webhook-id');
+```
+
+## `webhooks.getLogs(): Promise<WebhookLog[]>`
+
+Returns the delivery logs for all webhooks owned by the authenticated organization.
+
+```ts
 const logs = await client.organizations.webhooks.getLogs();
 console.log(logs);
 ```
 
-## Managing data stores
+## `dataStores.getAll(): Promise<DataStore[]>`
+
+Returns all data stores for the authenticated organization.
 
 ```ts
 const stores = await client.organizations.dataStores.getAll();
+console.log(stores);
+```
 
+## `dataStores.create(body): Promise<DataStore>`
+
+Creates a new data store.
+
+```ts
 const created = await client.organizations.dataStores.create({
   name: 'Member tiers',
   source: 'key-value',
@@ -43,22 +84,52 @@ const created = await client.organizations.dataStores.create({
     { key: 'silver', value: '500' },
   ],
 });
-
-const fetched = await client.organizations.dataStores.getById(created.id);
-
-await client.organizations.dataStores.update(created.id, {
-  ...created,
-  name: 'Renamed',
-});
-
-await client.organizations.dataStores.delete(created.id);
+console.log(created);
 ```
 
-## Managing exporters
+## `dataStores.getById(id): Promise<DataStore>`
+
+Returns a single data store by ID.
+
+```ts
+const fetched = await client.organizations.dataStores.getById('data-store-id');
+console.log(fetched);
+```
+
+## `dataStores.update(id, body): Promise<DataStore>`
+
+Updates an existing data store.
+
+```ts
+await client.organizations.dataStores.update('data-store-id', {
+  name: 'Renamed',
+  source: 'key-value',
+  keyValue: [{ key: 'gold', value: '1000' }],
+});
+```
+
+## `dataStores.delete(id): Promise<DataStore[]>`
+
+Deletes a data store. Returns the remaining data stores for the organization.
+
+```ts
+await client.organizations.dataStores.delete('data-store-id');
+```
+
+## `exporters.getAll(): Promise<Exporter[]>`
+
+Returns all exporters for the authenticated organization.
 
 ```ts
 const exporters = await client.organizations.exporters.getAll();
+console.log(exporters);
+```
 
+## `exporters.create(body): Promise<Exporter[]>`
+
+Creates a new exporter. Returns the full list of exporters after creation.
+
+```ts
 const created = await client.organizations.exporters.create({
   name: 'Nightly SFTP',
   what: 'enrollments',
@@ -72,12 +143,30 @@ const created = await client.organizations.exporters.create({
     filename: 'enrollments.csv',
   },
 });
+console.log(created);
+```
 
-const ex = created[0];
-await client.organizations.exporters.run(ex.id);
+## `exporters.run(id): Promise<string>`
 
-const logs = await client.organizations.exporters.getLogs(ex.id);
+Runs an exporter on demand.
+
+```ts
+await client.organizations.exporters.run('exporter-id');
+```
+
+## `exporters.getLogs(id): Promise<ExporterLog[]>`
+
+Returns the execution logs for an exporter.
+
+```ts
+const logs = await client.organizations.exporters.getLogs('exporter-id');
 console.log(logs);
+```
 
-await client.organizations.exporters.delete(ex.id);
+## `exporters.delete(id): Promise<string>`
+
+Deletes an exporter.
+
+```ts
+await client.organizations.exporters.delete('exporter-id');
 ```

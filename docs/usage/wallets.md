@@ -1,9 +1,8 @@
 # Wallets
 
-## Listing wallets for a campaign
+## `getAll(campaignId, pagination?): Promise<CampaignWalletsResponse>`
 
-Returns request logs grouped by bundle, plus the matching bundle entities. Supports
-optional pagination.
+Returns the wallets for a campaign, grouped by bundle. Supports optional pagination.
 
 ```ts
 const wallets = await client.campaigns.wallets.getAll('h8X2JxgrnEsu2U0dI8KN', {
@@ -13,7 +12,9 @@ const wallets = await client.campaigns.wallets.getAll('h8X2JxgrnEsu2U0dI8KN', {
 console.log(wallets);
 ```
 
-You can also fetch a single wallet enrollment:
+## `getEnrollment(campaignId, enrollmentId): Promise<CampaignWalletEnrollmentResponse>`
+
+Returns the details of a single wallet enrollment.
 
 ```ts
 const enrollment = await client.campaigns.wallets.getEnrollment(
@@ -23,9 +24,9 @@ const enrollment = await client.campaigns.wallets.getEnrollment(
 console.log(enrollment);
 ```
 
-## Getting wallet push logs for a pass
+## `getPushLogs(campaignId, passId): Promise<WalletUpdate[]>`
 
-Returns the history of pushes sent to wallets that have the pass installed.
+Returns the push log history for a specific pass.
 
 ```ts
 const pushes = await client.campaigns.wallets.getPushLogs(
@@ -35,10 +36,9 @@ const pushes = await client.campaigns.wallets.getPushLogs(
 console.log(pushes);
 ```
 
-## Pushing template updates to wallets
+## `pushTemplates(campaignId, templateIds): Promise<number>`
 
-Pushes the latest template changes to every wallet that contains a pass tied to one of
-the supplied templates. Returns the number of passes queued for update.
+Pushes template updates to every wallet that has the campaign's passes installed. Returns the number of passes that were queued for update.
 
 ```ts
 const count = await client.campaigns.wallets.pushTemplates(
@@ -48,9 +48,9 @@ const count = await client.campaigns.wallets.pushTemplates(
 console.log(count);
 ```
 
-## Dismissing pending wallet pushes
+## `dismissPushes(campaignId): Promise<string>`
 
-Clears the "pending changes" notice on a campaign without actually pushing.
+Dismisses the "pending pushes" notice for a campaign without actually pushing.
 
 ```ts
 await client.campaigns.wallets.dismissPushes('h8X2JxgrnEsu2U0dI8KN');

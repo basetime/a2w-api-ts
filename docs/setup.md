@@ -1,10 +1,10 @@
 # Setup
 
-After installing the package, wire up a `Client` with an API key and secret from your AddToWallet organization settings.
+After installing the package, wire up a `Client` with an API key and secret from your Addtowallet organization settings.
 
 #### API credentials
 
-Create an API key and secret in your organization's settings in the AddToWallet dashboard. Keep the secret private — treat it like a password.
+Create an API key and secret in your organization's settings in the Addtowallet dashboard. Keep the secret private — treat it like a password.
 
 Store both values in environment variables rather than hardcoding them in source:
 

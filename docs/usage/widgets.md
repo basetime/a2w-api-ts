@@ -1,10 +1,12 @@
 # Widgets
 
-## Signing a JWT with widgets
+## `signCampaignJwt(campaignId, payload): Promise<string>`
 
-`signJwt` signs an arbitrary payload with an explicit secret. `signCampaignJwt` signs
-using a campaign's stored `openEnrollmentJwtSecret`, which is what
-`client.campaigns.enrollments.create` needs. Wiring it in:
+Signs a campaign-scoped payload as a JWT. The backend signs with the campaign's `openEnrollmentJwtSecret`, so no client-side secret is required.
+
+## `enrollments.create(campaignId, metaValues?, formValues?): Promise<EnrollmentResponse>`
+
+Creates an enrollment for a campaign. Wire `jwtEncode` to `signCampaignJwt` before calling `create`:
 
 ```ts
 const campaignId = 'h8X2JxgrnEsu2U0dI8KN';
@@ -20,7 +22,9 @@ const enrollment = await client.campaigns.enrollments.create(
 console.log(enrollment.pass, enrollment.errors);
 ```
 
-Or sign an arbitrary payload directly:
+## `signJwt(payload, secret): Promise<string>`
+
+Signs an arbitrary payload as a JWT using a caller-supplied secret.
 
 ```ts
 const token = await client.widgets.signJwt({ sub: 'user-1' }, 'shared-secret');

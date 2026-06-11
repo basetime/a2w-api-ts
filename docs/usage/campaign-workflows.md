@@ -1,17 +1,17 @@
 # Campaign Workflows
 
-## Listing workflows attached to a campaign
+## `getAll(campaignId): Promise<CampaignWorkflow[]>`
+
+Returns the workflows attached to a campaign.
 
 ```ts
 const attached = await client.campaigns.workflows.getAll('h8X2JxgrnEsu2U0dI8KN');
 console.log(attached);
 ```
 
-## Attaching a workflow to a campaign
+## `attach(campaignId, body): Promise<CampaignWorkflow>`
 
-`runsWhen` controls when the workflow fires (`'enrolled'`, `'claimed'`, `'installed'`,
-`'redeemed'`, `'updated'`, `'scanned'`, or `'scheduled'`). Pass a `schedule` when
-`runsWhen` is `'scheduled'`.
+Attaches a workflow to a campaign. `runsWhen` controls when the workflow fires (`'enrolled'`, `'claimed'`, `'installed'`, `'redeemed'`, `'updated'`, `'scanned'`, or `'scheduled'`). Pass a `schedule` when `runsWhen` is `'scheduled'`.
 
 ```ts
 const attached = await client.campaigns.workflows.attach('h8X2JxgrnEsu2U0dI8KN', {
@@ -21,7 +21,9 @@ const attached = await client.campaigns.workflows.attach('h8X2JxgrnEsu2U0dI8KN',
 console.log(attached);
 ```
 
-## Updating a campaign workflow
+## `update(campaignId, workflowId, body): Promise<string>`
+
+Updates an existing workflow attachment on a campaign.
 
 ```ts
 await client.campaigns.workflows.update('h8X2JxgrnEsu2U0dI8KN', 'CWF01', {
@@ -30,9 +32,9 @@ await client.campaigns.workflows.update('h8X2JxgrnEsu2U0dI8KN', 'CWF01', {
 });
 ```
 
-## Detaching a workflow from a campaign
+## `detach(campaignId, workflowId): Promise<CampaignWorkflow[]>`
 
-Returns the remaining workflow attachments.
+Detaches a workflow from a campaign. Returns the remaining workflow attachments for the campaign.
 
 ```ts
 const remaining = await client.campaigns.workflows.detach(
