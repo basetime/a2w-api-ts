@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 - 2026-06-11
+
 - Refactor OAuthProvider to improve authentication handling. (`8e93260`)
 
 ## 2.0.1 - 2026-05-19
