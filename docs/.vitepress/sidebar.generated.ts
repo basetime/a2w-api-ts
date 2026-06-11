@@ -13,230 +13,62 @@ export const sidebar: DefaultTheme.SidebarItem[] =
     "link": "/installing"
   },
   {
-    "text": "Developing",
-    "link": "/developing"
+    "text": "Setup",
+    "link": "/setup"
   },
   {
-    "text": "Building",
-    "link": "/building"
-  },
-  {
-    "text": "Publishing",
-    "link": "/publishing"
-  },
-  {
-    "text": "Runtime validation",
-    "link": "/runtime-validation"
-  },
-  {
-    "text": "Examples",
-    "link": "/examples",
+    "text": "Usage",
+    "link": "/usage/",
+    "collapsed": false,
     "items": [
       {
-        "text": "Creating a new client with keys",
-        "link": "/examples#creating-a-new-client-with-keys"
+        "text": "Campaigns",
+        "link": "/usage/campaigns"
       },
       {
-        "text": "Creating a new client with oauth",
-        "link": "/examples#creating-a-new-client-with-oauth"
+        "text": "Passes",
+        "link": "/usage/passes"
       },
       {
-        "text": "Setting a custom user agent",
-        "link": "/examples#setting-a-custom-user-agent"
+        "text": "Enrollments",
+        "link": "/usage/enrollments"
       },
       {
-        "text": "Custom fetch",
-        "link": "/examples#custom-fetch"
+        "text": "Wallets",
+        "link": "/usage/wallets"
       },
       {
-        "text": "Fetching all campaigns",
-        "link": "/examples#fetching-all-campaigns"
+        "text": "Campaign Workflows",
+        "link": "/usage/campaign-workflows"
       },
       {
-        "text": "Fetching a pass",
-        "link": "/examples#fetching-a-pass"
+        "text": "Templates",
+        "link": "/usage/templates"
       },
       {
-        "text": "Querying for Passes",
-        "link": "/examples#querying-for-passes"
+        "text": "Organizations",
+        "link": "/usage/organizations"
       },
       {
-        "text": "Updating a pass",
-        "link": "/examples#updating-a-pass"
+        "text": "Images",
+        "link": "/usage/images"
       },
       {
-        "text": "Patching Pass Object Store",
-        "link": "/examples#patching-pass-object-store"
+        "text": "Scanners",
+        "link": "/usage/scanners"
       },
       {
-        "text": "Deleting Object Store Values",
-        "link": "/examples#deleting-object-store-values"
+        "text": "Workflows",
+        "link": "/usage/workflows"
       },
       {
-        "text": "Updating pass logs",
-        "link": "/examples#updating-pass-logs"
+        "text": "Barcodes",
+        "link": "/usage/barcodes"
       },
       {
-        "text": "Redeem a pass",
-        "link": "/examples#redeem-a-pass"
-      },
-      {
-        "text": "Get the redeemed status of a pass",
-        "link": "/examples#get-the-redeemed-status-of-a-pass"
-      },
-      {
-        "text": "Creating a pass bundle",
-        "link": "/examples#creating-a-pass-bundle"
-      },
-      {
-        "text": "Creating an enrollment",
-        "link": "/examples#creating-an-enrollment"
-      },
-      {
-        "text": "Fetching all templates",
-        "link": "/examples#fetching-all-templates"
-      },
-      {
-        "text": "Fetching a template by ID",
-        "link": "/examples#fetching-a-template-by-id"
-      },
-      {
-        "text": "Fetching templates by tag",
-        "link": "/examples#fetching-templates-by-tag"
-      },
-      {
-        "text": "Fetching the authenticated organization",
-        "link": "/examples#fetching-the-authenticated-organization"
-      },
-      {
-        "text": "Get image by ID",
-        "link": "/examples#get-image-by-id"
-      },
-      {
-        "text": "Get images by IDs",
-        "link": "/examples#get-images-by-ids"
-      },
-      {
-        "text": "Fetching all scanner apps",
-        "link": "/examples#fetching-all-scanner-apps"
-      },
-      {
-        "text": "Fetching a scanner app by ID",
-        "link": "/examples#fetching-a-scanner-app-by-id"
-      },
-      {
-        "text": "Creating a scanner app",
-        "link": "/examples#creating-a-scanner-app"
-      },
-      {
-        "text": "Updating a scanner app",
-        "link": "/examples#updating-a-scanner-app"
-      },
-      {
-        "text": "Deleting a scanner app",
-        "link": "/examples#deleting-a-scanner-app"
-      },
-      {
-        "text": "Updating a campaign",
-        "link": "/examples#updating-a-campaign"
-      },
-      {
-        "text": "Creating a simple campaign",
-        "link": "/examples#creating-a-simple-campaign"
-      },
-      {
-        "text": "Cloning a campaign",
-        "link": "/examples#cloning-a-campaign"
-      },
-      {
-        "text": "Deleting a campaign",
-        "link": "/examples#deleting-a-campaign"
-      },
-      {
-        "text": "Getting scanner logs for a pass",
-        "link": "/examples#getting-scanner-logs-for-a-pass"
-      },
-      {
-        "text": "Listing wallets for a campaign",
-        "link": "/examples#listing-wallets-for-a-campaign"
-      },
-      {
-        "text": "Getting wallet push logs for a pass",
-        "link": "/examples#getting-wallet-push-logs-for-a-pass"
-      },
-      {
-        "text": "Pushing template updates to wallets",
-        "link": "/examples#pushing-template-updates-to-wallets"
-      },
-      {
-        "text": "Dismissing pending wallet pushes",
-        "link": "/examples#dismissing-pending-wallet-pushes"
-      },
-      {
-        "text": "Listing workflows attached to a campaign",
-        "link": "/examples#listing-workflows-attached-to-a-campaign"
-      },
-      {
-        "text": "Attaching a workflow to a campaign",
-        "link": "/examples#attaching-a-workflow-to-a-campaign"
-      },
-      {
-        "text": "Updating a campaign workflow",
-        "link": "/examples#updating-a-campaign-workflow"
-      },
-      {
-        "text": "Detaching a workflow from a campaign",
-        "link": "/examples#detaching-a-workflow-from-a-campaign"
-      },
-      {
-        "text": "Running a workflow",
-        "link": "/examples#running-a-workflow"
-      },
-      {
-        "text": "Getting a workflow job status",
-        "link": "/examples#getting-a-workflow-job-status"
-      },
-      {
-        "text": "Listing and inspecting workflow jobs",
-        "link": "/examples#listing-and-inspecting-workflow-jobs"
-      },
-      {
-        "text": "Managing webhooks",
-        "link": "/examples#managing-webhooks"
-      },
-      {
-        "text": "Managing data stores",
-        "link": "/examples#managing-data-stores"
-      },
-      {
-        "text": "Managing exporters",
-        "link": "/examples#managing-exporters"
-      },
-      {
-        "text": "Cloning a template",
-        "link": "/examples#cloning-a-template"
-      },
-      {
-        "text": "Exporting a template",
-        "link": "/examples#exporting-a-template"
-      },
-      {
-        "text": "Importing a template",
-        "link": "/examples#importing-a-template"
-      },
-      {
-        "text": "Deleting a template",
-        "link": "/examples#deleting-a-template"
-      },
-      {
-        "text": "Rendering a barcode",
-        "link": "/examples#rendering-a-barcode"
-      },
-      {
-        "text": "Signing a JWT with widgets",
-        "link": "/examples#signing-a-jwt-with-widgets"
+        "text": "Widgets",
+        "link": "/usage/widgets"
       }
-    ],
-    "collapsed": false
+    ]
   }
 ]

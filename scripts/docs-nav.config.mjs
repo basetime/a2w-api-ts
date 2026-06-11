@@ -5,7 +5,7 @@
  * Run `pnpm docs:build:nav` to regenerate the sidebar.
  */
 
-/** @typedef {{ name: string; source: string; title: string; targetDir?: string }} SyncedDocPage */
+/** @typedef {{ name: string; source?: string; title: string; targetDir?: string }} SyncedDocPage */
 
 /** @type {SyncedDocPage[]} Optional synced pages copied from elsewhere in the repo. */
 export const syncedPages = [];
@@ -21,12 +21,27 @@ export const syncedPages = [];
  */
 export const docsNav = [
   { kind: 'overview', title: 'Introduction' },
-  { kind: 'page', slug: "installing", title: "Installing" },
-  { kind: 'page', slug: "developing", title: "Developing" },
-  { kind: 'page', slug: "building", title: "Building" },
-  { kind: 'page', slug: "publishing", title: "Publishing" },
-  { kind: 'page', slug: "runtime-validation", title: "Runtime validation" },
-  { kind: 'page', slug: "examples", title: "Examples", maxDepth: 3 },
+  { kind: 'page', slug: 'installing', title: 'Installing' },
+  { kind: 'page', slug: 'setup', title: 'Setup' },
+  {
+    kind: 'group',
+    slug: 'usage',
+    title: 'Usage',
+    pages: [
+      { name: 'campaigns', title: 'Campaigns' },
+      { name: 'passes', title: 'Passes' },
+      { name: 'enrollments', title: 'Enrollments' },
+      { name: 'wallets', title: 'Wallets' },
+      { name: 'campaign-workflows', title: 'Campaign Workflows' },
+      { name: 'templates', title: 'Templates' },
+      { name: 'organizations', title: 'Organizations' },
+      { name: 'images', title: 'Images' },
+      { name: 'scanners', title: 'Scanners' },
+      { name: 'workflows', title: 'Workflows' },
+      { name: 'barcodes', title: 'Barcodes' },
+      { name: 'widgets', title: 'Widgets' },
+    ],
+  },
 ];
 
 /** Slugs of canonical overview pages committed under docs/<slug>/index.md. */

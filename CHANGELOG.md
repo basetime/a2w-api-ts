@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Update documentation structure and clean up unused files. (`6714345`)
 - Enhance package.json and pnpm-lock.yaml for documentation and dependencies. (`26ef8af`)
 
 ## 2.1.0 - 2026-06-11
