@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Update documentation with new logo and layout enhancements. (`6ace5d4`)
 - Fix typos in documentation references to 'AddToWallet' by standardizing to 'Addtowallet' for consistency across setup instructions and configuration files.. (`2fcfd66`)
 - Update documentation structure and clean up unused files. (`6714345`)
 - Enhance package.json and pnpm-lock.yaml for documentation and dependencies. (`26ef8af`)

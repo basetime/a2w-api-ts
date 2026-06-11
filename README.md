@@ -1,4 +1,4 @@
-# AddToWallet Typescript Client
+![Logo](https://cdn.addtowallet.io/img/a2w-api-ts-logo.png)
 
 **Full documentation:** [https://basetime.github.io/a2w-api-ts/](https://basetime.github.io/a2w-api-ts/)
 
@@ -12,12 +12,12 @@
 
 ## Documentation
 
-| Topic | Link |
-| --- | --- |
-| Getting started | [Introduction](https://basetime.github.io/a2w-api-ts/) |
-| Installation | [Installation](https://basetime.github.io/a2w-api-ts/installing) |
-| Setup | [Setup](https://basetime.github.io/a2w-api-ts/setup) |
-| API usage | [Usage](https://basetime.github.io/a2w-api-ts/usage/) |
+| Topic               | Link                                                                           |
+| ------------------- | ------------------------------------------------------------------------------ |
+| Getting started     | [Introduction](https://basetime.github.io/a2w-api-ts/)                         |
+| Installation        | [Installation](https://basetime.github.io/a2w-api-ts/installing)               |
+| Setup               | [Setup](https://basetime.github.io/a2w-api-ts/setup)                           |
+| API usage           | [Usage](https://basetime.github.io/a2w-api-ts/usage/)                          |
 | Response validation | [Runtime validation](https://basetime.github.io/a2w-api-ts/runtime-validation) |
 
 Canonical docs live in [`docs/`](./docs/). Edit those pages directly, then run `pnpm docs:build:nav` to refresh the VitePress sidebar.

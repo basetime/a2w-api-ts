@@ -64,7 +64,13 @@ export default defineConfig({
     },
   },
   themeConfig: {
-    logo: false,
+    // Compact mark for the mobile nav bar; desktop uses the full-width
+    // sidebar brand (see theme/A2wApiSidebarBrand.vue + custom.css).
+    logo: {
+      src: 'https://cdn.addtowallet.io/img/a2w-api-ts-logo.png',
+      alt: '@basetime a2w-api-ts',
+    },
+    siteTitle: false,
     nav: [
       {
         text: `v${pkg.version}`,
