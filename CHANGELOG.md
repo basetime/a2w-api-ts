@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Update package.json description to correct capitalization of 'Addtowallet' for consistency.. (`093d64c`)
 - Update documentation with new logo and layout enhancements. (`6ace5d4`)
 - Fix typos in documentation references to 'AddToWallet' by standardizing to 'Addtowallet' for consistency across setup instructions and configuration files.. (`2fcfd66`)
 - Update documentation structure and clean up unused files. (`6714345`)
