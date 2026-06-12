@@ -9,44 +9,6 @@ const organization = await client.organizations.getMine();
 console.log(organization);
 ```
 
-## `getPassTypes(): Promise<PassType[]>`
-
-Returns the Apple pass types for the authenticated organization. Sensitive fields
-(signer certificate, key, passphrase) are omitted from the response.
-
-```ts
-const passTypes = await client.organizations.getPassTypes();
-console.log(passTypes);
-```
-
-## `exportPassType(id): Promise<PassTypeExport>`
-
-Exports a pass type, including its signer certificate, key, and passphrase.
-
-```ts
-const passType = await client.organizations.exportPassType('pass.com.example.demo');
-console.log(passType);
-```
-
-## `getGoogleIssuers(): Promise<GoogleIssuer[]>`
-
-Returns the Google Wallet issuers for the authenticated organization. Service-account
-credentials are omitted from the response.
-
-```ts
-const issuers = await client.organizations.getGoogleIssuers();
-console.log(issuers);
-```
-
-## `exportGoogleIssuer(id): Promise<GoogleIssuerExport>`
-
-Exports a Google issuer, including its service-account credentials.
-
-```ts
-const issuer = await client.organizations.exportGoogleIssuer('issuer-id');
-console.log(issuer);
-```
-
 ## `webhooks.getAll(): Promise<Webhook[]>`
 
 Returns all webhooks for the authenticated organization.
@@ -207,4 +169,42 @@ Deletes an exporter.
 
 ```ts
 await client.organizations.exporters.delete('exporter-id');
+```
+
+## `certs.getPassTypes(): Promise<PassType[]>`
+
+Returns the Apple pass types for the authenticated organization. Sensitive fields
+(signer certificate, key, passphrase) are omitted from the response.
+
+```ts
+const passTypes = await client.organizations.certs.getPassTypes();
+console.log(passTypes);
+```
+
+## `certs.exportPassType(id): Promise<PassTypeExport>`
+
+Exports a pass type, including its signer certificate, key, and passphrase.
+
+```ts
+const passType = await client.organizations.certs.exportPassType('pass.com.example.demo');
+console.log(passType);
+```
+
+## `certs.getGoogleIssuers(): Promise<GoogleIssuer[]>`
+
+Returns the Google Wallet issuers for the authenticated organization. Service-account
+credentials are omitted from the response.
+
+```ts
+const issuers = await client.organizations.certs.getGoogleIssuers();
+console.log(issuers);
+```
+
+## `certs.exportGoogleIssuer(id): Promise<GoogleIssuerExport>`
+
+Exports a Google issuer, including its service-account credentials.
+
+```ts
+const issuer = await client.organizations.certs.exportGoogleIssuer('issuer-id');
+console.log(issuer);
 ```

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Refactor OrganizationsEndpoint to include OrganizationCertsEndpoint. (`b17fb07`)
+
 ## 2.2.2 - 2026-06-12
 
 - Refactor export methods in OrganizationsEndpoint to remove token requirement. (`2e1ac8d`)

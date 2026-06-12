@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const zod_1 = require("zod");
 const ApiKey_1 = require("../types/ApiKey");
-const GoogleIssuer_1 = require("../types/GoogleIssuer");
 const Organization_1 = require("../types/Organization");
-const PassType_1 = require("../types/PassType");
 const ScannerInvite_1 = require("../types/ScannerInvite");
+const CertsEndpoint_1 = __importDefault(require("./organizations/CertsEndpoint"));
 const DataStoresEndpoint_1 = __importDefault(require("./organizations/DataStoresEndpoint"));
 const ExportersEndpoint_1 = __importDefault(require("./organizations/ExportersEndpoint"));
 const WebhooksEndpoint_1 = __importDefault(require("./organizations/WebhooksEndpoint"));
@@ -17,7 +16,8 @@ const Endpoint_1 = __importDefault(require("./Endpoint"));
  * Communicate with the organizations endpoints.
  *
  * Top-level methods cover the org itself, scanner-invite handshake, and API keys. Resource
- * sub-endpoints (webhooks, dataStores, exporters) are exposed as `public readonly` props,
+ * sub-endpoints (certs, webhooks, dataStores, exporters) are exposed as `public readonly`
+ * props,
  * mirroring the composition pattern of {@link ../Client | Client}.
  */
 class OrganizationsEndpoint extends Endpoint_1.default {
@@ -73,38 +73,6 @@ class OrganizationsEndpoint extends Endpoint_1.default {
             return await this.do.get('/apiKeys', zod_1.z.array(ApiKey_1.ApiKeySchema));
         };
         /**
-         * Returns the Apple pass types for the authenticated organization.
-         *
-         * Sensitive fields (signer certificate, key, passphrase) are omitted from the response.
-         */
-        this.getPassTypes = async () => {
-            return await this.do.get('/passTypes', zod_1.z.array(PassType_1.PassTypeSchema));
-        };
-        /**
-         * Exports a pass type, including its signer certificate, key, and passphrase.
-         *
-         * @param id The ID of the pass type.
-         */
-        this.exportPassType = async (id) => {
-            return await this.do.get(`/passTypes/${id}/export`, PassType_1.PassTypeExportSchema);
-        };
-        /**
-         * Returns the Google Wallet issuers for the authenticated organization.
-         *
-         * Service-account credentials are omitted from the response.
-         */
-        this.getGoogleIssuers = async () => {
-            return await this.do.get('/googleIssuers', zod_1.z.array(GoogleIssuer_1.GoogleIssuerSchema));
-        };
-        /**
-         * Exports a Google issuer, including its service-account credentials.
-         *
-         * @param id The ID of the Google issuer.
-         */
-        this.exportGoogleIssuer = async (id) => {
-            return await this.do.get(`/googleIssuers/${id}/export`, GoogleIssuer_1.GoogleIssuerExportSchema);
-        };
-        /**
          * Returns an API key by ID.
          *
          * @param id The ID of the API key.
@@ -125,6 +93,7 @@ class OrganizationsEndpoint extends Endpoint_1.default {
         this.deleteApiKey = async (id) => {
             return await this.do.del(`/apiKeys/${id}`);
         };
+        this.certs = new CertsEndpoint_1.default(this);
         this.webhooks = new WebhooksEndpoint_1.default(this);
         this.dataStores = new DataStoresEndpoint_1.default(this);
         this.exporters = new ExportersEndpoint_1.default(this);

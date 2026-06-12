@@ -15,6 +15,7 @@ export { default as CampaignWalletsEndpoint } from './endpoint/campaigns/Wallets
 export { default as CampaignWorkflowsEndpoint } from './endpoint/campaigns/WorkflowsEndpoint';
 export { default as TemplatesEndpoint } from './endpoint/TemplatesEndpoint';
 export { default as OrganizationsEndpoint } from './endpoint/OrganizationsEndpoint';
+export { default as OrganizationCertsEndpoint } from './endpoint/organizations/CertsEndpoint';
 export { default as OrganizationWebhooksEndpoint } from './endpoint/organizations/WebhooksEndpoint';
 export { default as OrganizationDataStoresEndpoint } from './endpoint/organizations/DataStoresEndpoint';
 export { default as OrganizationExportersEndpoint } from './endpoint/organizations/ExportersEndpoint';

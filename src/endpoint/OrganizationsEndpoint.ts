@@ -1,21 +1,10 @@
 import { z } from 'zod';
 import { Requester } from '../http/Requester';
 import { ApiKey, ApiKeySchema } from '../types/ApiKey';
-import {
-  GoogleIssuer,
-  GoogleIssuerExport,
-  GoogleIssuerExportSchema,
-  GoogleIssuerSchema,
-} from '../types/GoogleIssuer';
 import { Organization, OrganizationSchema } from '../types/Organization';
-import {
-  PassType,
-  PassTypeExport,
-  PassTypeExportSchema,
-  PassTypeSchema,
-} from '../types/PassType';
 import { ScannerDeviceInfo } from '../types/ScannerDeviceInfo';
 import { ScannerInvite, ScannerInviteSchema } from '../types/ScannerInvite';
+import OrganizationCertsEndpoint from './organizations/CertsEndpoint';
 import OrganizationDataStoresEndpoint from './organizations/DataStoresEndpoint';
 import OrganizationExportersEndpoint from './organizations/ExportersEndpoint';
 import OrganizationWebhooksEndpoint from './organizations/WebhooksEndpoint';
@@ -25,10 +14,20 @@ import Endpoint from './Endpoint';
  * Communicate with the organizations endpoints.
  *
  * Top-level methods cover the org itself, scanner-invite handshake, and API keys. Resource
- * sub-endpoints (webhooks, dataStores, exporters) are exposed as `public readonly` props,
+ * sub-endpoints (certs, webhooks, dataStores, exporters) are exposed as `public readonly`
+ * props,
  * mirroring the composition pattern of {@link ../Client | Client}.
  */
 export default class OrganizationsEndpoint extends Endpoint {
+  /**
+   * Pass type and Google issuer management (`/organization/passTypes*`,
+   * `/organization/googleIssuers*`).
+   *
+   * List and export Apple pass types and Google Wallet issuers, including sensitive
+   * credentials via the export endpoints.
+   */
+  public readonly certs: OrganizationCertsEndpoint;
+
   /**
    * Webhook management (`/organization/webhooks*`).
    *
@@ -58,6 +57,7 @@ export default class OrganizationsEndpoint extends Endpoint {
    */
   constructor(req: Requester) {
     super(req, '/organization');
+    this.certs = new OrganizationCertsEndpoint(this);
     this.webhooks = new OrganizationWebhooksEndpoint(this);
     this.dataStores = new OrganizationDataStoresEndpoint(this);
     this.exporters = new OrganizationExportersEndpoint(this);
@@ -127,42 +127,6 @@ export default class OrganizationsEndpoint extends Endpoint {
    */
   public getApiKeys = async (): Promise<ApiKey[]> => {
     return await this.do.get('/apiKeys', z.array(ApiKeySchema));
-  };
-
-  /**
-   * Returns the Apple pass types for the authenticated organization.
-   *
-   * Sensitive fields (signer certificate, key, passphrase) are omitted from the response.
-   */
-  public getPassTypes = async (): Promise<PassType[]> => {
-    return await this.do.get('/passTypes', z.array(PassTypeSchema));
-  };
-
-  /**
-   * Exports a pass type, including its signer certificate, key, and passphrase.
-   *
-   * @param id The ID of the pass type.
-   */
-  public exportPassType = async (id: string): Promise<PassTypeExport> => {
-    return await this.do.get(`/passTypes/${id}/export`, PassTypeExportSchema);
-  };
-
-  /**
-   * Returns the Google Wallet issuers for the authenticated organization.
-   *
-   * Service-account credentials are omitted from the response.
-   */
-  public getGoogleIssuers = async (): Promise<GoogleIssuer[]> => {
-    return await this.do.get('/googleIssuers', z.array(GoogleIssuerSchema));
-  };
-
-  /**
-   * Exports a Google issuer, including its service-account credentials.
-   *
-   * @param id The ID of the Google issuer.
-   */
-  public exportGoogleIssuer = async (id: string): Promise<GoogleIssuerExport> => {
-    return await this.do.get(`/googleIssuers/${id}/export`, GoogleIssuerExportSchema);
   };
 
   /**
