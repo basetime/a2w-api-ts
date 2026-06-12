@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.2.2 - 2026-06-12
+
 - Refactor export methods in OrganizationsEndpoint to remove token requirement. (`2e1ac8d`)
 - Implement PassType and GoogleIssuer functionalities in OrganizationsEndpoint. (`3c028b8`)
 - Update package.json description to correct capitalization of 'Addtowallet' for consistency.. (`093d64c`)
