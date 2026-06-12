@@ -141,17 +141,10 @@ export default class OrganizationsEndpoint extends Endpoint {
   /**
    * Exports a pass type, including its signer certificate, key, and passphrase.
    *
-   * Requires a one-time token obtained from the confirm endpoint.
-   *
    * @param id The ID of the pass type.
-   * @param token The one-time auth token.
    */
-  public exportPassType = async (id: string, token: string): Promise<PassTypeExport> => {
-    const url = this.qb.create('/passTypes/{id}/export')
-      .addParam('id', id)
-      .addQuery('token', token);
-
-    return await this.do.get(url, PassTypeExportSchema);
+  public exportPassType = async (id: string): Promise<PassTypeExport> => {
+    return await this.do.get(`/passTypes/${id}/export`, PassTypeExportSchema);
   };
 
   /**
@@ -166,17 +159,10 @@ export default class OrganizationsEndpoint extends Endpoint {
   /**
    * Exports a Google issuer, including its service-account credentials.
    *
-   * Requires a one-time token obtained from the confirm endpoint.
-   *
    * @param id The ID of the Google issuer.
-   * @param token The one-time auth token.
    */
-  public exportGoogleIssuer = async (id: string, token: string): Promise<GoogleIssuerExport> => {
-    const url = this.qb.create('/googleIssuers/{id}/export')
-      .addParam('id', id)
-      .addQuery('token', token);
-
-    return await this.do.get(url, GoogleIssuerExportSchema);
+  public exportGoogleIssuer = async (id: string): Promise<GoogleIssuerExport> => {
+    return await this.do.get(`/googleIssuers/${id}/export`, GoogleIssuerExportSchema);
   };
 
   /**

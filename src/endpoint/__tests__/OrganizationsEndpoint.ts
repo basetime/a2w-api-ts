@@ -144,10 +144,9 @@ describe('OrganizationsEndpoint', () => {
   /**
    *
    */
-  it('exportPassType() should GET /organization/passTypes/:id/export with token query', async () => {
+  it('exportPassType() should GET /organization/passTypes/:id/export', async () => {
     const id = 'pass.io.example.demo';
-    const token = 'OTT01';
-    const url = `${baseUrl}${endpoint}/passTypes/${id}/export?token=${token}&api=true`;
+    const url = `${baseUrl}${endpoint}/passTypes/${id}/export?api=true`;
     fetchMock.get(url, {
       id,
       signerCert: 'CERT',
@@ -156,7 +155,7 @@ describe('OrganizationsEndpoint', () => {
       teamIdentifier: 'TEAM01',
     });
 
-    const result = await client.organizations.exportPassType(id, token);
+    const result = await client.organizations.exportPassType(id);
     expectCommon(url, result, 'object');
   });
 
@@ -174,17 +173,16 @@ describe('OrganizationsEndpoint', () => {
   /**
    *
    */
-  it('exportGoogleIssuer() should GET /organization/googleIssuers/:id/export with token query', async () => {
+  it('exportGoogleIssuer() should GET /organization/googleIssuers/:id/export', async () => {
     const id = 'issuer01';
-    const token = 'OTT01';
-    const url = `${baseUrl}${endpoint}/googleIssuers/${id}/export?token=${token}&api=true`;
+    const url = `${baseUrl}${endpoint}/googleIssuers/${id}/export?api=true`;
     fetchMock.get(url, {
       id,
       name: 'Example Issuer',
       credentials: '{"type":"service_account"}',
     });
 
-    const result = await client.organizations.exportGoogleIssuer(id, token);
+    const result = await client.organizations.exportGoogleIssuer(id);
     expectCommon(url, result, 'object');
   });
 

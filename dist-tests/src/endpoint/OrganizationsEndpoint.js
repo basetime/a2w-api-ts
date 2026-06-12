@@ -83,16 +83,10 @@ class OrganizationsEndpoint extends Endpoint_1.default {
         /**
          * Exports a pass type, including its signer certificate, key, and passphrase.
          *
-         * Requires a one-time token obtained from the confirm endpoint.
-         *
          * @param id The ID of the pass type.
-         * @param token The one-time auth token.
          */
-        this.exportPassType = async (id, token) => {
-            const url = this.qb.create('/passTypes/{id}/export')
-                .addParam('id', id)
-                .addQuery('token', token);
-            return await this.do.get(url, PassType_1.PassTypeExportSchema);
+        this.exportPassType = async (id) => {
+            return await this.do.get(`/passTypes/${id}/export`, PassType_1.PassTypeExportSchema);
         };
         /**
          * Returns the Google Wallet issuers for the authenticated organization.
@@ -105,16 +99,10 @@ class OrganizationsEndpoint extends Endpoint_1.default {
         /**
          * Exports a Google issuer, including its service-account credentials.
          *
-         * Requires a one-time token obtained from the confirm endpoint.
-         *
          * @param id The ID of the Google issuer.
-         * @param token The one-time auth token.
          */
-        this.exportGoogleIssuer = async (id, token) => {
-            const url = this.qb.create('/googleIssuers/{id}/export')
-                .addParam('id', id)
-                .addQuery('token', token);
-            return await this.do.get(url, GoogleIssuer_1.GoogleIssuerExportSchema);
+        this.exportGoogleIssuer = async (id) => {
+            return await this.do.get(`/googleIssuers/${id}/export`, GoogleIssuer_1.GoogleIssuerExportSchema);
         };
         /**
          * Returns an API key by ID.

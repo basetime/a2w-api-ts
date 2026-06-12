@@ -42,8 +42,7 @@ export type PassType = z.infer<typeof PassTypeSchema>;
 /**
  * Schema for the full pass type returned by the export endpoint.
  *
- * Includes the signer certificate, key, and passphrase. Only retrievable with a
- * one-time token obtained from the confirm endpoint.
+ * Includes the signer certificate, key, and passphrase.
  */
 export const PassTypeExportSchema = z
   .object({

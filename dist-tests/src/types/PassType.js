@@ -34,8 +34,7 @@ exports.PassTypeSchema = zod_1.z
 /**
  * Schema for the full pass type returned by the export endpoint.
  *
- * Includes the signer certificate, key, and passphrase. Only retrievable with a
- * one-time token obtained from the confirm endpoint.
+ * Includes the signer certificate, key, and passphrase.
  */
 exports.PassTypeExportSchema = zod_1.z
     .object({

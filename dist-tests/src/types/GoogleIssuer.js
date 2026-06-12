@@ -61,8 +61,7 @@ exports.GoogleIssuerSchema = zod_1.z
 /**
  * Schema for the full Google issuer returned by the export endpoint.
  *
- * Includes the service-account credentials. Only retrievable with a one-time token
- * obtained from the confirm endpoint.
+ * Includes the service-account credentials.
  */
 exports.GoogleIssuerExportSchema = zod_1.z
     .object({

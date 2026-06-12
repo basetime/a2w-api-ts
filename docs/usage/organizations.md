@@ -19,16 +19,12 @@ const passTypes = await client.organizations.getPassTypes();
 console.log(passTypes);
 ```
 
-## `exportPassType(id, token): Promise<PassTypeExport>`
+## `exportPassType(id): Promise<PassTypeExport>`
 
-Exports a pass type, including its signer certificate, key, and passphrase. Requires a
-one-time token obtained from the confirm endpoint.
+Exports a pass type, including its signer certificate, key, and passphrase.
 
 ```ts
-const passType = await client.organizations.exportPassType(
-  'pass.com.example.demo',
-  'one-time-token',
-);
+const passType = await client.organizations.exportPassType('pass.com.example.demo');
 console.log(passType);
 ```
 
@@ -42,13 +38,12 @@ const issuers = await client.organizations.getGoogleIssuers();
 console.log(issuers);
 ```
 
-## `exportGoogleIssuer(id, token): Promise<GoogleIssuerExport>`
+## `exportGoogleIssuer(id): Promise<GoogleIssuerExport>`
 
-Exports a Google issuer, including its service-account credentials. Requires a one-time
-token obtained from the confirm endpoint.
+Exports a Google issuer, including its service-account credentials.
 
 ```ts
-const issuer = await client.organizations.exportGoogleIssuer('issuer-id', 'one-time-token');
+const issuer = await client.organizations.exportGoogleIssuer('issuer-id');
 console.log(issuer);
 ```
 

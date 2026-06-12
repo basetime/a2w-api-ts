@@ -79,8 +79,7 @@ export type GoogleIssuer = z.infer<typeof GoogleIssuerSchema>;
 /**
  * Schema for the full Google issuer returned by the export endpoint.
  *
- * Includes the service-account credentials. Only retrievable with a one-time token
- * obtained from the confirm endpoint.
+ * Includes the service-account credentials.
  */
 export const GoogleIssuerExportSchema = z
   .object({
