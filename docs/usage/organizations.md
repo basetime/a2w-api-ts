@@ -9,6 +9,49 @@ const organization = await client.organizations.getMine();
 console.log(organization);
 ```
 
+## `getPassTypes(): Promise<PassType[]>`
+
+Returns the Apple pass types for the authenticated organization. Sensitive fields
+(signer certificate, key, passphrase) are omitted from the response.
+
+```ts
+const passTypes = await client.organizations.getPassTypes();
+console.log(passTypes);
+```
+
+## `exportPassType(id, token): Promise<PassTypeExport>`
+
+Exports a pass type, including its signer certificate, key, and passphrase. Requires a
+one-time token obtained from the confirm endpoint.
+
+```ts
+const passType = await client.organizations.exportPassType(
+  'pass.com.example.demo',
+  'one-time-token',
+);
+console.log(passType);
+```
+
+## `getGoogleIssuers(): Promise<GoogleIssuer[]>`
+
+Returns the Google Wallet issuers for the authenticated organization. Service-account
+credentials are omitted from the response.
+
+```ts
+const issuers = await client.organizations.getGoogleIssuers();
+console.log(issuers);
+```
+
+## `exportGoogleIssuer(id, token): Promise<GoogleIssuerExport>`
+
+Exports a Google issuer, including its service-account credentials. Requires a one-time
+token obtained from the confirm endpoint.
+
+```ts
+const issuer = await client.organizations.exportGoogleIssuer('issuer-id', 'one-time-token');
+console.log(issuer);
+```
+
 ## `webhooks.getAll(): Promise<Webhook[]>`
 
 Returns all webhooks for the authenticated organization.

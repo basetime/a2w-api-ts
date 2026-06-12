@@ -153,6 +153,20 @@ export {
   type DataStoreSource,
 } from './types/DataStore';
 export {
+  PassTypeSchema,
+  PassTypeExportSchema,
+  type PassType,
+  type PassTypeExport,
+} from './types/PassType';
+export {
+  GoogleIssuerSchema,
+  GoogleIssuerExportSchema,
+  IssuerContactInfoSchema,
+  type GoogleIssuer,
+  type GoogleIssuerExport,
+  type IssuerContactInfo,
+} from './types/GoogleIssuer';
+export {
   ExporterSchema,
   ExporterInputSchema,
   ExporterSourceSchema,

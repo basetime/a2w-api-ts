@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Implement PassType and GoogleIssuer functionalities in OrganizationsEndpoint. (`3c028b8`)
 - Update package.json description to correct capitalization of 'Addtowallet' for consistency.. (`093d64c`)
 
 ## 2.2.1 - 2026-06-11

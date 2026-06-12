@@ -1,7 +1,19 @@
 import { z } from 'zod';
 import { Requester } from '../http/Requester';
 import { ApiKey, ApiKeySchema } from '../types/ApiKey';
+import {
+  GoogleIssuer,
+  GoogleIssuerExport,
+  GoogleIssuerExportSchema,
+  GoogleIssuerSchema,
+} from '../types/GoogleIssuer';
 import { Organization, OrganizationSchema } from '../types/Organization';
+import {
+  PassType,
+  PassTypeExport,
+  PassTypeExportSchema,
+  PassTypeSchema,
+} from '../types/PassType';
 import { ScannerDeviceInfo } from '../types/ScannerDeviceInfo';
 import { ScannerInvite, ScannerInviteSchema } from '../types/ScannerInvite';
 import OrganizationDataStoresEndpoint from './organizations/DataStoresEndpoint';
@@ -115,6 +127,56 @@ export default class OrganizationsEndpoint extends Endpoint {
    */
   public getApiKeys = async (): Promise<ApiKey[]> => {
     return await this.do.get('/apiKeys', z.array(ApiKeySchema));
+  };
+
+  /**
+   * Returns the Apple pass types for the authenticated organization.
+   *
+   * Sensitive fields (signer certificate, key, passphrase) are omitted from the response.
+   */
+  public getPassTypes = async (): Promise<PassType[]> => {
+    return await this.do.get('/passTypes', z.array(PassTypeSchema));
+  };
+
+  /**
+   * Exports a pass type, including its signer certificate, key, and passphrase.
+   *
+   * Requires a one-time token obtained from the confirm endpoint.
+   *
+   * @param id The ID of the pass type.
+   * @param token The one-time auth token.
+   */
+  public exportPassType = async (id: string, token: string): Promise<PassTypeExport> => {
+    const url = this.qb.create('/passTypes/{id}/export')
+      .addParam('id', id)
+      .addQuery('token', token);
+
+    return await this.do.get(url, PassTypeExportSchema);
+  };
+
+  /**
+   * Returns the Google Wallet issuers for the authenticated organization.
+   *
+   * Service-account credentials are omitted from the response.
+   */
+  public getGoogleIssuers = async (): Promise<GoogleIssuer[]> => {
+    return await this.do.get('/googleIssuers', z.array(GoogleIssuerSchema));
+  };
+
+  /**
+   * Exports a Google issuer, including its service-account credentials.
+   *
+   * Requires a one-time token obtained from the confirm endpoint.
+   *
+   * @param id The ID of the Google issuer.
+   * @param token The one-time auth token.
+   */
+  public exportGoogleIssuer = async (id: string, token: string): Promise<GoogleIssuerExport> => {
+    const url = this.qb.create('/googleIssuers/{id}/export')
+      .addParam('id', id)
+      .addQuery('token', token);
+
+    return await this.do.get(url, GoogleIssuerExportSchema);
   };
 
   /**

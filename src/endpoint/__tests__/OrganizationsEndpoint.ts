@@ -133,6 +133,64 @@ describe('OrganizationsEndpoint', () => {
   /**
    *
    */
+  it('getPassTypes() should GET /organization/passTypes', async () => {
+    const url = `${baseUrl}${endpoint}/passTypes?api=true`;
+    fetchMock.get(url, [{ id: 'pass.io.example.demo' }]);
+
+    const result = await client.organizations.getPassTypes();
+    expectCommon(url, result, 'array');
+  });
+
+  /**
+   *
+   */
+  it('exportPassType() should GET /organization/passTypes/:id/export with token query', async () => {
+    const id = 'pass.io.example.demo';
+    const token = 'OTT01';
+    const url = `${baseUrl}${endpoint}/passTypes/${id}/export?token=${token}&api=true`;
+    fetchMock.get(url, {
+      id,
+      signerCert: 'CERT',
+      signerKey: 'KEY',
+      signerKeyPassphrase: '',
+      teamIdentifier: 'TEAM01',
+    });
+
+    const result = await client.organizations.exportPassType(id, token);
+    expectCommon(url, result, 'object');
+  });
+
+  /**
+   *
+   */
+  it('getGoogleIssuers() should GET /organization/googleIssuers', async () => {
+    const url = `${baseUrl}${endpoint}/googleIssuers?api=true`;
+    fetchMock.get(url, [{ id: 'issuer01', name: 'Example Issuer' }]);
+
+    const result = await client.organizations.getGoogleIssuers();
+    expectCommon(url, result, 'array');
+  });
+
+  /**
+   *
+   */
+  it('exportGoogleIssuer() should GET /organization/googleIssuers/:id/export with token query', async () => {
+    const id = 'issuer01';
+    const token = 'OTT01';
+    const url = `${baseUrl}${endpoint}/googleIssuers/${id}/export?token=${token}&api=true`;
+    fetchMock.get(url, {
+      id,
+      name: 'Example Issuer',
+      credentials: '{"type":"service_account"}',
+    });
+
+    const result = await client.organizations.exportGoogleIssuer(id, token);
+    expectCommon(url, result, 'object');
+  });
+
+  /**
+   *
+   */
   it('getApiKey() should GET /organization/apiKeys/:id with scanner query', async () => {
     const id = 'KEY01';
     const scannerStr = encodeURIComponent(JSON.stringify(''));
