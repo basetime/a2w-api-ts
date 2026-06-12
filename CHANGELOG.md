@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.2.3 - 2026-06-12
+
 - Refactor OrganizationsEndpoint to include OrganizationCertsEndpoint. (`b17fb07`)
 
 ## 2.2.2 - 2026-06-12
