@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Enhance documentation for AddToWallet TypeScript Client. (`763df56`)
 - Update logo in documentation and remove unused cache files. (`43e1491`)
 
 ## 2.2.3 - 2026-06-12
