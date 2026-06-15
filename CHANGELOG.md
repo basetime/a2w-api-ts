@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Update logo in documentation and remove unused cache files. (`43e1491`)
+
 ## 2.2.3 - 2026-06-12
 
 - Refactor OrganizationsEndpoint to include OrganizationCertsEndpoint. (`b17fb07`)

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { withBase } from 'vitepress';
 
-const LOGO_URL = 'https://cdn.addtowallet.io/img/a2w-api-ts-logo.png';
+const LOGO_URL = 'https://cdn.addtowallet.io/img/a2w-api-logo.png';
 const homeHref = withBase('/');
 </script>
 

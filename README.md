@@ -1,4 +1,4 @@
-![Logo](https://cdn.addtowallet.io/img/a2w-api-ts-logo.png)
+![Logo](https://cdn.addtowallet.io/img/a2w-api-logo.png)
 
 **Full documentation:** [https://basetime.github.io/a2w-api-ts/](https://basetime.github.io/a2w-api-ts/)
 
