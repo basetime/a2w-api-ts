@@ -1,6 +1,6 @@
 ![Logo](https://cdn.addtowallet.io/img/a2w-api-logo.png)
 
-# AddToWallet TypeScript Client
+# Addtowallet TypeScript Client
 
 `@basetime/a2w-api-ts` is a Node.js and TypeScript client for the [Addtowallet](https://addtowallet.io) platform. Construct a `Client`, authenticate with API keys or OAuth, and call typed helpers for campaigns, passes, templates, scanners, workflows, and more.
 
