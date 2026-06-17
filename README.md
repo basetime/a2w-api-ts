@@ -1,5 +1,7 @@
 ![Logo](https://cdn.addtowallet.io/img/a2w-api-logo.png)
 
+THIS REPO HAS BEEN MOVED TO https://github.com/addtowallet/sdk
+
 **Full documentation:** [https://basetime.github.io/a2w-api-ts/](https://basetime.github.io/a2w-api-ts/)
 
 **TypeScript client for the AddToWallet API**
